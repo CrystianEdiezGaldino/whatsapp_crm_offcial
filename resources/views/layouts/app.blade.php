@@ -122,6 +122,10 @@
         @endif
     </div>
 
+    <!-- Feedback Containers -->
+    <div id="feedback-toast-container" class="fixed bottom-6 right-6 w-96 max-w-full z-40"></div>
+    <div id="feedback-modal-container"></div>
+
     @stack('scripts')
 </body>
 </html>
