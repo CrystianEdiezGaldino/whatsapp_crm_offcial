@@ -198,6 +198,50 @@
             </div>
         </div>
 
+        <!-- Previous Conversations History -->
+        @if($previousConversations->count() > 0)
+        <div class="border-b border-outline-variant bg-surface-container-low">
+            <details class="group cursor-pointer">
+                <summary class="p-3 flex items-center gap-2 text-sm font-semibold text-on-surface hover:bg-surface-container transition-colors list-none">
+                    <span class="material-symbols-outlined text-lg group-open:hidden">expand_more</span>
+                    <span class="material-symbols-outlined text-lg hidden group-open:inline">expand_less</span>
+                    <span class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">history</span>
+                        Histórico de Atendimentos
+                        <span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full">{{ $previousConversations->count() }}</span>
+                    </span>
+                </summary>
+                <div class="space-y-2 p-3 border-t border-outline-variant bg-white">
+                    @foreach($previousConversations as $prev)
+                    <div class="p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors">
+                        <div class="flex justify-between items-start gap-2 mb-1">
+                            <div>
+                                <p class="text-xs font-bold text-on-surface">
+                                    {{ $prev->created_at->format('d/m/Y \à\s H:i') }}
+                                </p>
+                                @php
+                                    $lastClaim = $prev->claims()->latest('claimed_at')->first();
+                                @endphp
+                                @if($lastClaim)
+                                <p class="text-[11px] text-on-surface-variant mt-0.5">
+                                    👤 {{ $lastClaim->user->name ?? 'Agente desconhecido' }}
+                                </p>
+                                @endif
+                            </div>
+                            <span class="text-[10px] font-bold text-white bg-green-600 px-2 py-1 rounded">✓ Resolvido</span>
+                        </div>
+                        @if($prev->lastMessage)
+                        <p class="text-xs text-on-surface-variant mt-1 line-clamp-2">
+                            {{ $prev->lastMessage->content ?? '(Sem mensagens de texto)' }}
+                        </p>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </details>
+        </div>
+        @endif
+
         <!-- Messages -->
         <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
             <div class="flex justify-center">

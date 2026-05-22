@@ -25,6 +25,7 @@ class ConversationController extends Controller
 
         $conversations = $query->orderBy('last_message_at', 'desc')->get();
         $activeConversation = null;
+        $previousConversations = [];
         $macros = Macro::where('user_id', Auth::id())->orWhereNull('user_id')->get();
 
         if ($request->filled('conversation')) {
@@ -34,6 +35,17 @@ class ConversationController extends Controller
                 'activeClaim.user',
                 'messages' => fn($q) => $q->orderBy('created_at', 'asc'),
             ])->find($request->conversation);
+
+            // Load previous conversations with same contact
+            if ($activeConversation) {
+                $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
+                    ->where('contact_id', $activeConversation->contact_id)
+                    ->where('id', '!=', $activeConversation->id)
+                    ->where('status', 'resolved')
+                    ->orderBy('created_at', 'desc')
+                    ->limit(10)
+                    ->get();
+            }
         } elseif ($conversations->count() > 0) {
             $activeConversation = Conversation::with([
                 'contact',
@@ -43,7 +55,7 @@ class ConversationController extends Controller
             ])->find($conversations->first()->id);
         }
 
-        return view('conversations.index', compact('conversations', 'activeConversation', 'macros'));
+        return view('conversations.index', compact('conversations', 'activeConversation', 'previousConversations', 'macros'));
     }
 
     public function sendMessage(Request $request)
@@ -236,5 +248,28 @@ class ConversationController extends Controller
     {
         $conversation->update(['status' => 'closed']);
         return redirect()->route('conversations.index');
+    }
+
+    public function history(Conversation $conversation)
+    {
+        $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
+            ->where('contact_id', $conversation->contact_id)
+            ->where('id', '!=', $conversation->id)
+            ->where('status', 'closed')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'history' => $previousConversations->map(fn($conv) => [
+                'id' => $conv->id,
+                'created_at' => $conv->created_at->format('d/m/Y H:i'),
+                'resolved_at' => $conv->updated_at->format('d/m/Y H:i'),
+                'claimed_by' => $conv->claims()->latest('claimed_at')->first()?->user->name ?? 'Desconhecido',
+                'last_message' => $conv->lastMessage?->content ?? '(Sem mensagens)',
+                'message_count' => $conv->messages()->count(),
+            ]),
+        ]);
     }
 }
