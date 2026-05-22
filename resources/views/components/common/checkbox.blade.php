@@ -5,6 +5,7 @@
     'value' => '1',
     'label' => null,
     'checked' => false,
+    'disabled' => false,
     'class' => '',
 ])
 
@@ -19,6 +20,7 @@
         value="{{ $value }}"
         class="w-4 h-4 rounded border-outline-variant cursor-pointer accent-secondary {{ $class }}"
         @if($checked) checked @endif
+        @if($disabled) disabled @endif
     >
     @if($label)
         <span class="text-sm text-on-surface">{{ $label }}</span>
