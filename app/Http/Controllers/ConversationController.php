@@ -275,8 +275,6 @@ class ConversationController extends Controller
 
     public function showHistoryConversation(Conversation $conversation)
     {
-        $this->authorize('view', $conversation);
-
         $messages = $conversation->messages()
             ->with(['conversation.contact'])
             ->orderBy('created_at', 'asc')
