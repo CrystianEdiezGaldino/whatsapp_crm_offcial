@@ -714,10 +714,15 @@
             const usersResponse = await fetch('/api/agents', {
                 headers: apiJsonHeaders(),
             });
+
+            if (!usersResponse.ok) {
+                throw new Error(`HTTP ${usersResponse.status}: ${usersResponse.statusText}`);
+            }
+
             const usersData = await parseJsonResponse(usersResponse);
 
-            if (!usersData.success || !usersData.agents) {
-                throw new Error('Não foi possível carregar a lista de agentes');
+            if (!usersData.success || !usersData.agents || usersData.agents.length === 0) {
+                throw new Error('Nenhum agente disponível');
             }
 
             // Criar um modal simples com seletor

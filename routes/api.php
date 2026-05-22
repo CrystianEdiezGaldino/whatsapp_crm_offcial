@@ -9,10 +9,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Illuminate\Http\Reques
 });
 
 // Lista de agentes para transferência
-Route::middleware('auth:sanctum')->get('/agents', function () {
-    $agents = User::where('role', '!=', 'admin')
-        ->orWhere('role', 'admin')
-        ->select('id', 'name', 'email', 'role')
+Route::middleware('auth')->get('/agents', function () {
+    $agents = User::select('id', 'name', 'email', 'role')
         ->orderBy('name')
         ->get();
 
