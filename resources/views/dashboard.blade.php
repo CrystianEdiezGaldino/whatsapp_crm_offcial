@@ -243,6 +243,7 @@
                     </thead>
                     <tbody class="divide-y divide-outline-variant/50">
                         @foreach($pendingChats as $chat)
+                        @if($chat->contact)
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
@@ -270,6 +271,7 @@
                                 </form>
                             </td>
                         </tr>
+                        @endif
                         @endforeach
                     </tbody>
                 </table>
