@@ -66,7 +66,7 @@ class DiagnoseWebhook extends Command
         if (empty($webhookLines)) {
             $this->line('  <fg=yellow>Nenhuma mensagem webhook encontrada nos últimos logs</>');
         } else {
-            $this->line("  <fg=green>Encontrados " . count($webhookLines) . " eventos webhook:</>');
+            $this->line("  <fg=green>Encontrados " . count($webhookLines) . " eventos webhook:</>");
             foreach (array_slice($webhookLines, -5) as $line) {
                 $this->line('    ' . trim($line));
             }
