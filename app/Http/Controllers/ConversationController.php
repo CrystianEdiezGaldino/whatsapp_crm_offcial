@@ -43,7 +43,7 @@ class ConversationController extends Controller
             ])->find($request->conversation);
 
             // Load previous conversations with same contact
-            if ($activeConversation) {
+            if ($activeConversation?->contact) {
                 $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
                     ->where('contact_id', $activeConversation->contact_id)
                     ->where('id', '!=', $activeConversation->id)
