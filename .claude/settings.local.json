@@ -55,7 +55,8 @@
       "Bash(Select-Object -First 50)",
       "Bash(Format-Table -AutoSize)",
       "Bash(cat)",
-      "Bash(bash /tmp/create_docs.sh)"
+      "Bash(bash /tmp/create_docs.sh)",
+      "mcp__plugin_claude-mem_mcp-search__smart_search"
     ]
   }
 }

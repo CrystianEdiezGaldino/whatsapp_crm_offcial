@@ -211,6 +211,34 @@ class WhatsAppService
         }
     }
 
+    public function getContactProfilePhoto(string $phone): ?string
+    {
+        try {
+            $normalizedPhone = PhoneNormalizer::forApi($phone);
+            $response = $this->client->get("{$normalizedPhone}/profile_photo", [
+                'query' => ['format' => 'url'],
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+            $photoUrl = $data['profile_photo_url'] ?? null;
+
+            if (!$photoUrl) {
+                Log::info('WhatsApp no profile photo found', ['phone' => $phone]);
+                return null;
+            }
+
+            Log::info('WhatsApp profile photo fetched', ['phone' => $phone, 'url' => $photoUrl]);
+            return $photoUrl;
+        } catch (ClientException $e) {
+            $error = $this->parseApiError($e);
+            Log::warning('WhatsApp profile photo not available', ['phone' => $phone, 'error' => $error]);
+            return null;
+        } catch (\Exception $e) {
+            Log::error('WhatsApp profile photo fetch failed', ['phone' => $phone, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
     public function sendTemplate(string $to, string $templateName, string $language = 'pt_BR', array $components = []): ?array
     {
         $payload = [
@@ -284,6 +312,15 @@ class WhatsAppService
         $contact = Contact::findOrCreateByPhone($phone, [
             'name' => $contactInfo['profile']['name'] ?? $phone,
         ]);
+
+        // Fetch and store profile photo if not already present
+        if (!$contact->profile_photo_url) {
+            $whatsapp = new self();
+            $profilePhotoUrl = $whatsapp->getContactProfilePhoto($phone);
+            if ($profilePhotoUrl) {
+                $contact->update(['profile_photo_url' => $profilePhotoUrl]);
+            }
+        }
 
         $conversation = Conversation::firstOrCreate(
             ['contact_id' => $contact->id, 'status' => 'open'],
