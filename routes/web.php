@@ -10,6 +10,7 @@ use App\Http\Controllers\MacroController;
 use App\Http\Controllers\MacroFileController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DocumentationController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -51,6 +52,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/export-conversations', [ReportController::class, 'exportConversations'])->name('reports.export-conversations');
     });
 });
+
+Route::get('/docs', [DocumentationController::class, 'index'])->name('documentation.index');
+Route::get('/docs/components/{component}', [DocumentationController::class, 'component'])->name('documentation.component');
 
 Route::get('/', function () {
     return redirect()->route('dashboard');

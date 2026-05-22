@@ -1,0 +1,28 @@
+﻿@extends('layouts.app')
+
+@section('content')
+<div class="min-h-screen bg-background">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <div class="mb-12">
+            <a href="{{ route('documentation.index') }}" class="text-secondary hover:text-secondary/80 flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined">arrow_back</span>
+                <span>Back to Components</span>
+            </a>
+            <h1 class="text-4xl font-bold text-on-surface mb-4">breadcrumb.Value.ToUpper()readcrumb Component</h1>
+            <p class="text-lg text-on-surface-variant">Navigation breadcrumbs</p>
+        </div>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-on-surface mb-6">Documentation</h2>
+            <x-card>
+                <p class="text-on-surface-variant">Detailed documentation for the breadcrumb component coming soon.</p>
+                <div class="mt-6 pt-6 border-t border-outline-variant">
+                    <x-button href="{{ route('documentation.index') }}" variant="secondary">
+                        Back to All Components
+                    </x-button>
+                </div>
+            </x-card>
+        </section>
+    </div>
+</div>
+@endsection
