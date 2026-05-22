@@ -159,15 +159,24 @@
             </div>
             <div class="flex gap-2">
                 @if(!$activeClaim)
-                    <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                        <span class="material-symbols-outlined text-base">done</span> Clamar
-                    </button>
+                    @if($isAdmin)
+                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                            <span class="material-symbols-outlined text-base">assignment</span> Transferir para Mim
+                        </button>
+                        <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                            <span class="material-symbols-outlined text-base">person_add</span> Transferir Para
+                        </button>
+                    @else
+                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                            <span class="material-symbols-outlined text-base">done</span> Clamar
+                        </button>
+                    @endif
                 @elseif($hasMyClaim)
                     <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-warning text-on-warning px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
                         <span class="material-symbols-outlined text-base">lock_open</span> Liberar
                     </button>
                 @endif
-                @if($isAdmin && $activeClaim)
+                @if($isAdmin && $activeClaim && !$hasMyClaim)
                     <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
                         <span class="material-symbols-outlined text-base">person_add</span> Reatribuir
                     </button>
@@ -332,7 +341,7 @@
                 @csrf
                 <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
                 <div class="relative">
-                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm" placeholder="Escreva uma mensagem... (digite / para macros)"></textarea>
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim && $isAdmin) disabled title="Clique em 'Transferir para mim' para reivindicar esta conversa" @endif></textarea>
 
                     <!-- Macros Menu -->
                     <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
@@ -700,16 +709,64 @@
     }
 
     async function openReassignModal(conversationId) {
-        const userList = prompt('Digite o ID do novo agente (ou deixe em branco para cancelar)');
-        if (!userList) return;
-
         try {
+            // Fetch lista de agentes
+            const usersResponse = await fetch('/api/agents', {
+                headers: apiJsonHeaders(),
+            });
+            const usersData = await parseJsonResponse(usersResponse);
+
+            if (!usersData.success || !usersData.agents) {
+                throw new Error('Não foi possível carregar a lista de agentes');
+            }
+
+            // Criar um modal simples com seletor
+            const selectedUserId = await new Promise((resolve) => {
+                const agents = usersData.agents;
+                let html = '<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">';
+
+                agents.forEach(agent => {
+                    html += `<div style="padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; hover: background-color: #f5f5f5;" onclick="document.reassignSelectedId='${agent.id}'; this.closest('#reassignModal').style.display='none';">
+                        <strong>${agent.name}</strong> ${agent.email ? '(' + agent.email + ')' : ''}
+                    </div>`;
+                });
+                html += '</div>';
+
+                const modal = document.createElement('div');
+                modal.id = 'reassignModal';
+                modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+
+                modal.innerHTML = `
+                    <div style="background:white;padding:24px;border-radius:12px;max-width:500px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+                        <h2 style="margin-top:0;margin-bottom:16px;font-size:18px;font-weight:bold;">Transferir Para</h2>
+                        ${html}
+                        <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;">
+                            <button onclick="this.closest('#reassignModal').remove();document.reassignSelectedId=null;" style="padding:8px 16px;border:1px solid #ddd;border-radius:6px;background:white;cursor:pointer;">Cancelar</button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+                document.reassignSelectedId = null;
+
+                // Aguardar clique
+                const checkInterval = setInterval(() => {
+                    if (!document.getElementById('reassignModal')) {
+                        clearInterval(checkInterval);
+                        resolve(document.reassignSelectedId);
+                    }
+                }, 100);
+            });
+
+            if (!selectedUserId) return;
+
+            // Executar reatribuição
             const response = await fetch(`/conversations/${conversationId}/reassign`, {
                 method: 'PATCH',
                 headers: apiJsonHeaders(),
                 body: JSON.stringify({
-                    user_id: parseInt(userList, 10),
-                    reason: 'Admin reatribuiu via interface',
+                    user_id: parseInt(selectedUserId, 10),
+                    reason: 'Admin transferiu via interface',
                 }),
             });
             const data = await parseJsonResponse(response);
