@@ -600,7 +600,7 @@
         });
     }
 
-    @if($activeConversation)
+    @if($activeConversation?->contact)
     const chatInbox = new ChatInboxHelper({
         chatEl: chatEl,
         contactName: @json($activeConversation->contact->name),
