@@ -13,10 +13,13 @@ class ConversationClaimController extends Controller
 {
     public function claim(Conversation $conversation)
     {
-        if ($conversation->hasActiveClaim()) {
+        $activeClaim = $conversation->getActiveClaim();
+
+        // Se há um claim ativo e não é do usuário atual e ele não é admin, rejeita
+        if ($activeClaim && $activeClaim->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este atendimento já foi clamado por ' . $conversation->getActiveClaim()->user->name,
+                'message' => 'Este atendimento já foi clamado por ' . $activeClaim->user->name,
             ], 422);
         }
 
