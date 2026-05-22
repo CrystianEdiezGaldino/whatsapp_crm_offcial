@@ -401,6 +401,9 @@
                     </div>
 
                     <div class="absolute right-4 bottom-4 flex items-center gap-2 text-on-surface-variant">
+                        <button type="button" id="emojiBtn" class="hover:text-primary transition-colors relative" title="Adicionar emoji">
+                            <span class="text-xl">😊</span>
+                        </button>
                         <label class="cursor-pointer hover:text-primary transition-colors" title="Enviar arquivo">
                             <span class="material-symbols-outlined">attach_file</span>
                             <input type="file" name="attachment" id="fileInput" class="hidden" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt">
@@ -411,6 +414,11 @@
                         <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform">
                             <span class="material-symbols-outlined">send</span>
                         </button>
+                    </div>
+
+                    <!-- Emoji Picker -->
+                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 w-80 p-3">
+                        <div class="grid grid-cols-6 gap-2" id="emojiGrid"></div>
                     </div>
                 </div>
             </form>
@@ -1018,6 +1026,49 @@
             showPendingNotification(sender);
             if (originalShowNotificationToast) originalShowNotificationToast(sender, message);
         };
+    }
+
+    // ===== Emoji Picker =====
+    const emojiBtn = document.getElementById('emojiBtn');
+    const emojiPicker = document.getElementById('emojiPicker');
+    const emojiGrid = document.getElementById('emojiGrid');
+
+    const emojis = [
+        '😊', '😂', '❤️', '👍', '🙏', '✨', '🎉', '🎁',
+        '👏', '💪', '🔥', '⭐', '✅', '❌', '⚠️', '💡',
+        '🚀', '📱', '💻', '⏰', '📧', '📞', '🏠', '🛒',
+        '💰', '💳', '📦', '🚚', '✏️', '📝', '📄', '🔔',
+        '🎯', '📊', '📈', '🎓', '👨‍💼', '👩‍💼', '👥', '🤝',
+        '😍', '😎', '🤔', '😅', '😢', '😡', '😴', '🤷',
+    ];
+
+    function initEmojiPicker() {
+        emojiGrid.innerHTML = emojis.map(emoji =>
+            `<button type="button" onclick="insertEmoji('${emoji}')"
+             class="text-2xl p-2 rounded-lg hover:bg-surface-container transition-colors">${emoji}</button>`
+        ).join('');
+    }
+
+    function insertEmoji(emoji) {
+        if (messageInput) {
+            messageInput.value += emoji;
+            messageInput.focus();
+            emojiPicker.classList.add('hidden');
+        }
+    }
+
+    if (emojiBtn) {
+        initEmojiPicker();
+        emojiBtn.addEventListener('click', () => {
+            emojiPicker.classList.toggle('hidden');
+        });
+
+        // Close emoji picker when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+                emojiPicker.classList.add('hidden');
+            }
+        });
     }
 
     // ===== History Modal =====
