@@ -260,6 +260,7 @@
         @endif
 
         <!-- Chat Input -->
+        @if($hasMyClaim || $isAdmin)
         <div class="p-4 bg-white border-t border-outline-variant">
             <!-- File Preview -->
             <div id="filePreview" class="hidden mb-2 bg-surface-container-low border border-outline-variant rounded-lg p-3 flex items-center gap-3">
@@ -300,6 +301,21 @@
                 </div>
             </form>
         </div>
+        @else
+        <!-- Chat Bloqueado - Precisa Clamar -->
+        <div class="p-6 bg-red-50 border-t border-red-200 flex flex-col items-center justify-center gap-4">
+            <div class="text-center">
+                <span class="material-symbols-outlined text-4xl text-red-500 block mb-2">lock</span>
+                <h3 class="text-sm font-semibold text-red-900 mb-1">Atendimento Indisponível</h3>
+                <p class="text-xs text-red-700 mb-4">Este atendimento foi reivindicado por <strong>{{ $activeClaim->user->name }}</strong></p>
+                <p class="text-xs text-red-600">Você precisa reivindicar este atendimento para poder responder.</p>
+            </div>
+            <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1.5 transition-all active:scale-95">
+                <span class="material-symbols-outlined text-base">done</span>
+                Reivindicar Atendimento
+            </button>
+        </div>
+        @endif
         @else
         <!-- No conversation selected -->
         <div class="flex-1 flex items-center justify-center">
