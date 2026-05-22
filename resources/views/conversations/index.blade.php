@@ -278,7 +278,13 @@
                 @csrf
                 <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
                 <div class="relative">
-                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm" placeholder="Escreva uma mensagem..."></textarea>
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm" placeholder="Escreva uma mensagem... (digite / para macros)"></textarea>
+
+                    <!-- Macros Menu -->
+                    <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
+                        <div id="macrosMenuItems" class="space-y-1 p-2"></div>
+                    </div>
+
                     <div class="absolute right-4 bottom-4 flex items-center gap-2 text-on-surface-variant">
                         <label class="cursor-pointer hover:text-primary transition-colors" title="Enviar arquivo">
                             <span class="material-symbols-outlined">attach_file</span>
@@ -635,5 +641,162 @@
             window.Feedback?.error('Erro: ' + e.message) || alert('Erro: ' + e.message);
         }
     }
+
+    // ===== Macros Menu com Slash Command =====
+    const macrosData = @json($macros ?? []);
+    const messageInput = document.getElementById('messageInput');
+    const macrosMenu = document.getElementById('macrosMenu');
+    const macrosMenuItems = document.getElementById('macrosMenuItems');
+
+    let allMacros = [];
+    let selectedMacroIndex = -1;
+
+    // Flatten macros from grouped structure
+    Object.values(macrosData).forEach(categoryMacros => {
+        if (Array.isArray(categoryMacros)) {
+            allMacros.push(...categoryMacros);
+        }
+    });
+
+    function getMacrosQuery() {
+        const text = messageInput.value;
+        const slashIndex = text.lastIndexOf('/');
+
+        if (slashIndex === -1) return null;
+
+        const afterSlash = text.substring(slashIndex + 1);
+        const beforeSlash = text.substring(0, slashIndex);
+
+        // Se tem espaço antes do /, não é comando
+        if (beforeSlash && !beforeSlash.match(/[\s\n]$/)) return null;
+
+        return { query: afterSlash.toLowerCase(), slashPos: slashIndex };
+    }
+
+    function filterMacros(query) {
+        if (query === '') {
+            return allMacros;
+        }
+
+        return allMacros.filter(macro =>
+            macro.name.toLowerCase().includes(query) ||
+            macro.shortcut?.toLowerCase().includes(query) ||
+            macro.content.toLowerCase().substring(0, 50).includes(query)
+        );
+    }
+
+    function renderMacrosMenu(query) {
+        const filtered = filterMacros(query);
+
+        if (filtered.length === 0) {
+            macrosMenuItems.innerHTML = '<div class="px-3 py-2 text-xs text-on-surface-variant text-center">Nenhuma macro encontrada</div>';
+            selectedMacroIndex = -1;
+            return;
+        }
+
+        selectedMacroIndex = -1;
+        macrosMenuItems.innerHTML = filtered.map((macro, index) => `
+            <button type="button"
+                class="macro-menu-item w-full text-left px-3 py-2 rounded-lg hover:bg-surface-container transition-colors text-sm"
+                data-index="${index}"
+                data-macro-id="${macro.id}"
+                data-content="${macro.content.replace(/"/g, '&quot;')}">
+                <div class="font-semibold text-on-surface text-sm">${macro.name}</div>
+                <div class="text-xs text-on-surface-variant line-clamp-1">${macro.content.substring(0, 60)}...</div>
+                ${macro.shortcut ? `<div class="text-[10px] text-secondary font-mono mt-0.5">/${macro.shortcut}</div>` : ''}
+            </button>
+        `).join('');
+
+        // Add click handlers
+        document.querySelectorAll('.macro-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                selectMacro(parseInt(item.dataset.index));
+            });
+        });
+    }
+
+    function showMacrosMenu() {
+        const query = getMacrosQuery();
+
+        if (!query) {
+            macrosMenu.classList.add('hidden');
+            return;
+        }
+
+        renderMacrosMenu(query.query);
+        macrosMenu.classList.remove('hidden');
+    }
+
+    function selectMacro(index) {
+        const query = getMacrosQuery();
+        if (!query) return;
+
+        const filtered = filterMacros(query.query);
+        if (index < 0 || index >= filtered.length) return;
+
+        const macro = filtered[index];
+        const text = messageInput.value;
+        const beforeSlash = text.substring(0, query.slashPos);
+
+        messageInput.value = beforeSlash + macro.content;
+        messageInput.focus();
+
+        macrosMenu.classList.add('hidden');
+
+        // Auto-scroll to bottom
+        messageInput.scrollTop = messageInput.scrollHeight;
+    }
+
+    function updateMenuSelection(direction) {
+        const query = getMacrosQuery();
+        if (!query) return;
+
+        const filtered = filterMacros(query.query);
+
+        if (direction === 'down') {
+            selectedMacroIndex = (selectedMacroIndex + 1) % filtered.length;
+        } else if (direction === 'up') {
+            selectedMacroIndex = selectedMacroIndex === -1 ? filtered.length - 1 : selectedMacroIndex - 1;
+        }
+
+        updateMenuVisuals(filtered);
+    }
+
+    function updateMenuVisuals(filtered) {
+        document.querySelectorAll('.macro-menu-item').forEach((item, idx) => {
+            item.classList.toggle('bg-surface-container', idx === selectedMacroIndex);
+        });
+    }
+
+    // Event listeners
+    messageInput.addEventListener('input', showMacrosMenu);
+
+    messageInput.addEventListener('keydown', (e) => {
+        const query = getMacrosQuery();
+        if (!query || macrosMenu.classList.contains('hidden')) return;
+
+        const filtered = filterMacros(query.query);
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            updateMenuSelection('down');
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            updateMenuSelection('up');
+        } else if (e.key === 'Enter' && selectedMacroIndex >= 0) {
+            e.preventDefault();
+            selectMacro(selectedMacroIndex);
+        } else if (e.key === 'Escape') {
+            macrosMenu.classList.add('hidden');
+        }
+    });
+
+    // Close menu on outside click
+    document.addEventListener('click', (e) => {
+        if (!messageInput.contains(e.target) && !macrosMenu.contains(e.target)) {
+            macrosMenu.classList.add('hidden');
+        }
+    });
 </script>
 @endpush
