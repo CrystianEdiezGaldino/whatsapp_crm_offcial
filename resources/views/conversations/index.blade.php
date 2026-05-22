@@ -71,7 +71,7 @@
                 $shouldShow = !request('status') || (request('status') === 'pending' && $convPending);
             @endphp
             @if($shouldShow && $conv->contact)
-            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : ($convPending ? 'bg-red-50 border-error hover:bg-red-100' : 'border-transparent hover:bg-surface-container-low') }}">
+            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : ($convPending ? 'bg-red-50 border-error hover:bg-red-100' : 'border-transparent hover:bg-surface-container-low') }}" data-claim-info="{{ $convPending ? '⏱️ Pendente' : '🔒 ' . ($conv->getActiveClaim()?->user->name ?? 'Sem atribuição') }}">
                 <div class="relative shrink-0">
                     <div class="w-12 h-12 rounded-full {{ $convPending ? 'bg-error' : 'bg-primary-fixed' }} flex items-center justify-center font-bold text-sm {{ $convPending ? 'text-on-error' : 'text-on-primary-fixed' }}">
                         {{ $conv->contact->initials }}
@@ -85,7 +85,9 @@
                         <div class="flex-1 min-w-0">
                             <h3 class="text-sm font-bold {{ $convPending ? 'text-error' : 'text-on-surface' }} truncate">{{ $conv->contact->name }}</h3>
                             @if($convPending)
-                            <span class="text-[10px] text-error font-semibold">⏱ Aguardando atendimento</span>
+                            <span class="text-[10px] text-error font-semibold">⏱️ Pendente</span>
+                            @else
+                            <span class="text-[10px] text-yellow-700 font-semibold">🔒 {{ $conv->getActiveClaim()?->user->name ?? 'Sem atribuição' }}</span>
                             @endif
                         </div>
                         <span class="text-[11px] text-on-surface-variant shrink-0">{{ $conv->last_message_at?->diffForHumans(short: true) }}</span>
@@ -141,17 +143,23 @@
                 </div>
                 <div class="flex-1">
                     <h2 class="text-sm font-bold text-on-surface">{{ $activeConversation->contact->name }}</h2>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <p class="text-xs text-secondary font-semibold">{{ $activeConversation->contact->phone }}</p>
                         @php
                             $activeClaim = $activeConversation->getActiveClaim();
                             $isAdmin = Auth::user()->isAdmin();
                             $hasMyClaim = $activeClaim && $activeClaim->user_id === Auth::id();
                         @endphp
-                        @if($activeClaim)
+                        @if(!$activeClaim)
+                            <span class="text-[11px] bg-red-100 text-red-800 px-2 py-0.5 rounded flex items-center gap-1">
+                                <span>⏱️</span> Aguardando atendimento
+                            </span>
+                        @else
                             <span class="text-[11px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded flex items-center gap-1">
-                                <span class="material-symbols-outlined text-xs">lock</span>
-                                {{ $activeClaim->user->name }}
+                                <span>🔒</span> Clamado por: {{ $activeClaim->user->name }}
+                                @if($hasMyClaim)
+                                <span class="ml-1 text-green-600 font-bold">(Você)</span>
+                                @endif
                             </span>
                         @endif
                     </div>
@@ -341,7 +349,7 @@
                 @csrf
                 <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
                 <div class="relative">
-                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim && $isAdmin) disabled title="Clique em 'Transferir para mim' para reivindicar esta conversa" @endif></textarea>
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim) disabled @if($isAdmin) title="Clique em 'Transferir para mim' para reivindicar esta conversa" @else title="Este atendimento foi clamado por {{ $activeClaim->user->name }}" @endif @endif></textarea>
 
                     <!-- Macros Menu -->
                     <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
