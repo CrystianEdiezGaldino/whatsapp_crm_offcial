@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback System Security Tests</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script src="feedback-system.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            padding: 10px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        #feedback-modal-container,
+        #feedback-toast-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        #feedback-modal-container > * {
+            pointer-events: auto;
+        }
+        #feedback-toast-container {
+            pointer-events: auto;
+            bottom: auto;
+            top: 20px;
+            right: 20px;
+            left: auto;
+            width: auto;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Feedback System XSS Security Tests</h1>
+    <p>These tests verify that HTML/JavaScript injections in titles, messages, and callbacks are properly escaped and never executed.</p>
+
+    <div class="test-section">
+        <h2>Test 1: HTML Injection in confirm() title</h2>
+        <p>This test passes an &lt;img&gt; tag with onerror handler in the title parameter.</p>
+        <button onclick="testConfirmTitleInjection()">Run Test</button>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: HTML Injection in confirm() message</h2>
+        <p>This test passes a &lt;script&gt; tag in the message parameter.</p>
+        <button onclick="testConfirmMessageInjection()">Run Test</button>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: HTML Injection in alert() title</h2>
+        <p>This test passes an &lt;img&gt; tag with onerror handler in the alert title.</p>
+        <button onclick="testAlertTitleInjection()">Run Test</button>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: HTML Injection in alert() message</h2>
+        <p>This test passes a &lt;script&gt; tag in the alert message.</p>
+        <button onclick="testAlertMessageInjection()">Run Test</button>
+        <div id="test4-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 5: HTML Injection in toast() message</h2>
+        <p>This test passes an &lt;img&gt; tag with onerror handler in the toast message.</p>
+        <button onclick="testToastInjection()">Run Test</button>
+        <div id="test5-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 6: Callback functions execute safely</h2>
+        <p>This test verifies that callbacks are executed properly when buttons are clicked.</p>
+        <button onclick="testCallbackExecution()">Run Test</button>
+        <div id="test6-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 7: DOM Inspection - No innerHTML from user input</h2>
+        <p>This test inspects the DOM to verify no user input was set via innerHTML.</p>
+        <button onclick="testDOMInspection()">Run Test</button>
+        <div id="test7-result"></div>
+    </div>
+
+    <!-- Containers for modals and toasts -->
+    <div id="feedback-modal-container"></div>
+    <div id="feedback-toast-container"></div>
+
+    <script>
+        // Track if XSS attempted to execute
+        window.xssAttempted = false;
+        window.xssPayloads = [];
+
+        // Override alert to detect XSS attempts
+        const originalAlert = window.alert;
+        window.alert = function(msg) {
+            window.xssAttempted = true;
+            window.xssPayloads.push('alert: ' + msg);
+            console.warn('XSS ATTEMPT DETECTED: alert() called with:', msg);
+        };
+
+        function showResult(elementId, passed, message) {
+            const el = document.getElementById(elementId);
+            el.className = passed ? 'test-result pass' : 'test-result fail';
+            el.textContent = passed ? '✓ PASS: ' + message : '✗ FAIL: ' + message;
+        }
+
+        function testConfirmTitleInjection() {
+            window.xssAttempted = false;
+            window.xssPayloads = [];
+
+            const xssPayload = '<img src=x onerror="window.xssAttempted=true; alert(\'XSS in title\')">';
+
+            Feedback.confirm(
+                xssPayload,
+                'Normal message',
+                () => console.log('Confirmed'),
+                () => console.log('Cancelled')
+            );
+
+            // Wait a moment for any XSS to execute
+            setTimeout(() => {
+                const modal = document.querySelector('[id^="confirm-modal-"]');
+                if (!modal) {
+                    showResult('test1-result', false, 'Modal not created');
+                    return;
+                }
+
+                const titleElement = modal.querySelector('h3');
+                const titleText = titleElement ? titleElement.textContent : '';
+
+                if (window.xssAttempted) {
+                    showResult('test1-result', false, 'XSS payload executed - onerror handler fired');
+                } else if (titleText === xssPayload && titleElement.innerHTML !== xssPayload) {
+                    showResult('test1-result', true, 'HTML payload displayed as plain text (textContent used safely)');
+                } else {
+                    showResult('test1-result', false, 'Unexpected DOM state: ' + titleElement.innerHTML);
+                }
+
+                // Cleanup
+                modal.remove();
+            }, 100);
+        }
+
+        function testConfirmMessageInjection() {
+            window.xssAttempted = false;
+            window.xssPayloads = [];
+
+            const xssPayload = '<script>window.xssAttempted=true; alert("XSS in message")</script>';
+
+            Feedback.confirm(
+                'Normal title',
+                xssPayload,
+                () => console.log('Confirmed'),
+                () => console.log('Cancelled')
+            );
+
+            setTimeout(() => {
+                const modal = document.querySelector('[id^="confirm-modal-"]');
+                if (!modal) {
+                    showResult('test2-result', false, 'Modal not created');
+                    return;
+                }
+
+                const messageElement = modal.querySelector('p');
+                const messageText = messageElement ? messageElement.textContent : '';
+
+                if (window.xssAttempted) {
+                    showResult('test2-result', false, 'XSS payload executed - script tag executed');
+                } else if (messageText === xssPayload && messageElement.innerHTML !== xssPayload) {
+                    showResult('test2-result', true, 'Script tag displayed as plain text (textContent used safely)');
+                } else {
+                    showResult('test2-result', false, 'Unexpected DOM state');
+                }
+
+                modal.remove();
+            }, 100);
+        }
+
+        function testAlertTitleInjection() {
+            window.xssAttempted = false;
+            window.xssPayloads = [];
+
+            const xssPayload = '<img src=x onerror="window.xssAttempted=true; alert(\'XSS in alert title\')">';
+
+            Feedback.alert(xssPayload, 'Normal message');
+
+            setTimeout(() => {
+                const modal = document.querySelector('[id^="alert-modal-"]');
+                if (!modal) {
+                    showResult('test3-result', false, 'Alert modal not created');
+                    return;
+                }
+
+                const titleElement = modal.querySelector('h3');
+                const titleText = titleElement ? titleElement.textContent : '';
+
+                if (window.xssAttempted) {
+                    showResult('test3-result', false, 'XSS payload executed - onerror handler fired');
+                } else if (titleText === xssPayload && titleElement.innerHTML !== xssPayload) {
+                    showResult('test3-result', true, 'HTML payload displayed as plain text (textContent used safely)');
+                } else {
+                    showResult('test3-result', false, 'Unexpected DOM state');
+                }
+
+                modal.remove();
+            }, 100);
+        }
+
+        function testAlertMessageInjection() {
+            window.xssAttempted = false;
+            window.xssPayloads = [];
+
+            const xssPayload = '<svg/onload="window.xssAttempted=true; alert(\'XSS in alert message\')">';
+
+            Feedback.alert('Normal title', xssPayload);
+
+            setTimeout(() => {
+                const modal = document.querySelector('[id^="alert-modal-"]');
+                if (!modal) {
+                    showResult('test4-result', false, 'Alert modal not created');
+                    return;
+                }
+
+                const messageElement = modal.querySelector('p');
+                const messageText = messageElement ? messageElement.textContent : '';
+
+                if (window.xssAttempted) {
+                    showResult('test4-result', false, 'XSS payload executed - onload handler fired');
+                } else if (messageText === xssPayload && messageElement.innerHTML !== xssPayload) {
+                    showResult('test4-result', true, 'SVG/onload payload displayed as plain text');
+                } else {
+                    showResult('test4-result', false, 'Unexpected DOM state');
+                }
+
+                modal.remove();
+            }, 100);
+        }
+
+        function testToastInjection() {
+            window.xssAttempted = false;
+            window.xssPayloads = [];
+
+            const xssPayload = '<img src=x onerror="window.xssAttempted=true; alert(\'XSS in toast\')">';
+
+            Feedback.toast(xssPayload, 'error', 5000);
+
+            setTimeout(() => {
+                const toastContainer = document.getElementById('feedback-toast-container');
+                const toast = toastContainer.querySelector('.toast');
+
+                if (!toast) {
+                    showResult('test5-result', false, 'Toast not created');
+                    return;
+                }
+
+                const messageElement = toast.querySelector('p');
+                const messageText = messageElement ? messageElement.textContent : '';
+
+                if (window.xssAttempted) {
+                    showResult('test5-result', false, 'XSS payload executed - onerror handler fired');
+                } else if (messageText === xssPayload && messageElement.innerHTML !== xssPayload) {
+                    showResult('test5-result', true, 'HTML payload in toast displayed as plain text');
+                } else {
+                    showResult('test5-result', false, 'Unexpected DOM state');
+                }
+
+                toast.remove();
+            }, 100);
+        }
+
+        function testCallbackExecution() {
+            let confirmCalled = false;
+            let cancelCalled = false;
+
+            Feedback.confirm(
+                'Test Callbacks',
+                'Click confirm or cancel to test callbacks',
+                () => { confirmCalled = true; console.log('Confirm callback executed'); },
+                () => { cancelCalled = true; console.log('Cancel callback executed'); }
+            );
+
+            setTimeout(() => {
+                const modal = document.querySelector('[id^="confirm-modal-"]');
+                if (!modal) {
+                    showResult('test6-result', false, 'Modal not created');
+                    return;
+                }
+
+                // Simulate confirm button click
+                const buttons = modal.querySelectorAll('button');
+                if (buttons.length >= 2) {
+                    buttons[1].click(); // Confirm button
+
+                    setTimeout(() => {
+                        if (confirmCalled && !cancelCalled) {
+                            showResult('test6-result', true, 'Callback functions execute safely and independently');
+                        } else {
+                            showResult('test6-result', false, 'Callback execution failed: confirm=' + confirmCalled + ', cancel=' + cancelCalled);
+                        }
+                    }, 50);
+                } else {
+                    showResult('test6-result', false, 'Buttons not found in modal');
+                }
+            }, 100);
+        }
+
+        function testDOMInspection() {
+            const xssPayload = '<img src=x onerror="alert(\'XSS\')">';
+
+            Feedback.confirm(
+                xssPayload,
+                xssPayload,
+                () => {},
+                () => {}
+            );
+
+            setTimeout(() => {
+                const modal = document.querySelector('[id^="confirm-modal-"]');
+                if (!modal) {
+                    showResult('test7-result', false, 'Modal not created');
+                    return;
+                }
+
+                const titleElement = modal.querySelector('h3');
+                const messageElement = modal.querySelector('p');
+
+                // Check if innerHTML contains the payload
+                const titleHasPayload = titleElement.innerHTML.includes('<img') || titleElement.innerHTML.includes('onerror');
+                const messageHasPayload = messageElement.innerHTML.includes('<img') || messageElement.innerHTML.includes('onerror');
+
+                if (!titleHasPayload && !messageHasPayload) {
+                    showResult('test7-result', true, 'DOM inspection: No HTML tags in innerHTML from user input (all safely escaped)');
+                } else {
+                    showResult('test7-result', false, 'DOM inspection: User input found in innerHTML - potential XSS vector');
+                }
+
+                modal.remove();
+            }, 100);
+        }
+    </script>
+</body>
+</html>

@@ -11,6 +11,7 @@ use App\Http\Controllers\MacroFileController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DocumentationController;
+use App\Http\Controllers\WebhookController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -55,6 +56,10 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/docs', [DocumentationController::class, 'index'])->name('documentation.index');
 Route::get('/docs/components/{component}', [DocumentationController::class, 'component'])->name('documentation.component');
+
+// Webhook Debug (apenas em desenvolvimento)
+Route::get('/webhook/debug', [WebhookController::class, 'debug'])->name('webhook.debug');
+Route::post('/webhook/debug', [WebhookController::class, 'debug']);
 
 Route::get('/', function () {
     return redirect()->route('dashboard');

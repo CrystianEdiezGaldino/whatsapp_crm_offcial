@@ -11,12 +11,21 @@ class MacroController extends Controller
     public function index()
     {
         $macros = Macro::where('user_id', Auth::id())
+            ->withCount('files')
             ->orderBy('category')
             ->orderBy('name')
             ->get()
             ->groupBy('category');
 
-        return view('macros.index', compact('macros'));
+        $allMacros = $macros->flatten();
+        $stats = [
+            'total' => $allMacros->count(),
+            'with_files' => $allMacros->where('files_count', '>', 0)->count(),
+            'categories' => $macros->count(),
+            'with_shortcut' => $allMacros->filter(fn ($m) => filled($m->shortcut))->count(),
+        ];
+
+        return view('macros.index', compact('macros', 'stats'));
     }
 
     public function store(Request $request)
