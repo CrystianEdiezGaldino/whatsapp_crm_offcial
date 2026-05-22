@@ -56,7 +56,8 @@
       "Bash(Format-Table -AutoSize)",
       "Bash(cat)",
       "Bash(bash /tmp/create_docs.sh)",
-      "mcp__plugin_claude-mem_mcp-search__smart_search"
+      "mcp__plugin_claude-mem_mcp-search__smart_search",
+      "Bash(php -l app/Console/Commands/DiagnoseWebhook.php)"
     ]
   }
 }

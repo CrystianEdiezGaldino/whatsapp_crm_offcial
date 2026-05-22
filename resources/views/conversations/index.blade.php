@@ -717,6 +717,10 @@
     const macrosMenu = document.getElementById('macrosMenu');
     const macrosMenuItems = document.getElementById('macrosMenuItems');
 
+    // Only initialize macros menu if the input exists (i.e., user has claimed the conversation)
+    if (!messageInput || !macrosMenu) {
+        console.log('Macros menu skipped: chat input not available');
+    } else {
     let allMacros = [];
     let selectedMacroIndex = -1;
 
@@ -867,6 +871,7 @@
             macrosMenu.classList.add('hidden');
         }
     });
+    } // End of macros menu initialization
 
     // ===== Notificação de Novo Atendimento Pendente =====
     function showPendingNotification(contactName) {
