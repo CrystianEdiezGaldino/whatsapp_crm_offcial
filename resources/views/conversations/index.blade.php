@@ -578,16 +578,8 @@
         });
     }
 
-    // ===== Notificações em tempo real via Laravel Echo =====
-    // Global listener para recarregar a página quando houver nova mensagem
-    if (typeof window.Echo !== 'undefined') {
-        Echo.channel('conversations.all')
-            .listen('message.received', (event) => {
-                console.log('[Echo Global] Nova mensagem recebida');
-                // Recarregar página após 1.5s para atualizar lista de conversas
-                setTimeout(() => window.location.reload(), 1500);
-            });
-    }
+    // ===== Notificações em tempo real =====
+    // Polling will handle message notifications
 
     if (typeof window.Echo !== 'undefined' && @if($activeConversation) true @else false @endif) {
         const conversationId = {{ $activeConversation->id ?? 'null' }};
@@ -625,23 +617,7 @@
             setTimeout(() => toast.classList.add('hidden'), 5000);
         }
 
-        // Listener Echo para mensagens recebidas
-        Echo.channel(`conversation.${conversationId}`)
-            .listen('message.received', (event) => {
-                console.log('[Echo] Nova mensagem recebida:', event);
-
-                // Reproduzir som
-                playNotificationSound();
-
-                // Mostrar notificação desktop
-                showDesktopNotification(event.sender_name, event.content);
-
-                // Mostrar toast inline
-                showNotificationToast(event.sender_name, event.content);
-
-                // Recarregar página para atualizar lista de conversas e contagens
-                setTimeout(() => window.location.reload(), 1500);
-            });
+        // Polling will handle message notifications
 
         // Solicitar permissão de notificação desktop
         if (Notification.permission === 'default') {
