@@ -43,7 +43,7 @@
                         @endif
                     </div>
                     <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="editMacro({{ $macro->id }}, '{{ addslashes($macro->name) }}', '{{ addslashes($macro->content) }}', '{{ $macro->shortcut }}', '{{ $macro->category }}')" class="p-1 hover:bg-surface-container-high text-on-surface-variant rounded transition-colors">
+                        <button onclick="editMacro({{ $macro->id }}, @json($macro->name), @json($macro->content), @json($macro->shortcut), @json($macro->category))" class="p-1 hover:bg-surface-container-high text-on-surface-variant rounded transition-colors">
                             <span class="material-symbols-outlined text-lg">edit</span>
                         </button>
                         <form method="POST" action="{{ route('macros.destroy', $macro) }}" class="inline" onsubmit="return confirm('Remover macro?')">
@@ -234,7 +234,7 @@ function deleteFile(fileId) {
 
     fetch(`{{ url('/macros') }}/${currentMacroId}/files/${fileId}`, {
         method: 'DELETE',
-        headers: {'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''},
+        headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
     })
     .then(r => r.json())
     .then(data => {
@@ -258,7 +258,7 @@ if (macroFileInput) {
 
         fetch(`{{ url('/macros') }}/${currentMacroId}/files`, {
             method: 'POST',
-            headers: {'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''},
+            headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
             body: formData,
         })
         .then(r => r.json())

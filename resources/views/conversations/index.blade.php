@@ -93,7 +93,7 @@
                         @php
                             $activeClaim = $activeConversation->getActiveClaim();
                             $isAdmin = Auth::user()->isAdmin();
-                            $hasMyClain = $activeClaim && $activeClaim->user_id === Auth::id();
+                            $hasMyClaim = $activeClaim && $activeClaim->user_id === Auth::id();
                         @endphp
                         @if($activeClaim)
                             <span class="text-[11px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded flex items-center gap-1">
@@ -109,7 +109,7 @@
                     <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
                         <span class="material-symbols-outlined text-base">done</span> Clamar
                     </button>
-                @elseif($hasMyClain)
+                @elseif($hasMyClaim)
                     <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-warning text-on-warning px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
                         <span class="material-symbols-outlined text-base">lock_open</span> Liberar
                     </button>
@@ -179,7 +179,7 @@
                         </div>
                         @endif
                         @if($msg->content)
-                        <div class="bg-white p-4 rounded-xl {{ $msg->media_url ? 'rounded-bl-none' : 'rounded-bl-none' }} border border-outline-variant shadow-sm">
+                        <div class="bg-white p-4 rounded-xl rounded-bl-none border border-outline-variant shadow-sm">
                             <p class="text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
                         </div>
                         @endif
@@ -555,73 +555,85 @@
     }
 
     // ===== Funções de Claim/Release =====
-    function claimConversation(conversationId) {
-        fetch(`/conversations/${conversationId}/claim`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '',
-            },
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                location.reload();
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(e => alert('Erro: ' + e.message));
+    function apiJsonHeaders() {
+        return {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+        };
     }
 
-    function releaseConversation(conversationId) {
+    async function parseJsonResponse(response) {
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (_) {
+            throw new Error('Resposta inválida do servidor (HTTP ' + response.status + ')');
+        }
+    }
+
+    async function claimConversation(conversationId) {
+        try {
+            const response = await fetch(`/conversations/${conversationId}/claim`, {
+                method: 'POST',
+                headers: apiJsonHeaders(),
+            });
+            const data = await parseJsonResponse(response);
+            if (data.success) {
+                window.Feedback?.success(data.message) || alert(data.message);
+                location.reload();
+            } else {
+                window.Feedback?.error(data.message) || alert(data.message);
+            }
+        } catch (e) {
+            window.Feedback?.error('Erro: ' + e.message) || alert('Erro: ' + e.message);
+        }
+    }
+
+    async function releaseConversation(conversationId) {
         if (!confirm('Tem certeza que deseja liberar este atendimento?')) return;
 
-        fetch(`/conversations/${conversationId}/claim`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '',
-            },
-        })
-        .then(r => r.json())
-        .then(data => {
+        try {
+            const response = await fetch(`/conversations/${conversationId}/claim`, {
+                method: 'DELETE',
+                headers: apiJsonHeaders(),
+            });
+            const data = await parseJsonResponse(response);
             if (data.success) {
-                alert(data.message);
+                window.Feedback?.success(data.message) || alert(data.message);
                 location.reload();
             } else {
-                alert(data.message);
+                window.Feedback?.error(data.message) || alert(data.message);
             }
-        })
-        .catch(e => alert('Erro: ' + e.message));
+        } catch (e) {
+            window.Feedback?.error('Erro: ' + e.message) || alert('Erro: ' + e.message);
+        }
     }
 
-    function openReassignModal(conversationId) {
+    async function openReassignModal(conversationId) {
         const userList = prompt('Digite o ID do novo agente (ou deixe em branco para cancelar)');
         if (!userList) return;
 
-        fetch(`/conversations/${conversationId}/reassign`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '',
-            },
-            body: JSON.stringify({
-                user_id: parseInt(userList),
-                reason: 'Admin reatribuiu via interface',
-            }),
-        })
-        .then(r => r.json())
-        .then(data => {
+        try {
+            const response = await fetch(`/conversations/${conversationId}/reassign`, {
+                method: 'PATCH',
+                headers: apiJsonHeaders(),
+                body: JSON.stringify({
+                    user_id: parseInt(userList, 10),
+                    reason: 'Admin reatribuiu via interface',
+                }),
+            });
+            const data = await parseJsonResponse(response);
             if (data.success) {
-                alert(data.message);
+                window.Feedback?.success(data.message) || alert(data.message);
                 location.reload();
             } else {
-                alert(data.message);
+                window.Feedback?.error(data.message) || alert(data.message);
             }
-        })
-        .catch(e => alert('Erro: ' + e.message));
+        } catch (e) {
+            window.Feedback?.error('Erro: ' + e.message) || alert('Erro: ' + e.message);
+        }
     }
 </script>
 @endpush
