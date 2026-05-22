@@ -41,7 +41,7 @@ class ConversationController extends Controller
                 $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
                     ->where('contact_id', $activeConversation->contact_id)
                     ->where('id', '!=', $activeConversation->id)
-                    ->where('status', 'resolved')
+                    ->where('status', 'closed')
                     ->orderBy('created_at', 'desc')
                     ->limit(10)
                     ->get();

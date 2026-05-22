@@ -65,7 +65,8 @@
       "Bash(Select-Object -First 5 FullName)",
       "Bash(xargs grep -l \"NotificationManager\")",
       "Bash(node -c \"F:/BACKUP/whatsapp/smcc-whatsapp/resources/js/notifications.js\")",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(xargs grep -l \"conversations\")"
     ]
   }
 }
