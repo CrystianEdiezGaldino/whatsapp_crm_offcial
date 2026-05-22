@@ -828,12 +828,17 @@
     let allMacros = [];
     let selectedMacroIndex = -1;
 
-    // Flatten macros from grouped structure
-    Object.values(macrosData).forEach(categoryMacros => {
-        if (Array.isArray(categoryMacros)) {
-            allMacros.push(...categoryMacros);
-        }
-    });
+    // Handle both array and grouped structure
+    if (Array.isArray(macrosData)) {
+        allMacros = macrosData;
+    } else {
+        // Flatten macros from grouped structure
+        Object.values(macrosData).forEach(categoryMacros => {
+            if (Array.isArray(categoryMacros)) {
+                allMacros.push(...categoryMacros);
+            }
+        });
+    }
 
     function getMacrosQuery() {
         const text = messageInput.value;
