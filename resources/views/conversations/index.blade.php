@@ -70,7 +70,7 @@
                 $convPending = !$conv->getActiveClaim();
                 $shouldShow = !request('status') || (request('status') === 'pending' && $convPending);
             @endphp
-            @if($shouldShow)
+            @if($shouldShow && $conv->contact)
             <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : ($convPending ? 'bg-red-50 border-error hover:bg-red-100' : 'border-transparent hover:bg-surface-container-low') }}">
                 <div class="relative shrink-0">
                     <div class="w-12 h-12 rounded-full {{ $convPending ? 'bg-error' : 'bg-primary-fixed' }} flex items-center justify-center font-bold text-sm {{ $convPending ? 'text-on-error' : 'text-on-primary-fixed' }}">
