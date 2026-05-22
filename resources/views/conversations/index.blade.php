@@ -36,31 +36,72 @@
 
     <!-- Left: Conversation List -->
     <section class="w-[360px] border-r border-outline-variant bg-white flex flex-col overflow-hidden shrink-0">
-        <div class="p-4 border-b border-outline-variant flex justify-between items-center">
-            <h2 class="text-lg font-semibold text-on-surface">Chats Ativos</h2>
-            <div class="flex gap-1">
-                <a href="{{ route('conversations.index') }}" class="px-2 py-1 text-xs rounded {{ !request('assigned') ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">Todos</a>
+        <div class="p-4 border-b border-outline-variant">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold text-on-surface">Chats Ativos</h2>
+                @php
+                    $pendingCount = $conversations->filter(fn($c) => !$c->getActiveClaim())->count();
+                    $totalCount = $conversations->count();
+                @endphp
+                @if($pendingCount > 0)
+                <span class="bg-error text-on-error text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
+                    {{ $pendingCount }} pendente{{ $pendingCount !== 1 ? 's' : '' }}
+                </span>
+                @endif
+            </div>
+            <div class="flex gap-1 flex-wrap">
+                <a href="{{ route('conversations.index') }}" class="px-2 py-1 text-xs rounded {{ !request('assigned') && !request('status') ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">
+                    Todos
+                    <span class="text-[10px] ml-1 opacity-75">({{ $totalCount }})</span>
+                </a>
+                <a href="{{ route('conversations.index', ['status' => 'pending']) }}" class="px-2 py-1 text-xs rounded flex items-center gap-1 {{ request('status') === 'pending' ? 'bg-error text-on-error font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">
+                    <span class="material-symbols-outlined text-[14px]">schedule</span>
+                    Pendentes
+                    @if($pendingCount > 0)
+                    <span class="text-[10px] ml-1 font-bold">{{ $pendingCount }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('conversations.index', ['assigned' => 'mine']) }}" class="px-2 py-1 text-xs rounded {{ request('assigned') === 'mine' ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">Meus</a>
             </div>
         </div>
         <div class="flex-1 overflow-y-auto custom-scrollbar">
             @forelse($conversations as $conv)
-            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : 'border-transparent hover:bg-surface-container-low' }}">
+            @php
+                $convPending = !$conv->getActiveClaim();
+                $shouldShow = !request('status') || (request('status') === 'pending' && $convPending);
+            @endphp
+            @if($shouldShow)
+            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : ($convPending ? 'bg-red-50 border-error hover:bg-red-100' : 'border-transparent hover:bg-surface-container-low') }}">
                 <div class="relative shrink-0">
-                    <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-on-primary-fixed">
+                    <div class="w-12 h-12 rounded-full {{ $convPending ? 'bg-error' : 'bg-primary-fixed' }} flex items-center justify-center font-bold text-sm {{ $convPending ? 'text-on-error' : 'text-on-primary-fixed' }}">
                         {{ $conv->contact->initials }}
                     </div>
+                    @if($convPending)
+                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-error text-on-error rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white">!</span>
+                    @endif
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-start">
-                        <h3 class="text-sm font-bold text-on-surface truncate">{{ $conv->contact->name }}</h3>
-                        <span class="text-[11px] text-on-surface-variant shrink-0 ml-2">{{ $conv->last_message_at?->diffForHumans(short: true) }}</span>
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold {{ $convPending ? 'text-error' : 'text-on-surface' }} truncate">{{ $conv->contact->name }}</h3>
+                            @if($convPending)
+                            <span class="text-[10px] text-error font-semibold">⏱ Aguardando atendimento</span>
+                            @endif
+                        </div>
+                        <span class="text-[11px] text-on-surface-variant shrink-0">{{ $conv->last_message_at?->diffForHumans(short: true) }}</span>
                     </div>
                     <p class="text-sm text-on-surface-variant truncate mt-0.5">{{ $conv->lastMessage?->content ?? 'Sem mensagens' }}</p>
                 </div>
             </a>
+            @endif
             @empty
-            <div class="p-8 text-center text-on-surface-variant text-sm">Nenhuma conversa ativa.</div>
+            <div class="p-8 text-center text-on-surface-variant text-sm">
+                @if(request('status') === 'pending')
+                    ✓ Nenhum atendimento pendente!
+                @else
+                    Nenhuma conversa ativa.
+                @endif
+            </div>
             @endforelse
         </div>
     </section>
@@ -68,14 +109,26 @@
     <!-- Center: Chat -->
     <section class="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
         <!-- Toast de Notificação -->
-        <div id="notificationToast" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 z-50 max-w-xs">
+        <div id="notificationToast" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 z-50 max-w-xs animate-slideInUp">
             <div class="flex items-center gap-3">
-                <span class="text-lg">📩</span>
+                <span class="text-lg" id="toastIcon">📩</span>
                 <div class="flex-1">
                     <p class="text-sm font-semibold" id="toastSender">Novo contato</p>
                     <p class="text-xs opacity-90" id="toastMessage">Você tem uma mensagem</p>
                 </div>
-                <button onclick="document.getElementById('notificationToast').classList.add('hidden')" class="text-white hover:opacity-75">✕</button>
+                <button onclick="document.getElementById('notificationToast').classList.add('hidden')" class="text-white hover:opacity-75 flex-shrink-0">✕</button>
+            </div>
+        </div>
+
+        <!-- Notification Badge for Pending Chats -->
+        <div id="pendingBadge" class="fixed top-20 right-6 bg-error text-on-error p-4 rounded-xl shadow-lg hidden transition-all duration-300 z-50 max-w-xs">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-2xl">schedule</span>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold">Novo Atendimento Pendente</p>
+                    <p class="text-xs opacity-90" id="pendingName">Aguardando sua ação</p>
+                </div>
+                <button onclick="document.getElementById('pendingBadge').classList.add('hidden')" class="text-on-error hover:opacity-75 flex-shrink-0">✕</button>
             </div>
         </div>
 
@@ -814,5 +867,43 @@
             macrosMenu.classList.add('hidden');
         }
     });
+
+    // ===== Notificação de Novo Atendimento Pendente =====
+    function showPendingNotification(contactName) {
+        const badge = document.getElementById('pendingBadge');
+        const toast = document.getElementById('notificationToast');
+
+        if (!badge) return;
+
+        // Se há conversa ativa e é sobre outra conversa, mostrar badge de pendente
+        if (@if($activeConversation) true @else false @endif && contactName !== @json($activeConversation->contact->name ?? null)) {
+            // Nova conversa pendente, não é a atual
+            document.getElementById('pendingName').textContent = contactName + ' aguardando resposta';
+            badge.classList.remove('hidden');
+
+            // Auto-hide after 7 seconds
+            setTimeout(() => badge.classList.add('hidden'), 7000);
+        } else if (!toast || toast.classList.contains('hidden')) {
+            // Mostrar toast normal
+            document.getElementById('toastIcon').textContent = '🔔';
+            document.getElementById('toastSender').textContent = contactName || 'Novo Contato';
+            document.getElementById('toastMessage').textContent = 'Novo atendimento aguardando';
+
+            if (toast) {
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 6000);
+            }
+        }
+    }
+
+    // Interceptar evento de nova conversa criada
+    const originalShowNotificationToast = window.showNotificationToast;
+    if (@if($activeConversation) false @else true @endif) {
+        // Se não há conversa ativa, toda nova mensagem é um novo atendimento
+        window.showNotificationToast = function(sender, message) {
+            showPendingNotification(sender);
+            if (originalShowNotificationToast) originalShowNotificationToast(sender, message);
+        };
+    }
 </script>
 @endpush
