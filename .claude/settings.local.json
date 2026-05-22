@@ -57,7 +57,15 @@
       "Bash(cat)",
       "Bash(bash /tmp/create_docs.sh)",
       "mcp__plugin_claude-mem_mcp-search__smart_search",
-      "Bash(php -l app/Console/Commands/DiagnoseWebhook.php)"
+      "Bash(php -l app/Console/Commands/DiagnoseWebhook.php)",
+      "Bash(Get-ChildItem -Path \"F:\\\\BACKUP\\\\whatsapp\\\\smcc-whatsapp\" -Recurse -Directory -Name)",
+      "Bash(node -c resources/js/polling.js)",
+      "Bash(node -c \"F:/BACKUP/whatsapp/smcc-whatsapp/resources/js/conversation-polling.js\")",
+      "Bash(Get-ChildItem -Path \"F:\\\\BACKUP\\\\whatsapp\\\\smcc-whatsapp\" -Recurse -Include \"*.md\")",
+      "Bash(Select-Object -First 5 FullName)",
+      "Bash(xargs grep -l \"NotificationManager\")",
+      "Bash(node -c \"F:/BACKUP/whatsapp/smcc-whatsapp/resources/js/notifications.js\")",
+      "Read(//tmp/**)"
     ]
   }
 }
