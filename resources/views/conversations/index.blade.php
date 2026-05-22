@@ -1,0 +1,627 @@
+@extends('layouts.app', ['hideSidebar' => true])
+
+@section('title', 'Chats')
+
+@section('content')
+<div class="flex h-[calc(100vh)] w-full">
+    <!-- Mini Sidebar -->
+    <aside class="w-[68px] h-screen bg-primary-container flex flex-col items-center py-4 border-r border-outline-variant shrink-0 z-50">
+        <div class="w-10 h-10 bg-secondary-fixed rounded flex items-center justify-center mb-6">
+            <span class="material-symbols-outlined text-on-secondary-fixed text-lg">hub</span>
+        </div>
+        <nav class="flex-1 flex flex-col items-center gap-2">
+            @php $current = request()->route()->getName() ?? ''; @endphp
+            <a href="{{ route('dashboard') }}" title="Dashboard" class="w-10 h-10 rounded-lg flex items-center justify-center {{ $current === 'dashboard' ? 'bg-surface-container-highest/10 text-secondary-container' : 'text-on-primary-container/70 hover:bg-primary/50 hover:text-on-primary' }} transition-colors">
+                <span class="material-symbols-outlined text-xl">dashboard</span>
+            </a>
+            <a href="{{ route('conversations.index') }}" title="Chats" class="w-10 h-10 rounded-lg flex items-center justify-center {{ str_starts_with($current, 'conversations') ? 'bg-surface-container-highest/10 text-secondary-container' : 'text-on-primary-container/70 hover:bg-primary/50 hover:text-on-primary' }} transition-colors">
+                <span class="material-symbols-outlined text-xl">chat</span>
+            </a>
+            <a href="{{ route('contacts.index') }}" title="Contatos" class="w-10 h-10 rounded-lg flex items-center justify-center text-on-primary-container/70 hover:bg-primary/50 hover:text-on-primary transition-colors">
+                <span class="material-symbols-outlined text-xl">person_book</span>
+            </a>
+            <a href="{{ route('macros.index') }}" title="Macros" class="w-10 h-10 rounded-lg flex items-center justify-center text-on-primary-container/70 hover:bg-primary/50 hover:text-on-primary transition-colors">
+                <span class="material-symbols-outlined text-xl">bolt</span>
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" title="Sair" class="w-10 h-10 rounded-lg flex items-center justify-center text-on-primary-container/70 hover:text-on-primary transition-colors">
+                    <span class="material-symbols-outlined text-xl">logout</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Left: Conversation List -->
+    <section class="w-[360px] border-r border-outline-variant bg-white flex flex-col overflow-hidden shrink-0">
+        <div class="p-4 border-b border-outline-variant flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-on-surface">Chats Ativos</h2>
+            <div class="flex gap-1">
+                <a href="{{ route('conversations.index') }}" class="px-2 py-1 text-xs rounded {{ !request('assigned') ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">Todos</a>
+                <a href="{{ route('conversations.index', ['assigned' => 'mine']) }}" class="px-2 py-1 text-xs rounded {{ request('assigned') === 'mine' ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">Meus</a>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar">
+            @forelse($conversations as $conv)
+            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : 'border-transparent hover:bg-surface-container-low' }}">
+                <div class="relative shrink-0">
+                    <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-on-primary-fixed">
+                        {{ $conv->contact->initials }}
+                    </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-sm font-bold text-on-surface truncate">{{ $conv->contact->name }}</h3>
+                        <span class="text-[11px] text-on-surface-variant shrink-0 ml-2">{{ $conv->last_message_at?->diffForHumans(short: true) }}</span>
+                    </div>
+                    <p class="text-sm text-on-surface-variant truncate mt-0.5">{{ $conv->lastMessage?->content ?? 'Sem mensagens' }}</p>
+                </div>
+            </a>
+            @empty
+            <div class="p-8 text-center text-on-surface-variant text-sm">Nenhuma conversa ativa.</div>
+            @endforelse
+        </div>
+    </section>
+
+    <!-- Center: Chat -->
+    <section class="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+        <!-- Toast de Notificação -->
+        <div id="notificationToast" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 z-50 max-w-xs">
+            <div class="flex items-center gap-3">
+                <span class="text-lg">📩</span>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold" id="toastSender">Novo contato</p>
+                    <p class="text-xs opacity-90" id="toastMessage">Você tem uma mensagem</p>
+                </div>
+                <button onclick="document.getElementById('notificationToast').classList.add('hidden')" class="text-white hover:opacity-75">✕</button>
+            </div>
+        </div>
+
+        @if($activeConversation)
+        <!-- Chat Header -->
+        <div class="p-4 bg-white border-b border-outline-variant flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-3 flex-1">
+                <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-on-primary-fixed">
+                    {{ $activeConversation->contact->initials }}
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-sm font-bold text-on-surface">{{ $activeConversation->contact->name }}</h2>
+                    <div class="flex items-center gap-2">
+                        <p class="text-xs text-secondary font-semibold">{{ $activeConversation->contact->phone }}</p>
+                        @php
+                            $activeClaim = $activeConversation->getActiveClaim();
+                            $isAdmin = Auth::user()->isAdmin();
+                            $hasMyClain = $activeClaim && $activeClaim->user_id === Auth::id();
+                        @endphp
+                        @if($activeClaim)
+                            <span class="text-[11px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">lock</span>
+                                {{ $activeClaim->user->name }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                @if(!$activeClaim)
+                    <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                        <span class="material-symbols-outlined text-base">done</span> Clamar
+                    </button>
+                @elseif($hasMyClain)
+                    <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-warning text-on-warning px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                        <span class="material-symbols-outlined text-base">lock_open</span> Liberar
+                    </button>
+                @endif
+                @if($isAdmin && $activeClaim)
+                    <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                        <span class="material-symbols-outlined text-base">person_add</span> Reatribuir
+                    </button>
+                @endif
+                <form method="POST" action="{{ route('conversations.resolve', $activeConversation) }}" class="inline">
+                    @csrf @method('PATCH')
+                    <button type="submit" class="bg-error text-on-error px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                        <span class="material-symbols-outlined text-base">done_all</span> Encerrar
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+            <div class="flex justify-center">
+                <span class="text-[11px] uppercase text-on-surface-variant bg-surface-container py-1 px-3 rounded-full tracking-wider">
+                    {{ $activeConversation->created_at->format('d/m/Y') }}
+                </span>
+            </div>
+            @foreach($activeConversation->messages as $msg)
+                @if($msg->direction === 'inbound')
+                <!-- Customer Message -->
+                <div class="flex items-end gap-3 max-w-[80%]">
+                    <div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-[10px] text-on-primary-fixed shrink-0">
+                        {{ $activeConversation->contact->initials }}
+                    </div>
+                    <div>
+                        @if($msg->media_url)
+                        <div class="mb-1 rounded-lg overflow-hidden">
+                            @if(str_starts_with($msg->mime_type ?? '', 'image/'))
+                            <a href="{{ Storage::url($msg->media_url) }}" target="_blank">
+                                <img src="{{ Storage::url($msg->media_url) }}" alt="{{ $msg->media_filename ?? 'Imagem' }}" class="max-w-[280px] max-h-[240px] rounded-lg object-cover border border-outline-variant cursor-pointer hover:opacity-90 transition-opacity">
+                            </a>
+                            @elseif(str_starts_with($msg->mime_type ?? '', 'audio/'))
+                            <div class="bg-white border border-outline-variant rounded-lg p-3 min-w-[260px]">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="material-symbols-outlined text-primary text-lg">mic</span>
+                                    <p class="text-xs font-bold text-on-surface truncate flex-1">{{ $msg->media_filename ?? 'Audio' }}</p>
+                                    <a href="{{ Storage::url($msg->media_url) }}" download class="material-symbols-outlined text-on-surface-variant text-base hover:text-primary">download</a>
+                                </div>
+                                <audio controls class="w-full h-8" preload="metadata">
+                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ $msg->mime_type ?? 'audio/mpeg' }}">
+                                </audio>
+                            </div>
+                            @elseif(str_starts_with($msg->mime_type ?? '', 'video/'))
+                            <div class="bg-white border border-outline-variant rounded-lg overflow-hidden max-w-[300px]">
+                                <video controls class="w-full max-h-[200px]" preload="metadata">
+                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ $msg->mime_type ?? 'video/mp4' }}">
+                                </video>
+                            </div>
+                            @else
+                            <div class="bg-white border border-outline-variant rounded-lg p-3 flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary text-2xl">description</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-on-surface truncate">{{ $msg->media_filename ?? 'Arquivo' }}</p>
+                                    <p class="text-[10px] text-on-surface-variant">{{ $msg->mime_type ?? '' }}</p>
+                                </div>
+                                <a href="{{ Storage::url($msg->media_url) }}" download class="material-symbols-outlined text-on-surface-variant text-lg hover:text-primary">download</a>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+                        @if($msg->content)
+                        <div class="bg-white p-4 rounded-xl {{ $msg->media_url ? 'rounded-bl-none' : 'rounded-bl-none' }} border border-outline-variant shadow-sm">
+                            <p class="text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
+                        </div>
+                        @endif
+                        <span class="text-[10px] text-on-surface-variant mt-1 block">{{ $msg->created_at->format('H:i') }}</span>
+                    </div>
+                </div>
+                @else
+                <!-- Agent Message -->
+                <div class="flex flex-col items-end">
+                    <div class="max-w-[80%]">
+                        @if($msg->media_url)
+                        <div class="mb-1 rounded-lg overflow-hidden">
+                            @if(str_starts_with($msg->mime_type ?? '', 'image/'))
+                            <a href="{{ Storage::url($msg->media_url) }}" target="_blank">
+                                <img src="{{ Storage::url($msg->media_url) }}" alt="{{ $msg->media_filename ?? 'Imagem' }}" class="max-w-[280px] max-h-[240px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity">
+                            </a>
+                            @elseif(str_starts_with($msg->mime_type ?? '', 'audio/'))
+                            <div class="bg-white border border-outline-variant rounded-lg p-3 min-w-[260px]">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="material-symbols-outlined text-primary text-lg">mic</span>
+                                    <p class="text-xs font-bold text-on-surface truncate flex-1">{{ $msg->media_filename ?? 'Audio' }}</p>
+                                </div>
+                                <audio controls class="w-full h-8" preload="metadata">
+                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ $msg->mime_type ?? 'audio/mpeg' }}">
+                                </audio>
+                            </div>
+                            @elseif(str_starts_with($msg->mime_type ?? '', 'video/'))
+                            <div class="bg-white border border-outline-variant rounded-lg overflow-hidden max-w-[300px]">
+                                <video controls class="w-full max-h-[200px]" preload="metadata">
+                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ $msg->mime_type ?? 'video/mp4' }}">
+                                </video>
+                            </div>
+                            @else
+                            <div class="bg-white border border-outline-variant rounded-lg p-3 flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary text-2xl">description</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-on-surface truncate">{{ $msg->media_filename ?? 'Arquivo' }}</p>
+                                    <p class="text-[10px] text-on-surface-variant">{{ $msg->mime_type ?? '' }}</p>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+                        @if($msg->content)
+                        <div class="bg-primary-container text-on-primary p-4 rounded-xl rounded-br-none shadow-md">
+                            <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
+                        </div>
+                        @endif
+                        <div class="flex justify-end items-center gap-1 mt-1">
+                            <span class="text-[10px] text-on-surface-variant">{{ $msg->created_at->format('H:i') }}</span>
+                            @if($msg->status === 'read')
+                            <span class="material-symbols-outlined text-[14px] text-blue-500">done_all</span>
+                            @elseif($msg->status === 'delivered')
+                            <span class="material-symbols-outlined text-[14px] text-on-surface-variant">done_all</span>
+                            @elseif($msg->status === 'failed')
+                            <span class="material-symbols-outlined text-[14px] text-error">error</span>
+                            @else
+                            <span class="material-symbols-outlined text-[14px] text-on-surface-variant">check</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                @endif
+            @endforeach
+        </div>
+
+        <!-- Macros Quick Bar -->
+        @if($macros->count() > 0)
+        <div class="px-4 py-2 bg-white border-t border-outline-variant">
+            <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
+                @foreach($macros as $macro)
+                <button onclick="applyMacro('{{ addslashes($macro->content) }}')" class="whitespace-nowrap bg-surface-container-low border border-outline-variant px-3 py-1.5 rounded-full text-xs text-on-surface hover:bg-surface-container transition-colors shrink-0">
+                    {{ $macro->name }}
+                </button>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <!-- Chat Input -->
+        <div class="p-4 bg-white border-t border-outline-variant">
+            <!-- File Preview -->
+            <div id="filePreview" class="hidden mb-2 bg-surface-container-low border border-outline-variant rounded-lg p-3 flex items-center gap-3">
+                <div id="filePreviewThumb" class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden shrink-0">
+                    <span id="filePreviewIcon" class="material-symbols-outlined text-on-surface-variant text-xl">description</span>
+                    <img id="filePreviewImg" class="w-full h-full object-cover hidden">
+                    <audio id="filePreviewAudio" class="hidden" preload="metadata"></audio>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p id="filePreviewName" class="text-xs font-bold text-on-surface truncate"></p>
+                    <p id="filePreviewSize" class="text-[10px] text-on-surface-variant"></p>
+                </div>
+                <button type="button" onclick="clearAttachment()" class="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors text-lg">close</button>
+            </div>
+            <form id="chatForm" method="POST" action="{{ route('conversations.send') }}" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
+                <div class="relative">
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm" placeholder="Escreva uma mensagem..."></textarea>
+                    <div class="absolute right-4 bottom-4 flex items-center gap-2 text-on-surface-variant">
+                        <label class="cursor-pointer hover:text-primary transition-colors" title="Enviar arquivo">
+                            <span class="material-symbols-outlined">attach_file</span>
+                            <input type="file" name="attachment" id="fileInput" class="hidden" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt">
+                        </label>
+                        <button type="button" id="audioRecordBtn" class="hover:text-primary transition-colors" title="Gravar audio">
+                            <span class="material-symbols-outlined">mic</span>
+                        </button>
+                        <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        @else
+        <!-- No conversation selected -->
+        <div class="flex-1 flex items-center justify-center">
+            <div class="text-center">
+                <span class="material-symbols-outlined text-6xl text-outline-variant">chat</span>
+                <p class="text-on-surface-variant mt-4">Selecione uma conversa para comecar</p>
+            </div>
+        </div>
+        @endif
+    </section>
+
+    <!-- Right: Contact Details -->
+    @if($activeConversation)
+    <section class="w-[300px] border-l border-outline-variant bg-white flex flex-col overflow-y-auto custom-scrollbar shrink-0">
+        <div class="p-6 space-y-6">
+            <!-- Contact Identity -->
+            <div class="text-center">
+                <div class="w-20 h-20 rounded-2xl mx-auto mb-3 bg-primary-fixed flex items-center justify-center font-bold text-2xl text-on-primary-fixed">
+                    {{ $activeConversation->contact->initials }}
+                </div>
+                <h2 class="text-lg font-semibold text-on-surface">{{ $activeConversation->contact->name }}</h2>
+                <p class="text-sm text-on-surface-variant">{{ $activeConversation->contact->email ?? 'Sem email' }}</p>
+                <div class="flex justify-center gap-1 mt-2 flex-wrap">
+                    @foreach($activeConversation->contact->tags ?? [] as $tag)
+                    <span class="bg-secondary-container/30 text-on-secondary-container px-2 py-0.5 rounded-full text-xs font-semibold">{{ $tag }}</span>
+                    @endforeach
+                </div>
+            </div>
+
+            <!-- Contact Details -->
+            <div class="space-y-3">
+                <div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg">
+                    <span class="material-symbols-outlined text-on-surface-variant text-lg">call</span>
+                    <div>
+                        <p class="text-[11px] text-on-surface-variant">WhatsApp</p>
+                        <p class="text-sm font-semibold">{{ $activeConversation->contact->phone }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg">
+                    <span class="material-symbols-outlined text-on-surface-variant text-lg">person</span>
+                    <div>
+                        <p class="text-[11px] text-on-surface-variant">Agente</p>
+                        <p class="text-sm font-semibold">{{ $activeConversation->assignedUser?->name ?? 'Nenhum' }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg">
+                    <span class="material-symbols-outlined text-on-surface-variant text-lg">schedule</span>
+                    <div>
+                        <p class="text-[11px] text-on-surface-variant">Ultima mensagem</p>
+                        <p class="text-sm font-semibold">{{ $activeConversation->last_message_at?->diffForHumans() ?? '-' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div>
+                <h3 class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Notas</h3>
+                <div class="bg-surface-container p-3 rounded-lg text-sm text-on-surface-variant">
+                    {{ $activeConversation->contact->notes ?? 'Sem notas' }}
+                </div>
+            </div>
+        </div>
+    </section>
+    @endif
+</div>
+@endsection
+
+@push('scripts')
+<script src="{{ asset('js/helpers/chat-inbox.js') }}"></script>
+<script>
+    const chatEl = document.getElementById('chatMessages');
+    if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
+
+    const APP_URL = '{{ config("app.url") }}';
+
+    function applyMacro(content) {
+        const input = document.getElementById('messageInput');
+        if (input) { input.value = content; input.focus(); }
+    }
+
+    // === File Preview ===
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            if (!this.files[0]) { clearAttachment(); return; }
+            const file = this.files[0];
+            const previewName = document.getElementById('filePreviewName');
+            const previewSize = document.getElementById('filePreviewSize');
+            const previewIcon = document.getElementById('filePreviewIcon');
+            const previewImg = document.getElementById('filePreviewImg');
+
+            previewName.textContent = file.name;
+            previewSize.textContent = formatFileSize(file.size);
+            previewIcon.classList.remove('hidden');
+            previewImg.classList.add('hidden');
+
+            if (file.type.startsWith('image/')) {
+                previewIcon.textContent = 'image';
+                const url = URL.createObjectURL(file);
+                previewImg.src = url;
+                previewImg.classList.remove('hidden');
+                previewIcon.classList.add('hidden');
+            } else if (file.type.startsWith('audio/')) {
+                previewIcon.textContent = 'audio_file';
+            } else if (file.type.startsWith('video/')) {
+                previewIcon.textContent = 'videocam';
+            } else {
+                previewIcon.textContent = 'description';
+            }
+
+            filePreview.classList.remove('hidden');
+        });
+    }
+
+    function clearAttachment() {
+        if (fileInput) fileInput.value = '';
+        if (filePreview) filePreview.classList.add('hidden');
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    // === Audio Recording ===
+    const audioRecordBtn = document.getElementById('audioRecordBtn');
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    if (audioRecordBtn) {
+        audioRecordBtn.addEventListener('click', async function() {
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                        const file = new File([blob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        fileInput.files = dt.files;
+                        fileInput.dispatchEvent(new Event('change'));
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+                    audioRecordBtn.classList.add('text-error');
+                    audioRecordBtn.querySelector('.material-symbols-outlined').textContent = 'stop';
+                    audioRecordBtn.title = 'Parar gravacao';
+                } catch(e) {
+                    alert('Nao foi possivel acessar o microfone: ' + e.message);
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+                audioRecordBtn.classList.remove('text-error');
+                audioRecordBtn.querySelector('.material-symbols-outlined').textContent = 'mic';
+                audioRecordBtn.title = 'Gravar audio';
+            }
+        });
+    }
+
+    @if($activeConversation)
+    const chatInbox = new ChatInboxHelper({
+        chatEl: chatEl,
+        contactName: @json($activeConversation->contact->name),
+        pollUrl: @json(route('conversations.poll', $activeConversation)),
+        initialMessageIds: @json($activeConversation->messages->pluck('id')),
+        initialKeys: @json($activeConversation->messages->map(fn ($m) => \App\Helpers\ChatInboxHelper::dedupeKey($m))),
+        lastMessageId: {{ $activeConversation->messages->last()->id ?? 0 }},
+    });
+
+    chatInbox.bindSendForm(document.getElementById('chatForm'), function () {
+        const input = document.getElementById('messageInput');
+        if (input) input.value = '';
+        clearAttachment();
+    });
+
+    chatInbox.startPolling();
+    @endif
+
+    const chatForm = document.getElementById('chatForm');
+    const msgInput = document.getElementById('messageInput');
+    if (msgInput && chatForm) {
+        msgInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                chatForm.requestSubmit();
+            }
+        });
+    }
+
+    // ===== Notificações em tempo real via Laravel Echo =====
+    if (typeof window.Echo !== 'undefined' && @if($activeConversation) true @else false @endif) {
+        const conversationId = {{ $activeConversation->id ?? 'null' }};
+
+        function playNotificationSound() {
+            const audio = new Audio('/sounds/notification.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(err => console.log('Autoplay bloqueado ou arquivo não encontrado:', err));
+        }
+
+        function showDesktopNotification(sender, message) {
+            if (Notification.permission === 'granted') {
+                const notification = new Notification(sender, {
+                    body: message.substring(0, 100),
+                    icon: '/images/whatsapp-icon.png',
+                    badge: '/images/badge.png',
+                    tag: 'whatsapp-' + conversationId,
+                });
+
+                notification.onclick = () => {
+                    window.focus();
+                    notification.close();
+                };
+            }
+        }
+
+        function showNotificationToast(sender, message) {
+            const toast = document.getElementById('notificationToast');
+            if (!toast) return;
+
+            document.getElementById('toastSender').textContent = sender;
+            document.getElementById('toastMessage').textContent = message.substring(0, 50) + (message.length > 50 ? '...' : '');
+
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 5000);
+        }
+
+        // Listener Echo para mensagens recebidas
+        Echo.channel(`conversation.${conversationId}`)
+            .listen('message.received', (event) => {
+                console.log('[Echo] Nova mensagem recebida:', event);
+
+                // Reproduzir som
+                playNotificationSound();
+
+                // Mostrar notificação desktop
+                showDesktopNotification(event.sender_name, event.content);
+
+                // Mostrar toast inline
+                showNotificationToast(event.sender_name, event.content);
+            });
+
+        // Solicitar permissão de notificação desktop
+        if (Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                console.log('Notification permission:', permission);
+            });
+        }
+    }
+
+    // ===== Funções de Claim/Release =====
+    function claimConversation(conversationId) {
+        fetch(`/conversations/${conversationId}/claim`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            },
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(e => alert('Erro: ' + e.message));
+    }
+
+    function releaseConversation(conversationId) {
+        if (!confirm('Tem certeza que deseja liberar este atendimento?')) return;
+
+        fetch(`/conversations/${conversationId}/claim`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            },
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(e => alert('Erro: ' + e.message));
+    }
+
+    function openReassignModal(conversationId) {
+        const userList = prompt('Digite o ID do novo agente (ou deixe em branco para cancelar)');
+        if (!userList) return;
+
+        fetch(`/conversations/${conversationId}/reassign`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            },
+            body: JSON.stringify({
+                user_id: parseInt(userList),
+                reason: 'Admin reatribuiu via interface',
+            }),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(e => alert('Erro: ' + e.message));
+    }
+</script>
+@endpush

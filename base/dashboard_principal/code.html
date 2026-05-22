@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "primary-fixed": "#dae2fd",
+                    "secondary-container": "#5dfd8a",
+                    "surface-tint": "#565e74",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#eff1f3",
+                    "outline": "#76777d",
+                    "on-secondary-fixed": "#002109",
+                    "secondary-fixed-dim": "#3de273",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#66ff8e",
+                    "primary-fixed-dim": "#bec6e0",
+                    "surface-bright": "#f7f9fb",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f2f4f6",
+                    "on-surface": "#191c1e",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-background": "#191c1e",
+                    "surface": "#f7f9fb",
+                    "on-tertiary-container": "#75859d",
+                    "surface-container": "#eceef0",
+                    "tertiary-fixed": "#d3e4fe",
+                    "tertiary-container": "#0b1c30",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#bec6e0",
+                    "primary-container": "#131b2e",
+                    "on-primary-fixed": "#131b2e",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c6c6cd",
+                    "tertiary": "#000000",
+                    "secondary": "#006d2f",
+                    "primary": "#000000",
+                    "inverse-surface": "#2d3133",
+                    "on-error-container": "#93000a",
+                    "on-surface-variant": "#45464d",
+                    "on-secondary-container": "#007232",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#e6e8ea",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "background": "#f7f9fb",
+                    "on-primary-container": "#7c839b",
+                    "surface-dim": "#d8dadc",
+                    "surface-variant": "#e0e3e5",
+                    "on-secondary-fixed-variant": "#005322",
+                    "tertiary-fixed-dim": "#b7c8e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "gutter": "16px",
+                    "sidebar-width": "260px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "chat-bubble": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "chat-bubble": ["14.5px", {"lineHeight": "21px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .chart-bar {
+            transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen flex">
+<!-- Sidebar Navigation Shell -->
+<aside class="w-sidebar-width h-screen sticky top-0 left-0 bg-primary-container flex flex-col py-lg px-md border-r border-outline-variant transition-all duration-300 z-50">
+<div class="mb-xl flex items-center gap-sm">
+<div class="w-10 h-10 bg-secondary-fixed rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-fixed" data-icon="hub">hub</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">OmniChannel ERP</h1>
+<p class="font-label-sm text-label-sm text-on-primary-container/70">WhatsApp Service</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-md py-sm px-md rounded-lg border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-body-md text-body-md">Chats</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person_book">person_book</span>
+<span class="font-body-md text-body-md">Contacts</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-xs border-t border-on-primary-container/10 pt-lg">
+<button class="w-full bg-secondary text-on-secondary py-sm rounded-lg font-label-md text-label-md mb-md flex items-center justify-center gap-xs active:scale-95 transition-transform shadow-lg shadow-secondary/20">
+<span class="material-symbols-outlined text-[20px]" data-icon="add_comment">add_comment</span>
+                New Chat
+            </button>
+<a class="flex items-center gap-md py-sm px-md rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center h-16 px-lg w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-lg">
+<h2 class="font-headline-md text-headline-md font-extrabold text-primary">WhatsApp ERP</h2>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px]" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-md w-64 focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="Search chats or agents..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-sm px-sm py-1 bg-secondary-container/20 rounded-full border border-secondary-container/30">
+<span class="active-dot bg-secondary"></span>
+<span class="font-label-md text-label-md text-on-secondary-container">Online</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<button class="material-symbols-outlined p-2 hover:bg-surface-container rounded-full" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined p-2 hover:bg-surface-container rounded-full" data-icon="history">history</button>
+</div>
+<div class="h-8 w-px bg-outline-variant mx-xs"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">Ricardo Silva</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Admin Agent</p>
+</div>
+<img alt="Agent Avatar" class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a middle-aged male customer service agent with a friendly and reliable expression. He is wearing a minimalist navy blue polo shirt, and the background is a clean, bright corporate office with soft, natural morning light. The overall mood is professional, efficient, and approachable, perfectly aligned with a high-performance ERP environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_OlPmcO6-1ML5rSrePbHbdyltTQhWtraNoKREc06GNZ5JwkaEAc7GWR4LJxVNOM_nRexNpkLI_1UHK76E60VQKag524mr_Q6W5IRiaB3G4poO6AXIF8RjJbbMZuRoVO608d8OD-8lhIdpZZqB8WRpxmbv6PktApNkpcLX_JY3rcdETfH5Dv3tupH2XQ-5ld2DOFDz-F67nZZEiNnwSa4c9GRs45I6iLnn_NGQH2ssvpvHOy-4QVTiaZgxfwXSPm73pY3emEqY9cI"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Body -->
+<div class="p-lg overflow-y-auto custom-scrollbar flex-1">
+<!-- Metrics Summary -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md mb-lg">
+<div class="bg-white p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs group hover:border-secondary transition-colors duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg" data-icon="forum">forum</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/20 px-2 py-0.5 rounded-full">+12%</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mt-md">Total Atendimentos</p>
+<p class="font-display-lg text-display-lg text-on-surface">1,284</p>
+</div>
+<div class="bg-white p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs group hover:border-secondary transition-colors duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg" data-icon="timer">timer</span>
+<span class="font-label-sm text-label-sm text-error bg-error-container/20 px-2 py-0.5 rounded-full">-4%</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mt-md">Tempo Médio de Resposta</p>
+<p class="font-display-lg text-display-lg text-on-surface">1m 24s</p>
+</div>
+<div class="bg-white p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs group hover:border-secondary transition-colors duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg" data-icon="person_add">person_add</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/20 px-2 py-0.5 rounded-full">+8%</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mt-md">Novos Contatos</p>
+<p class="font-display-lg text-display-lg text-on-surface">342</p>
+</div>
+<div class="bg-white p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col gap-xs group hover:border-secondary transition-colors duration-300">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg" data-icon="point_of_sale">point_of_sale</span>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container/20 px-2 py-0.5 rounded-full">+22%</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant mt-md">Conversões</p>
+<p class="font-display-lg text-display-lg text-on-surface">56</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg items-start">
+<!-- Chart Section -->
+<div class="lg:col-span-2 bg-white rounded-xl border border-outline-variant shadow-sm flex flex-col">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Volume de Mensagens</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Mensagens enviadas e recebidas por hora</p>
+</div>
+<div class="flex bg-surface-container-low p-xs rounded-lg border border-outline-variant">
+<button class="px-md py-1 bg-white shadow-sm rounded-lg font-label-md text-label-md text-on-surface">Hoje</button>
+<button class="px-md py-1 font-label-md text-label-md text-on-surface-variant hover:text-on-surface">Semana</button>
+</div>
+</div>
+<div class="p-lg h-[340px] flex items-end justify-between gap-2 relative">
+<!-- Simulated Chart Grid -->
+<div class="absolute inset-x-lg inset-y-lg flex flex-col justify-between pointer-events-none">
+<div class="border-b border-outline-variant/30 w-full h-0"></div>
+<div class="border-b border-outline-variant/30 w-full h-0"></div>
+<div class="border-b border-outline-variant/30 w-full h-0"></div>
+<div class="border-b border-outline-variant/30 w-full h-0"></div>
+<div class="border-b border-outline-variant w-full h-0"></div>
+</div>
+<!-- Bars -->
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-secondary-container/40 rounded-t-sm chart-bar relative" style="height: 40%">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">120</div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-2">08h</span>
+</div>
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-secondary-container/40 rounded-t-sm chart-bar relative" style="height: 65%">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">210</div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-2">10h</span>
+</div>
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-secondary rounded-t-sm chart-bar relative" style="height: 85%">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">450</div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-2 font-bold">12h</span>
+</div>
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-secondary-container/40 rounded-t-sm chart-bar relative" style="height: 70%">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">280</div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-2">14h</span>
+</div>
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-secondary-container/40 rounded-t-sm chart-bar relative" style="height: 55%">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">180</div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-2">16h</span>
+</div>
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-secondary-container/40 rounded-t-sm chart-bar relative" style="height: 95%">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">520</div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-2">18h</span>
+</div>
+<div class="flex flex-col items-center flex-1 group">
+<div class="w-full bg-secondary-container/40 rounded-t-sm chart-bar relative" style="height: 35%">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">95</div>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-2">20h</span>
+</div>
+</div>
+</div>
+<!-- Online Agents -->
+<div class="bg-white rounded-xl border border-outline-variant shadow-sm flex flex-col">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Atendentes Online</h3>
+<span class="font-label-md text-label-md text-on-surface-variant">14/20</span>
+</div>
+<div class="p-md flex flex-col gap-sm max-h-[420px] overflow-y-auto custom-scrollbar">
+<div class="flex items-center gap-md p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">
+<div class="relative">
+<img alt="Agent" class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A portrait of a professional female customer service representative smiling confidently. She is in a high-tech corporate setting with glass partitions and soft bokeh lighting. The overall visual style is corporate modern, using a color palette of soft whites and deep navies, reflecting a focused and efficient workplace environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcNm_obhiR5hQfvfVhtoUxDBDo-6BoH8ZFkFbwRbp9N0VWFgbEuq6Sger0yMVCR493job_BpENTYTk1d5_PkB0ufYlD3Pk_sVOsI3gVtXb2zavXDrhmZBBM_seuIMIeKzkFSGIx5jLM6FcPtH0qwXbyStnfopPNYJHSKdD9OTTNrdcRNTYPI5N9tvWUgIR2O0CSEdjuM592ZL8QG2WcO6ruN-40xV8zQVQ92SYXd16v9m3Ix4rvXjKx7zhOqZ9GQDX5wsFuIcZ_1Y"/>
+<span class="active-dot bg-secondary absolute bottom-0 right-0 border-2 border-white"></span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Ana Paula Martins</p>
+<p class="font-label-sm text-label-sm text-secondary">Ativo agora</p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">4 chats</span>
+</div>
+<div class="flex items-center gap-md p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">
+<div class="relative">
+<img alt="Agent" class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A close-up headshot of a professional male support agent looking at a computer screen, with a calm and concentrated expression. He is wearing a grey minimalist sweater in a modern, clean-lined office space with cool-toned studio lighting. The aesthetic is professional, data-driven, and minimalist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9w6NXTjGCHtpMukt29TyueQ1t5l0-644VC2EujPa4Ylg8SlC-muuUa6q9mRx2fH3A2K2vZqSAE-UgV3U1oRgE9USR0uOde2dEgqYIp_th8rjg5aqALND5-sZO7vxniaxIyslg1hKF_C0nD_vsvNTUMzsTzvd25RCp7Ayu8XzIIQYQ8TIlyzL0sn_Ioyetpa0X77JDzGQJn5mNKXuz7_78pqdD1Uw8lcDq4RVnnQquAvqiGVkqbf5suq3VSrhgJ5KTi8ZUthn2Njw"/>
+<span class="active-dot bg-secondary absolute bottom-0 right-0 border-2 border-white"></span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Carlos Eduardo</p>
+<p class="font-label-sm text-label-sm text-secondary">Ativo agora</p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">2 chats</span>
+</div>
+<div class="flex items-center gap-md p-sm hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">
+<div class="relative">
+<img alt="Agent" class="w-10 h-10 rounded-full border border-outline-variant object-cover" data-alt="A portrait of a young female customer service agent with a focused and professional demeanor. She is in a minimalist, modern office environment with blurred computer monitors in the background. The lighting is bright and airy, and the color scheme matches a clean, corporate ERP brand with whites, slates, and dark navies." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7ZFzh-Urf3yFv8RoCzNua9oMr7SsjdEeWfQXoM93HoShAAsm66xvy9MYfFpgx_uXgtbpxZnp2plFCwWurYZH5DdU9ZzktjYfXA47_Z99agVoIbIeX5iRogGGWYfMrHg8bf4RXZkAkxYpybWc_WuLY5s9ZCqtcrKycSf-xJeHMBqMF09c8FKtWznY-CIJcqO9EyI4Q5P7x2T_qY95uS3xfv-rUmpSjs86JlgM6l8SktlTZQ-OblX1M1LlhO4wzpzkkAHv9WWtPD6w"/>
+<span class="active-dot bg-amber-400 absolute bottom-0 right-0 border-2 border-white"></span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-label-md text-label-md text-on-surface truncate">Juliana Costa</p>
+<p class="font-label-sm text-label-sm text-on-tertiary-container">Ausente (5m)</p>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">0 chats</span>
+</div>
+</div>
+<button class="m-md py-sm border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface hover:bg-slate-50 transition-colors">
+                        Ver Todos os Agentes
+                    </button>
+</div>
+<!-- Pending Chats (Wide) -->
+<div class="lg:col-span-3 bg-white rounded-xl border border-outline-variant shadow-sm flex flex-col">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Atendimentos Pendentes</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">Chats aguardando distribuição ou primeira resposta</p>
+</div>
+<button class="flex items-center gap-xs font-label-md text-label-md text-secondary border border-secondary/20 px-md py-1.5 rounded-lg hover:bg-secondary/5 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="sort">sort</span>
+                            Filtrar Prioridade
+                        </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 border-b border-outline-variant">
+<tr>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant">Cliente</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant">Última Mensagem</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant">Tempo de Espera</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant">Prioridade</th>
+<th class="px-lg py-md font-label-md text-label-md text-on-surface-variant">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50">
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-on-primary-fixed">MS</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Marcos Souza</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">+55 11 98823-...</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<p class="font-body-md text-body-md text-on-surface-variant truncate max-w-[300px]">"Gostaria de saber o status do meu pedido #4592..."</p>
+</td>
+<td class="px-lg py-md text-error font-semibold font-label-md text-label-md">12m 45s</td>
+<td class="px-lg py-md">
+<span class="px-sm py-1 bg-error-container text-on-error-container text-[11px] font-bold rounded-lg uppercase tracking-wider">Alta</span>
+</td>
+<td class="px-lg py-md">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-1.5 rounded-lg active:scale-95 transition-transform">Assumir</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-on-secondary-fixed">RA</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Renata Alves</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">+55 21 97711-...</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<p class="font-body-md text-body-md text-on-surface-variant truncate max-w-[300px]">"Pode me enviar o catálogo de verão por favor?"</p>
+</td>
+<td class="px-lg py-md font-label-md text-label-md">04m 12s</td>
+<td class="px-lg py-md">
+<span class="px-sm py-1 bg-surface-container-highest text-on-surface-variant text-[11px] font-bold rounded-lg uppercase tracking-wider">Média</span>
+</td>
+<td class="px-lg py-md">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-1.5 rounded-lg active:scale-95 transition-transform">Assumir</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center font-bold text-on-tertiary-fixed">FM</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Fábio Melo</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">+55 31 99221-...</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-md">
+<p class="font-body-md text-body-md text-on-surface-variant truncate max-w-[300px]">"Obrigado, vou aguardar o retorno."</p>
+</td>
+<td class="px-lg py-md font-label-md text-label-md">01m 20s</td>
+<td class="px-lg py-md">
+<span class="px-sm py-1 bg-surface-container-low text-outline text-[11px] font-bold rounded-lg uppercase tracking-wider">Baixa</span>
+</td>
+<td class="px-lg py-md">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-1.5 rounded-lg active:scale-95 transition-transform">Assumir</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Interactive Atmospheric Micro-interaction -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate chart bars on load
+            const bars = document.querySelectorAll('.chart-bar');
+            bars.forEach(bar => {
+                const height = bar.style.height;
+                bar.style.height = '0';
+                setTimeout(() => {
+                    bar.style.height = height;
+                }, 100);
+            });
+
+            // Simulate real-time metric update
+            setInterval(() => {
+                const totalMetric = document.querySelector('.font-display-lg');
+                if (totalMetric) {
+                    const currentVal = parseInt(totalMetric.innerText.replace(',', ''));
+                    if (Math.random() > 0.7) {
+                        totalMetric.innerText = (currentVal + 1).toLocaleString();
+                    }
+                }
+            }, 5000);
+        });
+    </script>
+</body></html>

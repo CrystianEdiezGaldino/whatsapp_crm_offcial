@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OmniChannel ERP | Gestão de Clientes</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#dae2fd",
+                      "secondary-container": "#5dfd8a",
+                      "surface-tint": "#565e74",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-on-surface": "#eff1f3",
+                      "outline": "#76777d",
+                      "on-secondary-fixed": "#002109",
+                      "secondary-fixed-dim": "#3de273",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#66ff8e",
+                      "primary-fixed-dim": "#bec6e0",
+                      "surface-bright": "#f7f9fb",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#f2f4f6",
+                      "on-surface": "#191c1e",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-background": "#191c1e",
+                      "surface": "#f7f9fb",
+                      "on-tertiary-container": "#75859d",
+                      "surface-container": "#eceef0",
+                      "tertiary-fixed": "#d3e4fe",
+                      "tertiary-container": "#0b1c30",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "error": "#ba1a1a",
+                      "inverse-primary": "#bec6e0",
+                      "primary-container": "#131b2e",
+                      "on-primary-fixed": "#131b2e",
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#c6c6cd",
+                      "tertiary": "#000000",
+                      "secondary": "#006d2f",
+                      "primary": "#000000",
+                      "inverse-surface": "#2d3133",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#45464d",
+                      "on-secondary-container": "#007232",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#e6e8ea",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "background": "#f7f9fb",
+                      "on-primary-container": "#7c839b",
+                      "surface-dim": "#d8dadc",
+                      "surface-variant": "#e0e3e5",
+                      "on-secondary-fixed-variant": "#005322",
+                      "tertiary-fixed-dim": "#b7c8e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "base": "4px",
+                      "sm": "8px",
+                      "xl": "32px",
+                      "gutter": "16px",
+                      "sidebar-width": "260px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "chat-bubble": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "chat-bubble": ["14.5px", {"lineHeight": "21px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background flex overflow-hidden">
+<!-- SideNavBar (Anchor) -->
+<aside class="w-sidebar-width h-screen sticky top-0 left-0 bg-primary-container flex flex-col h-full py-lg px-md border-r border-outline-variant shrink-0">
+<div class="mb-xl">
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">OmniChannel ERP</h1>
+<p class="text-on-primary-container/70 text-label-sm uppercase tracking-widest mt-xs">WhatsApp Service</p>
+</div>
+<button class="mb-xl bg-secondary hover:bg-secondary/90 text-on-primary py-sm px-md flex items-center justify-center gap-sm transition-transform active:scale-95">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span class="font-label-md">New Chat</span>
+</button>
+<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-md py-sm px-md transition-colors duration-200 text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md transition-colors duration-200 text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-body-md">Chats</span>
+</a>
+<!-- Active State Navigation -->
+<a class="flex items-center gap-md py-sm px-md transition-colors duration-200 border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="person_book">person_book</span>
+<span class="font-body-md">Contacts</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md transition-colors duration-200 text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-body-md">Reports</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md transition-colors duration-200 text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-on-primary-container/10">
+<div class="flex items-center gap-md p-md mb-md">
+<img alt="Agent Profile Picture" class="w-10 h-10 rounded-full object-cover" data-alt="A professional headshot of a customer service agent in a bright, modern office environment. The lighting is soft and natural, emphasizing a clean corporate aesthetic with a palette of deep blues and crisp whites. The agent looks confident and friendly, embodying efficiency and reliability for an enterprise environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYoV-Jis4t5e8aR7hjNvlEqJuNFSdA-Nx6oeGxysmJwl_J7X7oeCgVwFkF_kg6XZdjf5zyQoXMVZLfo3CX_kaz3hsfWSFdusaukTJs6LrmR9KjrCi8K0kWyxnNQl8WxtCsQhrSzgV0kAwaGgNiHlxF3VRATohL6u_aiMwz2q-Rc_-ktjS8HrDeqrh2kr9mRcTycCDFvxDft6wecHJLTOxJ48uGbbfi7SlpCwT-V0K2qg2nNxJPnc9xmHAYFqel7Oz-d4-hGyazHYs"/>
+<div class="overflow-hidden">
+<p class="text-on-primary font-body-md truncate">Ricardo Silva</p>
+<p class="text-on-primary-container/50 text-label-sm">Supervisor</p>
+</div>
+</div>
+<a class="flex items-center gap-md py-sm px-md text-on-primary-container/70 hover:text-on-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body-md">Help</span>
+</a>
+<a class="flex items-center gap-md py-sm px-md text-on-primary-container/70 hover:text-on-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar (Anchor) -->
+<header class="flex justify-between items-center h-16 px-lg w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-lg flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none focus:ring-1 focus:ring-secondary pl-11 py-xs rounded-lg text-body-md" placeholder="Pesquisar por nome ou WhatsApp..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs px-md py-xs bg-secondary-container/20 text-on-secondary-container rounded-full">
+<span class="w-2 h-2 bg-secondary rounded-full"></span>
+<span class="font-label-md">Online</span>
+</div>
+<div class="flex gap-sm">
+<button class="p-sm hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-sm hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</button>
+</div>
+</div>
+</header>
+<!-- CRM Content -->
+<div class="flex-1 overflow-y-auto p-lg custom-scrollbar">
+<!-- Header & Primary Actions -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md mb-xl">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Gestão de Clientes</h2>
+<p class="text-on-surface-variant text-body-md">Gerencie sua base de contatos e segmentações do WhatsApp.</p>
+</div>
+<div class="flex items-center gap-sm">
+<button class="bg-surface-container-highest hover:bg-surface-container-high text-on-surface font-label-md px-md py-sm flex items-center gap-xs border border-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="file_upload">file_upload</span>
+                        Importar Lista
+                    </button>
+<button class="bg-primary text-on-primary font-label-md px-md py-sm flex items-center gap-xs transition-transform active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="person_add">person_add</span>
+                        Novo Contato
+                    </button>
+</div>
+</div>
+<!-- Bento Filter Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md mb-lg">
+<div class="bg-white p-md border border-outline-variant shadow-sm col-span-1">
+<label class="block font-label-sm text-on-surface-variant mb-xs uppercase">Filtrar por Tag</label>
+<select class="w-full border-none bg-surface-container-low focus:ring-1 focus:ring-secondary text-body-md rounded-sm">
+<option>Todas as Tags</option>
+<option>VIP</option>
+<option>Novo Lead</option>
+<option>Suporte</option>
+<option>Inativo</option>
+</select>
+</div>
+<div class="bg-white p-md border border-outline-variant shadow-sm col-span-1">
+<label class="block font-label-sm text-on-surface-variant mb-xs uppercase">Período</label>
+<div class="flex items-center bg-surface-container-low px-sm rounded-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="calendar_today">calendar_today</span>
+<input class="w-full border-none bg-transparent focus:ring-0 text-body-md" type="date"/>
+</div>
+</div>
+<div class="bg-white p-md border border-outline-variant shadow-sm col-span-1">
+<label class="block font-label-sm text-on-surface-variant mb-xs uppercase">Agente Responsável</label>
+<select class="w-full border-none bg-surface-container-low focus:ring-1 focus:ring-secondary text-body-md rounded-sm">
+<option>Todos os Agentes</option>
+<option>Ricardo Silva</option>
+<option>Ana Paula</option>
+<option>Carlos Eduardo</option>
+</select>
+</div>
+<div class="bg-white p-md border border-outline-variant shadow-sm col-span-1 flex items-end">
+<button class="w-full py-[10px] bg-primary-container text-on-primary font-label-md hover:bg-primary transition-colors">
+                        Aplicar Filtros
+                    </button>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-white border border-outline-variant shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-md py-sm font-label-md text-on-surface-variant uppercase w-12">
+<input class="rounded-sm border-outline text-secondary focus:ring-secondary" type="checkbox"/>
+</th>
+<th class="px-md py-sm font-label-md text-on-surface-variant uppercase">Contato</th>
+<th class="px-md py-sm font-label-md text-on-surface-variant uppercase">WhatsApp</th>
+<th class="px-md py-sm font-label-md text-on-surface-variant uppercase">Tags</th>
+<th class="px-md py-sm font-label-md text-on-surface-variant uppercase">Último Contato</th>
+<th class="px-md py-sm font-label-md text-on-surface-variant uppercase">Agente</th>
+<th class="px-md py-sm font-label-md text-on-surface-variant uppercase text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-md py-md">
+<input class="rounded-sm border-outline text-secondary focus:ring-secondary" type="checkbox"/>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="Customer Photo" class="w-10 h-10 rounded-full object-cover" data-alt="A high-resolution close-up portrait of a satisfied customer with a professional and friendly expression. The background is a blurred, airy office environment with soft teal and white tones. The overall lighting is bright and modern, creating a trustworthy and efficient visual atmosphere consistent with a premium ERP interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYHyevndlKXkxCagmduhe_WSp91XgTYcGWDUdvrDlsOxXEHjySwGN7btxNnrfV7PCSMou3BvmqxxxYz8YXAnKyENRIwZ47gld-6OTQLV7wwCr7Lq6iMKNr6T8naHv8rPovoB0i0W5D7z0qLykkvfz11d3LOUCygofuGsMlWJm6XnE_qmdguNaVQy9vHwugnQiZ41i5B5efToj5splObQtyDxeB0fiXBVGx0wkXP89Qxkn7DV26OMw14RBirlKBtxgtiZB-mifwcIg"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-secondary border-2 border-white rounded-full"></span>
+</div>
+<div>
+<p class="font-body-md font-semibold text-primary">Beatriz Oliveira</p>
+<p class="text-label-sm text-on-surface-variant">ID: 29401</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs text-body-md text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[18px]" data-icon="phone_android">phone_android</span>
+                                        +55 11 98765-4321
+                                    </div>
+</td>
+<td class="px-md py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-[2px] bg-secondary-container/30 text-on-secondary-container font-label-sm rounded-sm">VIP</span>
+<span class="px-xs py-[2px] bg-primary-fixed/30 text-on-primary-fixed-variant font-label-sm rounded-sm">Varejo</span>
+</div>
+</td>
+<td class="px-md py-md">
+<p class="text-body-md">Hoje, 14:20</p>
+<p class="text-label-sm text-on-surface-variant">"Obrigado pelo retorno..."</p>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<img class="w-6 h-6 rounded-full" data-alt="Small thumbnail avatar of a professional male support agent in a clean, modern corporate setting with navy and white color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD38Iq9tQMEweHdmYXzBmq9FlxsboUlf7hUUokdXK5BgJPkHJvekuJHxAgCNLzZXRcTIUBymMyTc3DHehh6tvsSKSICobrdjxjJHg-Y51g7hsQMKKRf3gg5teMQJB-dEGyT2Ke5YzIGoLftUgiEsP7ryqYmUOeTv3G6I2kfVqYDt9DVor17ouI6DDXFMv47To68KGbk6f1B4FBUYE-jZaKxJNDmrAxx7bAXdLbFzYD4ciarRGbgiEMf7rNtn5M2Owsd8cW66HgSfi8"/>
+<span class="text-body-md">Ricardo S.</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-xs hover:bg-secondary-container/20 text-secondary rounded transition-colors" title="Iniciar Chat">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</button>
+<button class="p-xs hover:bg-primary-fixed/20 text-primary-fixed-variant rounded transition-colors" title="Ver Histórico">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-xs hover:bg-surface-container-highest text-on-surface-variant rounded transition-colors" title="Editar">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-md py-md">
+<input class="rounded-sm border-outline text-secondary focus:ring-secondary" type="checkbox"/>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="Customer Photo" class="w-10 h-10 rounded-full object-cover" data-alt="A professional portrait of a male corporate client in a bright, modern studio. The lighting is crisp, emphasizing clean lines and a professional demeanor. The color palette features whites and grays, suitable for a high-end enterprise ERP interface focusing on efficiency and data precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyvHD4eGDKDWtKxnlwnZ8Lm-gqD5jiFHgboxLxhZ0FGFuxz5PB-CDiOPh2LSbWzipm7USMK4VOwgGWqzYQs94JWveS5r_sCWJiXn9qTqfR1lmUy-lAie5ZU398n95NgJ8rDIYY4_MJjZxb6yTGyaVDDMuIYJpDNaCkjcg66EYG9jlBaUmKF3QnU8gJGhJtfR2NuJX49etKlWEvE-TnDbpedZ0xP9SGxzF5hBHM6XozRPUCkWEX35gkpkVCivepeJM4APLu-v2jzPk"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-outline rounded-full"></span>
+</div>
+<div>
+<p class="font-body-md font-semibold text-primary">Marcos Ferreira</p>
+<p class="text-label-sm text-on-surface-variant">ID: 29398</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs text-body-md text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[18px]" data-icon="phone_android">phone_android</span>
+                                        +55 21 99887-1122
+                                    </div>
+</td>
+<td class="px-md py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-[2px] bg-error-container/30 text-on-error-container font-label-sm rounded-sm">Lead Frio</span>
+</div>
+</td>
+<td class="px-md py-md">
+<p class="text-body-md">Ontem, 09:15</p>
+<p class="text-label-sm text-on-surface-variant text-nowrap overflow-hidden text-ellipsis w-40">Interessado no plano corporativo...</p>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">AP</div>
+<span class="text-body-md">Ana Paula</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-xs hover:bg-secondary-container/20 text-secondary rounded transition-colors" title="Iniciar Chat">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</button>
+<button class="p-xs hover:bg-primary-fixed/20 text-primary-fixed-variant rounded transition-colors" title="Ver Histórico">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-xs hover:bg-surface-container-highest text-on-surface-variant rounded transition-colors" title="Editar">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-md py-md">
+<input class="rounded-sm border-outline text-secondary focus:ring-secondary" type="checkbox"/>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="Customer Photo" class="w-10 h-10 rounded-full object-cover" data-alt="A portrait of a female entrepreneur in a bright minimalist workspace. The lighting is natural and high-key, creating a clean, modern aesthetic. The scene reflects professionalism and reliability, using a palette of soft neutrals that integrate seamlessly with the corporate ERP design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdjtjCPey7H-1JXmXWbwTPimmHwLZV1sSINpkL97x6fqvvA2iNeWfTNdybfUUD4uW4UWIa7VvXGchqJuvW0Ji3zKrcjjiPNDac6C6VSwGFP7M4GC6WlaCL8Q8DaDwGsnpHsQIvPXbcsD_rhzLxZU-LPnskpfnl2cCdz3qSSpBKVE3g9uKPwm4Dwl3fBEK-G_elBP78Yyosspr9aVGv6LsDYHxnGV_vmRWGPm31oUx93cJZPNq_VlUVQawtN0zsShYtvEc4_AXVM8k"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-secondary border-2 border-white rounded-full"></span>
+</div>
+<div>
+<p class="font-body-md font-semibold text-primary">Juliana Santos</p>
+<p class="text-label-sm text-on-surface-variant">ID: 29395</p>
+</div>
+</div>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-xs text-body-md text-on-surface">
+<span class="material-symbols-outlined text-secondary text-[18px]" data-icon="phone_android">phone_android</span>
+                                        +55 31 97766-5544
+                                    </div>
+</td>
+<td class="px-md py-md">
+<div class="flex flex-wrap gap-xs">
+<span class="px-xs py-[2px] bg-tertiary-fixed/40 text-on-tertiary-fixed-variant font-label-sm rounded-sm">Suporte</span>
+<span class="px-xs py-[2px] bg-secondary-container/30 text-on-secondary-container font-label-sm rounded-sm">VIP</span>
+</div>
+</td>
+<td class="px-md py-md">
+<p class="text-body-md">24 Out, 16:45</p>
+<p class="text-label-sm text-on-surface-variant truncate w-40">Ticket #882 resolvido.</p>
+</td>
+<td class="px-md py-md">
+<div class="flex items-center gap-sm">
+<img class="w-6 h-6 rounded-full" data-alt="Small thumbnail avatar of a professional male support agent in a clean, modern corporate setting with navy and white color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxqsfWpFi7vosrSYyvn-FB0mfLYBpo0MIyNA6B51iJOHeyUf8dVYSwTQ5VpLFbA6COqRdCqG-tmErtjs9jCJSvlDHsuRrAWhvOgJ4DUO3xulsg1ZfK9hK2-dIwT_zW3TTz1zZQ7EAci9HSnA6tFmRYbFoBRPOMxqsLkw3OuRa07668JnHAnfYV1UvOy7i80AJt1fFnvfcqpDVIEhAT7nn5PQ8eE4Ea9E68Gp2eMpNBuW4uu3KY9YIp2AdBMKBnWDZ3BSpHMCd_h5k"/>
+<span class="text-body-md">Ricardo S.</span>
+</div>
+</td>
+<td class="px-md py-md text-right">
+<div class="flex justify-end gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-xs hover:bg-secondary-container/20 text-secondary rounded transition-colors" title="Iniciar Chat">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</button>
+<button class="p-xs hover:bg-primary-fixed/20 text-primary-fixed-variant rounded transition-colors" title="Ver Histórico">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-xs hover:bg-surface-container-highest text-on-surface-variant rounded transition-colors" title="Editar">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-md py-sm bg-surface-container-low flex items-center justify-between border-t border-outline-variant">
+<span class="text-label-sm text-on-surface-variant">Exibindo 1-3 de 1,240 contatos</span>
+<div class="flex items-center gap-sm">
+<button class="p-xs hover:bg-surface-container-high rounded disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<div class="flex items-center gap-xs">
+<button class="w-8 h-8 rounded bg-primary text-on-primary font-label-md">1</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-high font-label-md">2</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container-high font-label-md">3</button>
+<span class="px-xs text-on-surface-variant">...</span>
+<button class="w-8 h-8 rounded hover:bg-surface-container-high font-label-md">42</button>
+</div>
+<button class="p-xs hover:bg-surface-container-high rounded">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple micro-interactions for the demo
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', (e) => {
+                if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                    row.classList.toggle('bg-secondary-container/10', checkbox.checked);
+                }
+            });
+        });
+
+        // Search highlight effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-secondary/30');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-secondary/30');
+        });
+    </script>
+</body></html>

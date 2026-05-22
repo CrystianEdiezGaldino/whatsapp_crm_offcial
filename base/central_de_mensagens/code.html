@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .chat-container {
+            height: calc(100vh - 64px);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#dae2fd",
+                      "secondary-container": "#5dfd8a",
+                      "surface-tint": "#565e74",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-on-surface": "#eff1f3",
+                      "outline": "#76777d",
+                      "on-secondary-fixed": "#002109",
+                      "secondary-fixed-dim": "#3de273",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#66ff8e",
+                      "primary-fixed-dim": "#bec6e0",
+                      "surface-bright": "#f7f9fb",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#f2f4f6",
+                      "on-surface": "#191c1e",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-background": "#191c1e",
+                      "surface": "#f7f9fb",
+                      "on-tertiary-container": "#75859d",
+                      "surface-container": "#eceef0",
+                      "tertiary-fixed": "#d3e4fe",
+                      "tertiary-container": "#0b1c30",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "error": "#ba1a1a",
+                      "inverse-primary": "#bec6e0",
+                      "primary-container": "#131b2e",
+                      "on-primary-fixed": "#131b2e",
+                      "on-secondary": "#ffffff",
+                      "outline-variant": "#c6c6cd",
+                      "tertiary": "#000000",
+                      "secondary": "#006d2f",
+                      "primary": "#000000",
+                      "inverse-surface": "#2d3133",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#45464d",
+                      "on-secondary-container": "#007232",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#e6e8ea",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "background": "#f7f9fb",
+                      "on-primary-container": "#7c839b",
+                      "surface-dim": "#d8dadc",
+                      "surface-variant": "#e0e3e5",
+                      "on-secondary-fixed-variant": "#005322",
+                      "tertiary-fixed-dim": "#b7c8e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "base": "4px",
+                      "sm": "8px",
+                      "xl": "32px",
+                      "gutter": "16px",
+                      "sidebar-width": "260px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "chat-bubble": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "label-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "chat-bubble": ["14.5px", {"lineHeight": "21px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background font-body-md text-on-background overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- SideNavBar (ERP Main Nav) -->
+<aside class="bg-primary-container text-secondary-fixed-dim w-sidebar-width h-screen sticky top-0 left-0 border-r border-outline-variant flex flex-col py-lg px-md">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">OmniChannel ERP</h1>
+<p class="font-label-sm text-label-sm text-on-primary-container/70">WhatsApp Service</p>
+</div>
+<button class="mb-lg w-full bg-secondary-container text-on-secondary-container py-sm rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add_comment</span>
+                New Chat
+            </button>
+<nav class="flex-1 space-y-sm">
+<a class="flex items-center gap-md p-sm rounded-lg border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-md p-sm rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span>Chats</span>
+</a>
+<a class="flex items-center gap-md p-sm rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">person_book</span>
+<span>Contacts</span>
+</a>
+<a class="flex items-center gap-md p-sm rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center gap-md p-sm rounded-lg text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-sm border-t border-outline-variant pt-lg">
+<div class="flex items-center gap-md p-sm rounded-lg text-on-primary-container/70 hover:text-on-primary cursor-pointer">
+<span class="material-symbols-outlined">help</span>
+<span>Help</span>
+</div>
+<div class="flex items-center gap-md p-sm rounded-lg text-on-primary-container/70 hover:text-on-primary cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+<span>Logout</span>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col h-full bg-surface">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center h-16 px-lg w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-extrabold text-primary">WhatsApp ERP</span>
+<div class="hidden md:flex items-center bg-surface-container-low px-md py-xs rounded-full border border-outline-variant w-96">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full ml-sm" placeholder="Search conversations..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-opacity">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-opacity">history</span>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary overflow-hidden">
+<img alt="Agent Avatar" class="w-full h-full object-cover" data-alt="Close-up portrait of a professional male customer service representative with a warm, confident smile. He is wearing a modern headset and a dark navy blazer, set against a blurred office background with soft bokeh. The lighting is bright and clean, reflecting a high-end corporate atmosphere with professional clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUvxPWNvgBdPsS230mVnYUpl1iAYS5X6q0U9jKiY6WTmP5Kkrd5ZUBGb3RGl462Cz0NhJyGJBeNaotZ4aNhd37FZVtDxQBqvPKduKtDXXx6lgM-Pq3uakcvFeGd4YMpAxrv0fWHtOaBh22uWSDxT2nJxc1ve0EZCkWz0CXJl4rIJvsUrkI7MlcuDhRuf5h17EIKchpDr9YVKEW7efmsYQdGOhvuOxSQHtNp0oGJxk6gggvi0RkkMQfvn6-x75h-XnMEwJQBqbioQM"/>
+</div>
+<span class="text-label-md font-label-md text-primary font-bold">Online</span>
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Left Column: Conversation List -->
+<section class="w-[360px] border-r border-outline-variant bg-white flex flex-col overflow-hidden">
+<div class="p-md border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-headline-sm text-on-surface">Active Chats</h2>
+<span class="bg-surface-container-highest px-sm py-1 rounded text-label-sm">24 Online</span>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Chat Item Active -->
+<div class="p-md flex gap-md cursor-pointer bg-surface-container-low border-l-4 border-secondary">
+<div class="relative flex-shrink-0">
+<img alt="Customer" class="w-12 h-12 rounded-full object-cover" data-alt="Close-up headshot of a friendly young woman with a natural, professional look. She has a subtle smile and clear eyes, looking directly into the camera. The background is a soft, light-toned minimalist interior, perfectly suited for a light-mode enterprise UI. Her expression conveys trust and approachability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0lsJLK7g36ao6PNvAkYCJkkPwJPJbUSzcu0au_jK9zQZROkycz1mV8nQOa4Mjq906KLbmXxi1MjoaVSQykXN8whgjdyJAhp4fRWtQekRqnHc3QcFW5lYMui3E_cbZhZU08Hc51rHEvzcoxX_pr533YuX3XRVCC7a9uGYvZXw1c_agJtZt_cZVRwLf2fucKBtR6i2ZITsK97pofF4icZ5OSMzkZ2PSqwm9NFEM8hULFqMzfSn5OA-weNDKpKTRKs_dVQlO3P3Gerc"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-white"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-on-surface truncate">Alice Hoffmann</h3>
+<span class="text-label-sm text-error font-bold">2m wait</span>
+</div>
+<p class="text-body-md text-on-surface-variant truncate">I have a question about the invoice #9921...</p>
+</div>
+</div>
+<!-- Chat Items -->
+<div class="p-md flex gap-md cursor-pointer hover:bg-surface-container-low transition-colors border-l-4 border-transparent">
+<div class="relative flex-shrink-0">
+<img alt="Customer" class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a middle-aged professional man with glasses, wearing a neutral grey sweater. He looks calm and inquisitive, positioned in a well-lit home office with soft natural light streaming from a window. The aesthetic is clean, sharp, and corporate-modern, utilizing a bright color palette of whites and soft greys." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo44K1vSGPkXPibm5XdSXc0RXGAoATPYgLIqfnHZMVO9gCMWEaqN9EJDBtks3lR_rbjZHigN4WkvpmgB1HYwgxU35NCjtYSpyayRvFYt2Hd4HoYlXHv3NeQEti_cKvSxLZNc2qsga5G3iuKywliI2VDv3RvcritbEDQZMxf46YhCtQCwmo213ZsY_BhQQL1jAyjzvBPwegLt1pW8WLTh27NeGcw5Xfjf-KpzsmJ1ebhmz9TFLi4etV4nEMGLBIS3vTXHsl0UDWsik"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-on-surface truncate">Robert Peterson</h3>
+<span class="text-label-sm text-on-surface-variant">15m</span>
+</div>
+<p class="text-body-md text-on-surface-variant truncate">Thank you for the quick resolution!</p>
+</div>
+</div>
+<div class="p-md flex gap-md cursor-pointer hover:bg-surface-container-low transition-colors border-l-4 border-transparent">
+<div class="relative flex-shrink-0">
+<img alt="Customer" class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a young business woman with blonde hair, looking professional and friendly. She is in a contemporary office setting with large glass windows and soft morning light. The image has a clean, high-contrast look that fits a premium ERP interface, focusing on a sense of reliability and modern business standards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQViDKR1Ma6rLW5DJCCwM9s7ZxzhMxW-5nB8N5NXqLSJuAMt1otCV8UcG5hKa3chzzTkUQ8Yk_caQtc9mFB0V77CwNbcAjRWnZmjpj6Z9OzsilaaVqLf0Hzfcnm51M6uEzKXPpLEDKOwLKCDYc1NTGhWTlIT-_bgk580giyC7xP9TxUgCN5WqwErcz-DcGSROc0fg5h1UgbP0GOwcIQUU20Ld4gL-rSBi9ZeGF4W3ByLz5bP1vD2DHjtg8R8thIf1udboucsLIOj4"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-white"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-on-surface truncate">Clara Mendes</h3>
+<span class="text-label-sm text-on-surface-variant">1h</span>
+</div>
+<p class="text-body-md text-on-surface-variant truncate">Can we reschedule our meeting?</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Central Area: Active Chat Window -->
+<section class="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+<!-- Chat Header -->
+<div class="p-md bg-white border-b border-outline-variant flex justify-between items-center shadow-sm">
+<div class="flex items-center gap-md">
+<img alt="Alice" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-y2j4V_gpGRLxxvAnusttaibNz8DmSj-bv5BuLIP6Sl0WGHeYCwnCNz-ouFQMRox9yTvXSDvL_UdutnGcy5iCcS8YB8GT7_HR5AyI7yyGcJKDm6wzYMX1uwG2cwJIsN87QwZpRXyhy_Re9uWRKZ8r0o_KKV63gCvlGBD9EYxkmmextf-PBUfffC_YIpVkdRvCYdbpO_uQfuv34IKgkOBLubmBkqv8Uf2iEkWuf0opGvURLeZQDDNr-Y8ysbECM7h10KY4LruajLg"/>
+<div>
+<h2 class="font-bold text-on-surface">Alice Hoffmann</h2>
+<p class="text-label-sm text-secondary font-bold">Active Customer • +55 11 98877-6655</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface-container-high px-md py-xs rounded-lg font-label-md text-on-surface-variant hover:bg-surface-container-highest flex items-center gap-1 transition-all">
+<span class="material-symbols-outlined text-[18px]">forward</span> Transfer
+                            </button>
+<button class="bg-error text-on-error px-md py-xs rounded-lg font-label-md hover:opacity-90 flex items-center gap-1 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px]">done_all</span> Resolve
+                            </button>
+</div>
+</div>
+<!-- Chat Messages -->
+<div class="flex-1 overflow-y-auto p-lg space-y-lg custom-scrollbar">
+<div class="flex justify-center">
+<span class="text-label-sm uppercase text-on-surface-variant bg-surface-container py-1 px-md rounded-full tracking-wider">Today</span>
+</div>
+<!-- Customer Message -->
+<div class="flex items-end gap-md max-w-[80%]">
+<img alt="Alice" class="w-8 h-8 rounded-full mb-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHPCAzzC7USn6ti_uvpDsTNbSbWvRMjMh9LJuyKddmxQ-ZgUC9TAsbdSwylDHnEqTjcLPf-_xQc1UP3Qfuedjr5OC7u_cZwxu7U9vD-s25p_Dulsr45DDOIKl0qmgZ4VW3X_xJh75dUrALVXmg4WJRIyqQDySFTxawGl873gzo6Zw35st7xqW4xRM9-QRcj9WwibnF-s9XTRu7ol-pm7H3N-zpYq4mTEPSwynO0kxx_9lhztK2q_IU-GT6qZO_v2nd9aMK5u666O0"/>
+<div class="bg-white p-md rounded-xl rounded-bl-none border border-outline-variant shadow-sm">
+<p class="text-chat-bubble text-on-surface">Hello, I'm having trouble with the latest invoice. It seems there is a double charge for the "Cloud Service" tier.</p>
+<span class="text-[10px] text-on-surface-variant mt-xs block">10:42 AM</span>
+</div>
+</div>
+<!-- Agent Message -->
+<div class="flex flex-col items-end gap-xs">
+<div class="max-w-[80%] bg-primary-container text-on-primary p-md rounded-xl rounded-br-none shadow-md">
+<p class="text-chat-bubble">Hi Alice! I'm sorry to hear about that. Let me check your account billing history right now. One moment, please.</p>
+<div class="flex justify-end items-center gap-1 mt-xs">
+<span class="text-[10px] text-on-primary-container">10:45 AM</span>
+<span class="material-symbols-outlined text-[14px] text-secondary-fixed">done_all</span>
+</div>
+</div>
+</div>
+<!-- Customer Message -->
+<div class="flex items-end gap-md max-w-[80%]">
+<img alt="Alice" class="w-8 h-8 rounded-full mb-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVVCFXYcsAIUQ7wHeo__riK7jg5CFHFFMx_yaPYNQJZyVFhmZZj-7LvKeoxe4h82TLezK5vTw4WbgyO4fDrTfa9UD46IxLS_WM66e0LkkGcP05c2cSIGMPuvWxXz_lUa1OnYY1NjpRbZf2dS7iOVcQ9t12VasN7oq_Bq5gEpF2hDJi5ECrDcjVce13SVTERMWnWa0CjyRUn4v7lG8lIARt71vUkFAxvSqxOIqarJMBi29qur_JbNCKGgahOzI-jNtOF-uzRV4AxRs"/>
+<div class="bg-white p-md rounded-xl rounded-bl-none border border-outline-variant shadow-sm">
+<p class="text-chat-bubble text-on-surface">Thank you. I've attached a screenshot of the banking notification I received.</p>
+<div class="mt-sm border border-outline-variant rounded-lg overflow-hidden bg-slate-50 p-sm flex items-center gap-md">
+<div class="w-12 h-12 bg-white flex items-center justify-center rounded border border-outline-variant">
+<span class="material-symbols-outlined text-primary">image</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-label-md font-bold truncate">screenshot_01.png</p>
+<p class="text-[10px] text-on-surface-variant">1.2 MB</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">download</span>
+</div>
+<span class="text-[10px] text-on-surface-variant mt-xs block">10:46 AM</span>
+</div>
+</div>
+</div>
+<!-- Chat Input -->
+<div class="p-md bg-white border-t border-outline-variant space-y-md">
+<!-- Quick Replies -->
+<div class="flex gap-sm overflow-x-auto custom-scrollbar pb-1">
+<button class="whitespace-nowrap bg-surface-container-low border border-outline-variant px-md py-1.5 rounded-full text-label-md text-on-surface hover:bg-surface-container transition-colors">👋 Greet Client</button>
+<button class="whitespace-nowrap bg-surface-container-low border border-outline-variant px-md py-1.5 rounded-full text-label-md text-on-surface hover:bg-surface-container transition-colors">⏳ Wait a Moment</button>
+<button class="whitespace-nowrap bg-surface-container-low border border-outline-variant px-md py-1.5 rounded-full text-label-md text-on-surface hover:bg-surface-container transition-colors">💳 Payment Link</button>
+<button class="whitespace-nowrap bg-surface-container-low border border-outline-variant px-md py-1.5 rounded-full text-label-md text-on-surface hover:bg-surface-container transition-colors">📦 Shipping Status</button>
+</div>
+<div class="relative group">
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-md pr-32 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none font-body-md" placeholder="Write a message..." rows="2"></textarea>
+<div class="absolute right-md bottom-md flex items-center gap-md text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">attach_file</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary transition-colors">mood</span>
+<button class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Mini-CRM -->
+<section class="w-[320px] border-l border-outline-variant bg-white flex flex-col overflow-y-auto custom-scrollbar">
+<div class="p-lg space-y-xl">
+<!-- Contact Identity -->
+<div class="text-center">
+<div class="w-24 h-24 rounded-2xl overflow-hidden mx-auto mb-md ring-4 ring-surface-container shadow-lg">
+<img alt="Alice" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqy9l3tailhnAQ3R6NSNayZdxY6Xx0YV7AR84YlaDDNz4dUDfpSZNd63MY84G4Zkbkrq82oonsnruuW2coGUHK2C88s5wbkACQ8mnugqtLSf0DgLdPbng8mwclT6pFSqqGknsPBgIamTBYxuj-u1gM_-l9lvxe--0f2xbjHSR5QQLQeFKzQFPOmZGRG5-KsTQuTuO_XR-qcXPmDrARZkVUXcoNL0IK2tJ8N6UJsL0TCGAP5k9tIcMtoI2s6-1bQwqTXskqMtPFwu0"/>
+</div>
+<h2 class="font-headline-sm text-on-surface">Alice Hoffmann</h2>
+<p class="text-body-md text-on-surface-variant mb-md">Product Designer at Bloom</p>
+<div class="flex justify-center gap-sm">
+<span class="bg-secondary-container/30 text-on-secondary-container px-sm py-1 rounded-full text-label-sm font-bold">VIP Client</span>
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-sm py-1 rounded-full text-label-sm font-bold">Tech Stack</span>
+</div>
+</div>
+<!-- Contact Details -->
+<div class="space-y-md">
+<div class="flex items-center gap-md p-sm bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-surface-variant">call</span>
+<div>
+<p class="text-label-sm text-on-surface-variant">Mobile</p>
+<p class="text-body-md font-semibold">+55 11 98877-6655</p>
+</div>
+</div>
+<div class="flex items-center gap-md p-sm bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-on-surface-variant">mail</span>
+<div>
+<p class="text-label-sm text-on-surface-variant">Email</p>
+<p class="text-body-md font-semibold">alice.h@bloom.com</p>
+</div>
+</div>
+</div>
+<!-- Purchase History -->
+<div>
+<h3 class="font-label-md text-on-surface-variant uppercase tracking-wider mb-sm">Purchase History</h3>
+<div class="space-y-sm">
+<div class="flex justify-between items-center p-sm border-b border-outline-variant">
+<div>
+<p class="text-body-md font-bold">Premium Subscription</p>
+<p class="text-label-sm text-on-surface-variant">Annual • Mar 12, 2024</p>
+</div>
+<span class="text-body-md font-bold">$499.00</span>
+</div>
+<div class="flex justify-between items-center p-sm border-b border-outline-variant">
+<div>
+<p class="text-body-md font-bold">Extra Cloud Storage</p>
+<p class="text-label-sm text-on-surface-variant">One-time • Jan 05, 2024</p>
+</div>
+<span class="text-body-md font-bold">$29.00</span>
+</div>
+</div>
+</div>
+<!-- Agent Notes -->
+<div>
+<div class="flex justify-between items-center mb-sm">
+<h3 class="font-label-md text-on-surface-variant uppercase tracking-wider">Agent Notes</h3>
+<span class="material-symbols-outlined text-secondary cursor-pointer">add_circle</span>
+</div>
+<div class="bg-surface-container p-md rounded-lg italic text-body-md text-on-surface-variant">
+                                "Prefers communication via WhatsApp between 10 AM and 2 PM. Very concerned about billing accuracy."
+                                <p class="text-label-sm text-on-surface-variant mt-sm not-italic font-bold">— Agent Mark S.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('nav a').forEach(l => {
+                    l.classList.remove('border-l-2', 'border-secondary-container', 'bg-surface-container-highest/10', 'text-on-primary', 'font-semibold');
+                    l.classList.add('text-on-primary-container/70');
+                });
+                this.classList.add('border-l-2', 'border-secondary-container', 'bg-surface-container-highest/10', 'text-on-primary', 'font-semibold');
+                this.classList.remove('text-on-primary-container/70');
+            });
+        });
+
+        const chatContainer = document.querySelector('.flex-1.overflow-y-auto');
+        if (chatContainer) {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body></html>
