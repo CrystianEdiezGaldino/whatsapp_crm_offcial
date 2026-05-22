@@ -19,8 +19,14 @@ class ConversationController extends Controller
         $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user'])
             ->where('status', 'open');
 
+        // Filter by "mine" = conversations with active claim by current user
         if ($request->filled('assigned') && $request->assigned === 'mine') {
-            $query->where('assigned_to', Auth::id());
+            $query->whereHas('activeClaim', fn($q) => $q->where('user_id', Auth::id()));
+        }
+
+        // Filter by status = pending (no active claim)
+        if ($request->filled('status') && $request->status === 'pending') {
+            $query->doesntHave('activeClaim');
         }
 
         $conversations = $query->orderBy('last_message_at', 'desc')->get();
