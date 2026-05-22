@@ -417,8 +417,8 @@
                     </div>
 
                     <!-- Emoji Picker -->
-                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 w-96 max-h-96 flex flex-col">
-                        <div class="flex gap-1 p-2 border-b border-outline-variant overflow-x-auto custom-scrollbar" id="emojiCategories"></div>
+                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 w-96 h-96 flex flex-col">
+                        <div class="flex gap-1 p-2 border-b border-outline-variant overflow-x-auto custom-scrollbar flex-shrink-0" id="emojiCategories"></div>
                         <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
                             <div class="grid grid-cols-7 gap-2" id="emojiGrid"></div>
                         </div>
