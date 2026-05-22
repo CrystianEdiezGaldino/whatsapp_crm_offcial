@@ -417,8 +417,11 @@
                     </div>
 
                     <!-- Emoji Picker -->
-                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 w-80 p-3">
-                        <div class="grid grid-cols-6 gap-2" id="emojiGrid"></div>
+                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 w-96 max-h-96 flex flex-col">
+                        <div class="flex gap-1 p-2 border-b border-outline-variant overflow-x-auto custom-scrollbar" id="emojiCategories"></div>
+                        <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
+                            <div class="grid grid-cols-7 gap-2" id="emojiGrid"></div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -1032,20 +1035,50 @@
     const emojiBtn = document.getElementById('emojiBtn');
     const emojiPicker = document.getElementById('emojiPicker');
     const emojiGrid = document.getElementById('emojiGrid');
+    const emojiCategories = document.getElementById('emojiCategories');
 
-    const emojis = [
-        '😊', '😂', '❤️', '👍', '🙏', '✨', '🎉', '🎁',
-        '👏', '💪', '🔥', '⭐', '✅', '❌', '⚠️', '💡',
-        '🚀', '📱', '💻', '⏰', '📧', '📞', '🏠', '🛒',
-        '💰', '💳', '📦', '🚚', '✏️', '📝', '📄', '🔔',
-        '🎯', '📊', '📈', '🎓', '👨‍💼', '👩‍💼', '👥', '🤝',
-        '😍', '😎', '🤔', '😅', '😢', '😡', '😴', '🤷',
-    ];
+    const emojisByCategory = {
+        'Reações': ['👍', '👎', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '👏', '🙌', '👏', '🎉', '🎊', '😍', '🥰', '😘', '💋'],
+        'Sentimentos': ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '🥲', '😋', '😛', '😜', '🤪', '😌', '😔', '😑', '😐', '😶', '🤐', '🤨', '🤔', '🤫', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤮', '🤧', '🤬', '🤯', '😳', '��', '😕', '😟', '🙁', '☹️', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖'],
+        'Gestos': ['👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👍', '👎', '👊', '👊', '👊', '✊', '👋', '👏', '🙌', '👐', '🤲', '🤝', '🤜', '🤛', '🦵', '🦶', '👂', '👃', '🧠', '🦷', '🦴'],
+        'Objetos': ['⌚', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️', '💽', '💾', '💿', '📀', '📧', '📨', '📩', '📤', '📥', '📦', '🏷️', '📪', '📫', '📬', '📭', '📮', '📯', '📜', '📞', '☎️', '📟', '📠', '🔋', '🔌', '💡', '🔦', '🕯️', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📑', '🧷', '🧹', '🧺', '🧻', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🚪', '🪑', '🚽', '🚿', '🛁', '🛒', '🚬', '⚰️', '⚱️', '🏺', '🔮', '📿', '💈', '⚗️', '⚖️', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🔩', '⌛', '⏳', '⏱️', '⏲️', '🧿', '🎞️', '🎬', '📺', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰'],
+        'Natureza': ['🌍', '🌎', '🌏', '🌐', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🌙', '🌚', '🌝', '🌛', '🌜', '⭐', '🌟', '✨', '⚡', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️', '⛄', '🌬️', '💨', '💧', '💦', '☔', '🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥑', '🍆', '🍅', '🌶️', '🌽', '🥒', '🥬', '🥦', '🧄', '🧅', '🍄', '🥜', '🌰', '🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇', '🥚', '🍳', '🧈', '🥞', '🥓', '🍗', '🍖', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🍰', '🎂', '🧁', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🍯', '🥛', '🍼', '☕', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'],
+        'Atividades': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎳', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🥅', '⛳', '⛸️', '🎣', '🎽', '🎿', '⛷️', '🏂', '🪂', '🛼', '🛹', '🛷', '🥌', '🎯', '🪀', '🪁', '🎪', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎮', '🎰', '🧩'],
+        'Viagem': ['✈️', '🛫', '🛬', '🛩️', '💺', '🛰️', '🚁', '🛶', '⛵', '🚤', '🛳️', '⛴️', '🛥️', '🚢', '🚧', '⚓', '⛽', '🚨', '🚥', '🚦', '🛑', '🚒', '🚓', '🚑', '🚐', '🛻', '🚚', '🚕', '🚙', '🚗', '🚌', '🚎', '🏎️', '🏍️', '🛵', '🦯', '🦽', '🦼', '🛺', '🚲', '🛴', '🌍', '🌎', '🌏', '🗺️', '🗿', '🗽', '🗼', '🏔️', '⛰️', '🌋', '⛰️', '🏕️', '⛺', '⛲', '⛺', '🏠', '🏡', '🏘️', '🏚️', '🏗️', '🏭', '🏢', '🏬', '🏣', '🏤', '🏥', '🏦', '🏧', '🏨', '🏪', '🏫', '🏩', '💒', '🏛️', '⛪', '🕌', '🕍', '🛕', '🕋', '⛩️', '🛤️', '🛣️', '🗾', '🎑', '🏞️', '🌅', '🌄', '🌠', '🎇', '🎆', '🌇', '🌆', '🏙️', '🌃', '🌌', '🌉', '🌁'],
+        'Símbolos': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🤜', '🤛', '✊', '👊', '✔️', '❌', '❎', '✅', '❌', '❓', '❔', '❕', '❗', '⁉️', '🔰', '🔱', '⚜️', '🔯', '💠', '🔷', '🔶', '🔹', '🔸', '🔺', '🔻', '💎', '💠', '🔘', '🔳', '🔲'],
+        'Bandeiras': ['🇧🇷', '🇺🇸', '🇪🇸', '🇮🇹', '🇫🇷', '🇩🇪', '🇯🇵', '🇨🇳', '🇷🇺', '🇰🇷', '🇮🇳', '🇲🇽', '🇨🇦', '🇦🇺', '🇿🇦', '🇬🇧'],
+    };
 
     function initEmojiPicker() {
+        // Create category buttons
+        const categoryBtns = Object.keys(emojisByCategory).map((category, index) =>
+            `<button type="button" data-category="${category}"
+             class="emoji-category-btn px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${index === 0 ? 'bg-primary text-on-primary' : 'hover:bg-surface-container text-on-surface-variant'}">${category}</button>`
+        ).join('');
+
+        emojiCategories.innerHTML = categoryBtns;
+
+        // Display first category
+        showEmojiCategory(Object.keys(emojisByCategory)[0]);
+
+        // Add category click handlers
+        document.querySelectorAll('.emoji-category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.emoji-category-btn').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary');
+                    b.classList.add('hover:bg-surface-container', 'text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary');
+                btn.classList.remove('hover:bg-surface-container', 'text-on-surface-variant');
+                showEmojiCategory(btn.dataset.category);
+            });
+        });
+    }
+
+    function showEmojiCategory(category) {
+        const emojis = emojisByCategory[category] || [];
         emojiGrid.innerHTML = emojis.map(emoji =>
-            `<button type="button" onclick="insertEmoji('${emoji}')"
-             class="text-2xl p-2 rounded-lg hover:bg-surface-container transition-colors">${emoji}</button>`
+            `<button type="button" onclick="insertEmoji('${emoji}')" class="text-2xl p-2 rounded-lg hover:bg-surface-container transition-colors">${emoji}</button>`
         ).join('');
     }
 
