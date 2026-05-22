@@ -24,12 +24,12 @@ class ConversationController extends Controller
             $query->whereHas('activeClaim', fn($q) => $q->where('user_id', Auth::id()));
         }
 
-        // Filter by status = pending (no active claim)
-        if ($request->filled('status') && $request->status === 'pending') {
-            $query->doesntHave('activeClaim');
-        }
-
         $conversations = $query->orderBy('last_message_at', 'desc')->get();
+
+        // Filter by status = pending (no active claim) - done in PHP to match the activeClaim() definition
+        if ($request->filled('status') && $request->status === 'pending') {
+            $conversations = $conversations->filter(fn($c) => !$c->getActiveClaim());
+        }
         $activeConversation = null;
         $previousConversations = collect();
         $macros = Macro::where('user_id', Auth::id())->orWhereNull('user_id')->get();
