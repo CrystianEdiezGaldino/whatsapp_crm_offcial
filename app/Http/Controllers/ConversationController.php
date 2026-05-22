@@ -25,7 +25,7 @@ class ConversationController extends Controller
 
         $conversations = $query->orderBy('last_message_at', 'desc')->get();
         $activeConversation = null;
-        $previousConversations = [];
+        $previousConversations = collect();
         $macros = Macro::where('user_id', Auth::id())->orWhereNull('user_id')->get();
 
         if ($request->filled('conversation')) {
