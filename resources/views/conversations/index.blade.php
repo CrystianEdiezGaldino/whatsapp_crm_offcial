@@ -570,6 +570,16 @@
     }
 
     // ===== Notificações em tempo real via Laravel Echo =====
+    // Global listener para recarregar a página quando houver nova mensagem
+    if (typeof window.Echo !== 'undefined') {
+        Echo.channel('conversations.all')
+            .listen('message.received', (event) => {
+                console.log('[Echo Global] Nova mensagem recebida');
+                // Recarregar página após 1.5s para atualizar lista de conversas
+                setTimeout(() => window.location.reload(), 1500);
+            });
+    }
+
     if (typeof window.Echo !== 'undefined' && @if($activeConversation) true @else false @endif) {
         const conversationId = {{ $activeConversation->id ?? 'null' }};
 
@@ -619,6 +629,9 @@
 
                 // Mostrar toast inline
                 showNotificationToast(event.sender_name, event.content);
+
+                // Recarregar página para atualizar lista de conversas e contagens
+                setTimeout(() => window.location.reload(), 1500);
             });
 
         // Solicitar permissão de notificação desktop

@@ -21,9 +21,12 @@ class MessageReceived implements ShouldBroadcast
         $this->agentId = $agentId;
     }
 
-    public function broadcastOn(): Channel
+    public function broadcastOn(): array
     {
-        return new Channel('conversation.' . $this->conversationId);
+        return [
+            new Channel('conversation.' . $this->conversationId),
+            new Channel('conversations.all'),
+        ];
     }
 
     public function broadcastAs(): string
