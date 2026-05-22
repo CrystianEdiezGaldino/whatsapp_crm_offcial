@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/conversations/{conversation}/assign', [ConversationController::class, 'assign'])->name('conversations.assign');
     Route::patch('/conversations/{conversation}/resolve', [ConversationController::class, 'resolve'])->name('conversations.resolve');
     Route::get('/conversations/{conversation}/history', [ConversationController::class, 'history'])->name('conversations.history');
+    Route::get('/conversations/{conversation}/history-view', [ConversationController::class, 'showHistoryConversation'])->name('conversations.history-view');
 
     Route::post('/conversations/{conversation}/claim', [ConversationClaimController::class, 'claim'])->name('conversations.claim');
     Route::delete('/conversations/{conversation}/claim', [ConversationClaimController::class, 'release'])->name('conversations.release');

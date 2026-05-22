@@ -272,4 +272,35 @@ class ConversationController extends Controller
             ]),
         ]);
     }
+
+    public function showHistoryConversation(Conversation $conversation)
+    {
+        $this->authorize('view', $conversation);
+
+        $messages = $conversation->messages()
+            ->with(['conversation.contact'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $claim = $conversation->claims()->latest('claimed_at')->first();
+
+        return response()->json([
+            'success' => true,
+            'conversation' => [
+                'id' => $conversation->id,
+                'contact_name' => $conversation->contact->name,
+                'contact_initials' => $conversation->contact->initials,
+                'created_at' => $conversation->created_at->format('d/m/Y H:i'),
+                'closed_at' => $conversation->updated_at->format('d/m/Y H:i'),
+                'claimed_by' => $claim?->user->name ?? 'Desconhecido',
+                'message_count' => $messages->count(),
+            ],
+            'messages' => $messages->map(fn($msg) => [
+                'direction' => $msg->direction,
+                'content' => $msg->content,
+                'created_at' => $msg->created_at->format('H:i'),
+                'has_media' => !is_null($msg->media_url),
+            ]),
+        ]);
+    }
 }

@@ -213,7 +213,7 @@
                 </summary>
                 <div class="space-y-2 p-3 border-t border-outline-variant bg-white">
                     @foreach($previousConversations as $prev)
-                    <div class="p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors">
+                    <button onclick="openHistoryModal({{ $prev->id }})" class="w-full text-left p-3 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95">
                         <div class="flex justify-between items-start gap-2 mb-1">
                             <div>
                                 <p class="text-xs font-bold text-on-surface">
@@ -235,7 +235,7 @@
                             {{ $prev->lastMessage->content ?? '(Sem mensagens de texto)' }}
                         </p>
                         @endif
-                    </div>
+                    </button>
                     @endforeach
                 </div>
             </details>
@@ -1013,6 +1013,94 @@
             showPendingNotification(sender);
             if (originalShowNotificationToast) originalShowNotificationToast(sender, message);
         };
+    }
+
+    // ===== History Modal =====
+    async function openHistoryModal(conversationId) {
+        try {
+            const response = await fetch(`/conversations/${conversationId}/history-view`, {
+                headers: apiJsonHeaders(),
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            const data = await parseJsonResponse(response);
+
+            if (!data.success) {
+                throw new Error(data.message || 'Erro ao carregar histórico');
+            }
+
+            const conv = data.conversation;
+            const messages = data.messages || [];
+
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
+            modal.id = 'historyModal';
+
+            let messagesHtml = '';
+            messages.forEach(msg => {
+                if (msg.direction === 'inbound') {
+                    messagesHtml += `
+                        <div class="flex items-end gap-2 mb-3">
+                            <div class="w-6 h-6 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-[10px] text-on-primary-fixed shrink-0">
+                                ${conv.contact_initials}
+                            </div>
+                            <div>
+                                <div class="bg-white p-3 rounded-lg rounded-bl-none border border-outline-variant max-w-xs">
+                                    <p class="text-sm text-on-surface">${msg.content}</p>
+                                </div>
+                                <span class="text-[10px] text-on-surface-variant mt-0.5 block ml-8">${msg.created_at}</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    messagesHtml += `
+                        <div class="flex flex-col items-end mb-3">
+                            <div class="bg-primary-container text-on-primary p-3 rounded-lg rounded-br-none max-w-xs">
+                                <p class="text-sm">${msg.content}</p>
+                            </div>
+                            <span class="text-[10px] text-on-surface-variant mt-0.5 mr-8">${msg.created_at}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            modal.innerHTML = `
+                <div class="bg-white rounded-xl shadow-xl flex flex-col w-full max-w-2xl max-h-[80vh]">
+                    <div class="p-4 border-b border-outline-variant flex justify-between items-center">
+                        <div>
+                            <h2 class="text-lg font-bold text-on-surface">Histórico: ${conv.contact_name}</h2>
+                            <p class="text-xs text-on-surface-variant mt-1">
+                                ${conv.created_at} até ${conv.closed_at} • Atendido por: ${conv.claimed_by} • ${conv.message_count} mensagens
+                            </p>
+                        </div>
+                        <button onclick="document.getElementById('historyModal').remove()" class="text-on-surface-variant hover:text-on-surface text-2xl">✕</button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
+                        ${messagesHtml || '<div class="text-center text-on-surface-variant text-sm py-8">Nenhuma mensagem neste atendimento</div>'}
+                    </div>
+                    <div class="p-4 border-t border-outline-variant flex justify-end gap-2">
+                        <button onclick="document.getElementById('historyModal').remove()" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Close on outside click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+
+        } catch (e) {
+            alert('Erro ao carregar histórico: ' + e.message);
+        }
     }
 </script>
 @endpush
