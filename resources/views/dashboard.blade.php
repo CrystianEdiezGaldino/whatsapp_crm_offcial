@@ -83,25 +83,33 @@
         <!-- Chart 1: Mensagens por Hora -->
         <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
             <h3 class="text-lg font-semibold text-on-surface mb-4">Mensagens por Hora</h3>
-            <canvas id="messagesByHourChart" height="300"></canvas>
+            <div style="height: 300px; position: relative;">
+                <canvas id="messagesByHourChart"></canvas>
+            </div>
         </div>
 
         <!-- Chart 2: Tipo de Mensagem -->
         <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
             <h3 class="text-lg font-semibold text-on-surface mb-4">Distribuição por Tipo</h3>
-            <canvas id="messagesByTypeChart" height="300"></canvas>
+            <div style="height: 300px; position: relative;">
+                <canvas id="messagesByTypeChart"></canvas>
+            </div>
         </div>
 
         <!-- Chart 3: Inbound vs Outbound -->
         <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
             <h3 class="text-lg font-semibold text-on-surface mb-4">Inbound vs Outbound</h3>
-            <canvas id="directionChart" height="300"></canvas>
+            <div style="height: 300px; position: relative;">
+                <canvas id="directionChart"></canvas>
+            </div>
         </div>
 
         <!-- Chart 4: Atividade por Agente -->
         <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
             <h3 class="text-lg font-semibold text-on-surface mb-4">Atividade por Agente</h3>
-            <canvas id="byAgentChart" height="300"></canvas>
+            <div style="height: 300px; position: relative;">
+                <canvas id="byAgentChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -286,8 +294,17 @@ async function loadDashboardData() {
     const params = new URLSearchParams(formData);
 
     try {
-        const response = await fetch(`/reports/dashboard-data?${params}`);
-        const data = await response.json();
+        const response = await fetch(`/reports/dashboard-data?${params}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        });
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+        }
+        const text = await response.text();
+        const data = JSON.parse(text);
 
         // Atualizar KPIs
         const totalMessages = data.by_direction.reduce((sum, d) => sum + d.count, 0);
@@ -326,7 +343,6 @@ function renderMessagesByHourChart(data) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
                 y: { beginAtZero: true }
@@ -387,7 +403,6 @@ function renderDirectionChart(data) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
                 y: { beginAtZero: true }
