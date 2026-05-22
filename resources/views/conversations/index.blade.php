@@ -713,6 +713,7 @@
             // Fetch lista de agentes
             const usersResponse = await fetch('/api/agents', {
                 headers: apiJsonHeaders(),
+                credentials: 'same-origin',
             });
 
             if (!usersResponse.ok) {

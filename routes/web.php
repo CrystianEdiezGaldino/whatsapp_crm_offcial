@@ -57,6 +57,18 @@ Route::middleware('auth')->group(function () {
 Route::get('/docs', [DocumentationController::class, 'index'])->name('documentation.index');
 Route::get('/docs/components/{component}', [DocumentationController::class, 'component'])->name('documentation.component');
 
+// API endpoints para modal de transferência
+Route::middleware('auth')->get('/api/agents', function () {
+    $agents = \App\Models\User::select('id', 'name', 'email', 'role')
+        ->orderBy('name')
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'agents' => $agents,
+    ]);
+});
+
 // Webhook Debug (apenas em desenvolvimento)
 Route::get('/webhook/debug', [WebhookController::class, 'debug'])->name('webhook.debug');
 Route::post('/webhook/debug', [WebhookController::class, 'debug']);

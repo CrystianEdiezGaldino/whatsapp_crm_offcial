@@ -8,17 +8,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Illuminate\Http\Reques
     return $request->user();
 });
 
-// Lista de agentes para transferência
-Route::middleware('auth')->get('/agents', function () {
-    $agents = User::select('id', 'name', 'email', 'role')
-        ->orderBy('name')
-        ->get();
-
-    return response()->json([
-        'success' => true,
-        'agents' => $agents,
-    ]);
-});
 
 // WhatsApp Webhook
 Route::get('/webhook/whatsapp', [WebhookController::class, 'verify']);
