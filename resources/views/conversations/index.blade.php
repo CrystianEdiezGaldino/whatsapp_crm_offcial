@@ -134,7 +134,7 @@
             </div>
         </div>
 
-        @if($activeConversation)
+        @if($activeConversation?->contact)
         <!-- Chat Header -->
         <div class="p-4 bg-white border-b border-outline-variant flex justify-between items-center shadow-sm">
             <div class="flex items-center gap-3 flex-1">
@@ -442,7 +442,7 @@
     </section>
 
     <!-- Right: Contact Details -->
-    @if($activeConversation)
+    @if($activeConversation?->contact)
     <section class="w-[300px] border-l border-outline-variant bg-white flex flex-col overflow-y-auto custom-scrollbar shrink-0">
         <div class="p-6 space-y-6">
             <!-- Contact Identity -->
