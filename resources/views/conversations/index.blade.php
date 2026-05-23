@@ -1191,5 +1191,33 @@
             alert('Erro ao carregar histórico: ' + e.message);
         }
     }
+
+    // Initialize SSE connections
+    document.addEventListener('DOMContentLoaded', function() {
+        const conversationId = new URLSearchParams(window.location.search).get('conversation');
+
+        if (conversationId) {
+            console.log('[Init] Starting SSE connection for conversation', conversationId);
+            window.SSEManager.connectToConversation(conversationId);
+            window.SSEManager.connectToMessages();
+        }
+
+        // Also connect to global conversations channel
+        window.SSEManager.connectToConversations();
+
+        // Listen to custom events
+        window.addEventListener('message-status-changed', (e) => {
+            console.log('[Event] Message status changed:', e.detail);
+        });
+
+        window.addEventListener('conversation-status-changed', (e) => {
+            console.log('[Event] Conversation status changed:', e.detail);
+        });
+    });
+
+    // Cleanup on page leave
+    window.addEventListener('beforeunload', function() {
+        window.SSEManager.disconnectAll();
+    });
 </script>
 @endpush

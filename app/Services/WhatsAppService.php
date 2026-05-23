@@ -401,6 +401,20 @@ class WhatsAppService
 
         if (!$waMsgId || !$newStatus) return;
 
-        Message::where('wa_message_id', $waMsgId)->update(['status' => $newStatus]);
+        $message = Message::where('wa_message_id', $waMsgId)->first();
+        if (!$message) return;
+
+        $oldStatus = $message->status;
+        $message->update(['status' => $newStatus]);
+
+        // Broadcast status change via Redis/SSE
+        event(new \App\Events\MessageStatusChanged($message));
+
+        Log::info('[MessageStatusChanged Event] Dispatched', [
+            'message_id' => $message->id,
+            'wa_message_id' => $waMsgId,
+            'old_status' => $oldStatus,
+            'new_status' => $newStatus,
+        ]);
     }
 }

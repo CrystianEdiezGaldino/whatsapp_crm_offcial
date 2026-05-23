@@ -47,6 +47,11 @@ class Conversation extends Model
         return $this->hasOne(ConversationClaim::class)->where('released_at', null)->latestOfMany('claimed_at');
     }
 
+    public function claimer()
+    {
+        return $this->belongsTo(User::class, 'claimed_by');
+    }
+
     public function isOpen(): bool
     {
         return $this->status === 'open';

@@ -23,7 +23,15 @@ class ConversationClaimController extends Controller
             ], 422);
         }
 
+        $oldStatus = $conversation->status;
         $claim = $conversation->claim(Auth::id(), 'Agente clamou o atendimento');
+
+        // Update conversation status to in_attendance
+        $conversation->update([
+            'status' => 'in_attendance',
+            'claimed_by' => Auth::id(),
+            'claimed_at' => now(),
+        ]);
 
         AuditLog::create([
             'auditable_type' => 'Conversation',
@@ -32,6 +40,7 @@ class ConversationClaimController extends Controller
             'description' => Auth::user()->name . ' clamou o atendimento',
             'user_id' => Auth::id(),
             'new_values' => [
+                'status' => 'in_attendance',
                 'claimed_by' => Auth::id(),
                 'claimed_at' => $claim->claimed_at,
             ],
@@ -39,7 +48,9 @@ class ConversationClaimController extends Controller
             'user_agent' => request()->userAgent(),
         ]);
 
+        // Broadcast status change
         event(new ConversationClaimed($conversation, Auth::user()));
+        event(new \App\Events\ConversationStatusChanged($conversation, $oldStatus));
 
         return response()->json([
             'success' => true,
@@ -49,6 +60,11 @@ class ConversationClaimController extends Controller
                 'user_id' => $claim->user_id,
                 'user_name' => $claim->user->name,
                 'claimed_at' => $claim->claimed_at,
+            ],
+            'conversation' => [
+                'id' => $conversation->id,
+                'status' => $conversation->status,
+                'claimed_by' => $conversation->claimed_by,
             ],
         ]);
     }
@@ -71,8 +87,16 @@ class ConversationClaimController extends Controller
             ], 403);
         }
 
+        $oldStatus = $conversation->status;
         $releasedUser = $activeClaim->user;
         $conversation->releaseClaim('Agente liberou o atendimento');
+
+        // Update conversation status back to new
+        $conversation->update([
+            'status' => 'new',
+            'claimed_by' => null,
+            'claimed_at' => null,
+        ]);
 
         AuditLog::create([
             'auditable_type' => 'Conversation',
@@ -81,15 +105,27 @@ class ConversationClaimController extends Controller
             'description' => Auth::user()->name . ' liberou o atendimento de ' . $releasedUser->name,
             'user_id' => Auth::id(),
             'old_values' => [
+                'status' => $oldStatus,
                 'claimed_by' => $releasedUser->id,
+            ],
+            'new_values' => [
+                'status' => 'new',
+                'claimed_by' => null,
             ],
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
 
+        // Broadcast status change
+        event(new \App\Events\ConversationStatusChanged($conversation, $oldStatus));
+
         return response()->json([
             'success' => true,
             'message' => 'Atendimento liberado com sucesso',
+            'conversation' => [
+                'id' => $conversation->id,
+                'status' => $conversation->status,
+            ],
         ]);
     }
 
