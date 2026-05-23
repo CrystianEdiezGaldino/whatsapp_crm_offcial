@@ -20,6 +20,8 @@ Route::middleware('guest')->group(function () {
 
 // Admin Routes
 Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('agents', \App\Http\Controllers\Admin\AgentController::class);
+
     Route::get('/distribution', [\App\Http\Controllers\Admin\DistributionController::class, 'index'])->name('distribution.index');
     Route::post('/distribution/settings', [\App\Http\Controllers\Admin\DistributionController::class, 'updateSettings'])->name('distribution.settings');
     Route::patch('/distribution/agents/{user}/capacity', [\App\Http\Controllers\Admin\DistributionController::class, 'updateAgentCapacity'])->name('distribution.agent.capacity');
