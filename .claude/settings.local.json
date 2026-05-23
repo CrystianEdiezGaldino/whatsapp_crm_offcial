@@ -77,7 +77,10 @@
       "Bash(Get-Content storage/logs/laravel.log -Tail 50)",
       "Bash(php -l app/Http/Controllers/HealthController.php)",
       "Bash(php -l app/Http/Controllers/WebhookController.php)",
-      "Bash(php -l app/Console/Commands/ProcessMessageRetries.php)"
+      "Bash(php -l app/Console/Commands/ProcessMessageRetries.php)",
+      "WebFetch(domain:developers.facebook.com)",
+      "WebSearch",
+      "Bash(php -l app/Services/WhatsAppTemplateBuilder.php)"
     ]
   }
 }
