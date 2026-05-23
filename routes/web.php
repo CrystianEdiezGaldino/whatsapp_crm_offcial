@@ -12,6 +12,7 @@ use App\Http\Controllers\AuditController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\HealthController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -79,6 +80,14 @@ Route::middleware('auth')->get('/api/agents', function () {
         'success' => true,
         'agents' => $agents,
     ]);
+});
+
+// Health Check Routes
+Route::get('/health', [HealthController::class, 'status'])->name('health.status');
+Route::get('/health/api', [HealthController::class, 'api'])->name('health.api');
+Route::middleware('auth')->group(function () {
+    Route::get('/health/dashboard', [HealthController::class, 'dashboard'])->name('health.dashboard');
+    Route::get('/health/webhooks', [HealthController::class, 'webhookLogs'])->name('health.webhooks');
 });
 
 // Webhook Debug (apenas em desenvolvimento)
