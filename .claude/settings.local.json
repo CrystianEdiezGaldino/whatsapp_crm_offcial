@@ -80,7 +80,10 @@
       "Bash(php -l app/Console/Commands/ProcessMessageRetries.php)",
       "WebFetch(domain:developers.facebook.com)",
       "WebSearch",
-      "Bash(php -l app/Services/WhatsAppTemplateBuilder.php)"
+      "Bash(php -l app/Services/WhatsAppTemplateBuilder.php)",
+      "Bash(php -l app/Services/WhatsAppOTPBuilder.php)",
+      "Bash(php -l app/Services/WhatsAppContactBuilder.php)",
+      "Bash(php -l app/Services/WhatsAppCarouselBuilder.php)"
     ]
   }
 }

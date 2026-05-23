@@ -317,6 +317,135 @@ class WhatsAppService
         }
     }
 
+    /**
+     * Send contact information (vCard)
+     */
+    public function sendContact(string $to, array $contact): ?array
+    {
+        // Validar número de telefone
+        $normalizedPhone = PhoneValidationService::normalize($to);
+        if (!$normalizedPhone) {
+            $this->lastError = ['message' => 'Invalid phone number format', 'code' => 400];
+            Log::error('[WhatsApp] Invalid phone number rejected', ['phone' => $to]);
+            return null;
+        }
+
+        try {
+            $response = $this->client->post("{$this->phoneNumberId}/messages", [
+                'json' => [
+                    'messaging_product' => 'whatsapp',
+                    'recipient_type' => 'individual',
+                    'to' => $normalizedPhone,
+                    'type' => 'contacts',
+                    'contacts' => [$contact],
+                ],
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            $this->lastError = $this->parseApiError($e);
+            Log::error('WhatsApp send contact failed', ['to' => $to, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Send emoji reaction to a message
+     * Only can react to messages you received from the user
+     */
+    public function sendReaction(string $messageId, string $emoji): ?array
+    {
+        try {
+            // Validate emoji is single character
+            if (strlen($emoji) > 4) {  // emojis can be up to 4 bytes UTF-8
+                Log::warning('[WhatsApp] Emoji reaction invalid', ['emoji' => $emoji]);
+                return null;
+            }
+
+            $response = $this->client->post("{$this->phoneNumberId}/messages", [
+                'json' => [
+                    'messaging_product' => 'whatsapp',
+                    'type' => 'reaction',
+                    'message_id' => $messageId,
+                    'emoji' => $emoji,
+                ],
+            ]);
+
+            Log::info('[WhatsApp] Reaction sent', [
+                'message_id' => $messageId,
+                'emoji' => $emoji,
+            ]);
+
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            $this->lastError = $this->parseApiError($e);
+            Log::error('WhatsApp send reaction failed', ['message_id' => $messageId, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Send OTP via authentication template
+     * CRITICAL: Must use authentication template, not freeform message
+     * Using this properly prevents account suspension
+     */
+    public function sendOTP(string $to, string $code, int $expirationMinutes = 10): ?array
+    {
+        // Validar número de telefone
+        $normalizedPhone = PhoneValidationService::normalize($to);
+        if (!$normalizedPhone) {
+            $this->lastError = ['message' => 'Invalid phone number format', 'code' => 400];
+            Log::error('[WhatsApp] Invalid phone number rejected', ['phone' => $to]);
+            return null;
+        }
+
+        // Build OTP template
+        $otpBuilder = WhatsAppOTPBuilder::create()
+            ->code($code)
+            ->expiresIn($expirationMinutes)
+            ->oneTabAutofill();
+
+        $template = $otpBuilder->build();
+
+        if (!$template) {
+            $this->lastError = ['message' => implode('; ', $otpBuilder->getErrors()), 'code' => 400];
+            Log::error('[WhatsApp] OTP template validation failed', [
+                'errors' => $otpBuilder->getErrors(),
+            ]);
+            return null;
+        }
+
+        // Log for audit (code length only, not actual code)
+        $otpBuilder->logAudit(auth()->id() ?? 'system', $normalizedPhone, 'sending');
+
+        try {
+            $response = $this->client->post("{$this->phoneNumberId}/messages", [
+                'json' => [
+                    'messaging_product' => 'whatsapp',
+                    'to' => $normalizedPhone,
+                    'type' => 'template',
+                    'template' => [
+                        'name' => $otpBuilder->getTemplateName(),
+                        'language' => ['code' => 'pt_BR'],
+                        'components' => $template['components'],
+                    ],
+                ],
+            ]);
+
+            $otpBuilder->logAudit(auth()->id() ?? 'system', $normalizedPhone, 'sent');
+
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            $this->lastError = $this->parseApiError($e);
+            Log::error('WhatsApp OTP send failed', [
+                'to' => $normalizedPhone,
+                'error' => $e->getMessage(),
+                'code' => '*** (hidden for security)',
+            ]);
+            return null;
+        }
+    }
+
     public static function processWebhook(array $payload): void
     {
         $entry = $payload['entry'][0]['changes'][0]['value'] ?? null;
