@@ -101,7 +101,15 @@ class WhatsAppService
 
     public function sendText(string $to, string $text): ?array
     {
-        return $this->postToRecipients($to, [
+        // Validar número de telefone
+        $normalizedPhone = PhoneValidationService::normalize($to);
+        if (!$normalizedPhone) {
+            $this->lastError = ['message' => 'Invalid phone number format', 'code' => 400];
+            Log::error('[WhatsApp] Invalid phone number rejected', ['phone' => $to]);
+            return null;
+        }
+
+        return $this->postToRecipients($normalizedPhone, [
             'type' => 'text',
             'text' => ['body' => $text, 'preview_url' => false],
         ]);
@@ -109,8 +117,16 @@ class WhatsAppService
 
     public function sendMedia(string $to, string $type, string $mediaId, ?string $caption = null): ?array
     {
+        // Validar número de telefone
+        $normalizedPhone = PhoneValidationService::normalize($to);
+        if (!$normalizedPhone) {
+            $this->lastError = ['message' => 'Invalid phone number format', 'code' => 400];
+            Log::error('[WhatsApp] Invalid phone number rejected', ['phone' => $to]);
+            return null;
+        }
+
         if ($type === 'audio') {
-            return $this->sendAudio($to, $mediaId, false);
+            return $this->sendAudio($normalizedPhone, $mediaId, false);
         }
 
         $mediaPayload = ['id' => $mediaId];
@@ -123,7 +139,7 @@ class WhatsAppService
             $mediaPayload['filename'] = $caption ?? 'document';
         }
 
-        return $this->postToRecipients($to, [
+        return $this->postToRecipients($normalizedPhone, [
             'type' => $type,
             $type => $mediaPayload,
         ]);
@@ -132,12 +148,20 @@ class WhatsAppService
     /** Envio de áudio via media_id (upload prévio na Meta). */
     public function sendAudio(string $to, string $mediaId, bool $asVoice = false): ?array
     {
+        // Validar número de telefone
+        $normalizedPhone = PhoneValidationService::normalize($to);
+        if (!$normalizedPhone) {
+            $this->lastError = ['message' => 'Invalid phone number format', 'code' => 400];
+            Log::error('[WhatsApp] Invalid phone number rejected', ['phone' => $to]);
+            return null;
+        }
+
         $audio = ['id' => $mediaId];
         if ($asVoice) {
             $audio['voice'] = true;
         }
 
-        return $this->postToRecipients($to, [
+        return $this->postToRecipients($normalizedPhone, [
             'type' => 'audio',
             'audio' => $audio,
         ]);
@@ -241,9 +265,17 @@ class WhatsAppService
 
     public function sendTemplate(string $to, string $templateName, string $language = 'pt_BR', array $components = []): ?array
     {
+        // Validar número de telefone
+        $normalizedPhone = PhoneValidationService::normalize($to);
+        if (!$normalizedPhone) {
+            $this->lastError = ['message' => 'Invalid phone number format', 'code' => 400];
+            Log::error('[WhatsApp] Invalid phone number rejected', ['phone' => $to]);
+            return null;
+        }
+
         $payload = [
             'messaging_product' => 'whatsapp',
-            'to' => PhoneNormalizer::forApi($to),
+            'to' => PhoneNormalizer::forApi($normalizedPhone),
             'type' => 'template',
             'template' => [
                 'name' => $templateName,
@@ -262,6 +294,7 @@ class WhatsAppService
 
             return json_decode($response->getBody()->getContents(), true);
         } catch (\Exception $e) {
+            $this->lastError = $this->parseApiError($e);
             Log::error('WhatsApp send template failed', ['to' => $to, 'error' => $e->getMessage()]);
             return null;
         }

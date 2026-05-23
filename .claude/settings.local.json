@@ -74,7 +74,10 @@
       "Bash(pkill -f \"php artisan serve\")",
       "Bash(netstat -ano)",
       "Bash(findstr \":8000\")",
-      "Bash(Get-Content storage/logs/laravel.log -Tail 50)"
+      "Bash(Get-Content storage/logs/laravel.log -Tail 50)",
+      "Bash(php -l app/Http/Controllers/HealthController.php)",
+      "Bash(php -l app/Http/Controllers/WebhookController.php)",
+      "Bash(php -l app/Console/Commands/ProcessMessageRetries.php)"
     ]
   }
 }

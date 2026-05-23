@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\WhatsAppService;
+use App\Services\WebhookMonitoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -25,7 +26,9 @@ class WebhookController extends Controller
 
     public function handle(Request $request)
     {
+        $startTime = microtime(true);
         $payload = $request->all();
+        $ipAddress = $request->ip();
 
         Log::info('Webhook received', ['payload' => $payload]);
 
@@ -35,9 +38,32 @@ class WebhookController extends Controller
             return response('Ignored', 200);
         }
 
-        WhatsAppService::processWebhook($payload);
+        // Registrar webhook
+        $webhookLog = WebhookMonitoringService::logWebhook(
+            type: 'message',
+            payload: $payload,
+            phoneNumber: null,
+            ipAddress: $ipAddress
+        );
 
-        return response('OK', 200);
+        try {
+            WhatsAppService::processWebhook($payload);
+
+            $processingTime = (int) round((microtime(true) - $startTime) * 1000);
+            WebhookMonitoringService::markSuccess($webhookLog, $processingTime);
+
+            return response('OK', 200);
+        } catch (\Exception $e) {
+            $processingTime = (int) round((microtime(true) - $startTime) * 1000);
+            WebhookMonitoringService::markFailed($webhookLog, $e->getMessage(), $processingTime);
+
+            Log::error('Webhook processing failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response('OK', 200);
+        }
     }
 
     public function debug(Request $request)
