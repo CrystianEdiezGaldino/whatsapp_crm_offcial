@@ -54,9 +54,19 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
+    public function agentCapacity()
+    {
+        return $this->hasOne(AgentCapacity::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
+    }
+
+    public function isAgent(): bool
+    {
+        return $this->role === 'agent';
     }
 
     public function isOnline(): bool
