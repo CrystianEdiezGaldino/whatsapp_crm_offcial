@@ -48,16 +48,24 @@ class DistributionController extends Controller
 
     public function updateSettings(Request $request)
     {
-        $validated = $request->validate([
-            'mode' => 'required|in:manual,automatic',
-            'overflow_action' => 'required|in:next_agent,queue',
-        ]);
+        try {
+            $validated = $request->validate([
+                'mode' => 'required|in:manual,automatic',
+                'overflow_action' => 'required|in:next_agent,queue',
+            ]);
 
-        $settings = DistributionSetting::current();
-        $settings->update($validated);
+            $settings = DistributionSetting::current();
+            $settings->update($validated);
 
-        return redirect()->route('admin.distribution.index')
-            ->with('success', 'Configurações de distribuição atualizadas com sucesso!');
+            \Log::info('[Distribution] Settings updated', $validated);
+
+            return redirect()->route('admin.distribution.index')
+                ->with('success', 'Configurações de distribuição atualizadas com sucesso!');
+        } catch (\Exception $e) {
+            \Log::error('[Distribution] Error updating settings', ['error' => $e->getMessage()]);
+            return redirect()->route('admin.distribution.index')
+                ->with('error', 'Erro ao atualizar configurações: ' . $e->getMessage());
+        }
     }
 
     public function updateAgentCapacity(Request $request, User $user)

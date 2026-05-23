@@ -71,7 +71,10 @@
       "mcp__plugin_claude-mem_mcp-search__get_observations",
       "Bash(powershell -Command \"Get-Date -Format 'yyyy_MM_dd_HHmmss'\")",
       "Bash(get-childitem \"resources\\\\views\\\\conversations\")",
-      "Bash(pkill -f \"php artisan serve\")"
+      "Bash(pkill -f \"php artisan serve\")",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":8000\")",
+      "Bash(Get-Content storage/logs/laravel.log -Tail 50)"
     ]
   }
 }

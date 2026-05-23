@@ -10,7 +10,7 @@ class Conversation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'contact_id', 'assigned_to', 'status', 'priority', 'last_message_at',
+        'contact_id', 'assigned_to', 'status', 'priority', 'last_message_at', 'claimed_by', 'claimed_at',
     ];
 
     protected $casts = [

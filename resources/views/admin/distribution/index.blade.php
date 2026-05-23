@@ -18,6 +18,32 @@
         </div>
     </div>
 
+    <!-- Alerts -->
+    @if($errors->any())
+    <div class="mx-6 mt-4 p-4 bg-error/10 border border-error text-error rounded-lg">
+        <strong>Erro:</strong>
+        <ul class="list-disc list-inside mt-2">
+            @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="mx-6 mt-4 p-4 bg-secondary-container/20 border border-secondary text-on-surface rounded-lg flex items-start gap-3">
+        <span class="material-symbols-outlined text-secondary mt-1">check_circle</span>
+        <span>{{ session('success') }}</span>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="mx-6 mt-4 p-4 bg-error/10 border border-error text-error rounded-lg flex items-start gap-3">
+        <span class="material-symbols-outlined mt-1">error</span>
+        <span>{{ session('error') }}</span>
+    </div>
+    @endif
+
     <!-- Content -->
     <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div class="grid grid-cols-1 gap-6 max-w-7xl">
