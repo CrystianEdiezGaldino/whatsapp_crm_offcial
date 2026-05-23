@@ -17,7 +17,7 @@ class ConversationController extends Controller
     public function index(Request $request)
     {
         $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user'])
-            ->where('status', 'open');
+            ->whereIn('status', ['new', 'in_attendance']);
 
         // Filter by "mine" = conversations with active claim by current user
         if ($request->filled('assigned') && $request->assigned === 'mine') {
@@ -47,7 +47,7 @@ class ConversationController extends Controller
                 $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
                     ->where('contact_id', $activeConversation->contact_id)
                     ->where('id', '!=', $activeConversation->id)
-                    ->where('status', 'closed')
+                    ->whereIn('status', ['closed', 'resolved'])
                     ->orderBy('created_at', 'desc')
                     ->limit(10)
                     ->get();
@@ -233,7 +233,7 @@ class ConversationController extends Controller
         $contact = Contact::findOrFail($validated['contact_id']);
 
         $conversation = Conversation::firstOrCreate(
-            ['contact_id' => $contact->id, 'status' => 'open'],
+            ['contact_id' => $contact->id, 'status' => 'new'],
             ['assigned_to' => Auth::id(), 'last_message_at' => now()]
         );
 
@@ -252,7 +252,12 @@ class ConversationController extends Controller
 
     public function resolve(Conversation $conversation)
     {
-        $conversation->update(['status' => 'closed']);
+        $oldStatus = $conversation->status;
+        $conversation->update(['status' => 'resolved']);
+
+        // Dispatch event for real-time update
+        event(new \App\Events\ConversationStatusChanged($conversation, $oldStatus));
+
         return redirect()->route('conversations.index');
     }
 
@@ -261,7 +266,7 @@ class ConversationController extends Controller
         $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
             ->where('contact_id', $conversation->contact_id)
             ->where('id', '!=', $conversation->id)
-            ->where('status', 'closed')
+            ->whereIn('status', ['closed', 'resolved'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
