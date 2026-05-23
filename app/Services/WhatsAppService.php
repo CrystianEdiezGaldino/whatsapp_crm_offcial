@@ -323,9 +323,12 @@ class WhatsAppService
         }
 
         $conversation = Conversation::firstOrCreate(
-            ['contact_id' => $contact->id, 'status' => 'open'],
+            ['contact_id' => $contact->id, 'status' => 'new'],
             ['last_message_at' => now()]
         );
+
+        // Apply automatic distribution if enabled
+        \App\Services\DistributionService::assign($conversation);
 
         $content = match ($type) {
             'text' => $waMessage['text']['body'] ?? null,

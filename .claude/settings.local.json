@@ -70,7 +70,8 @@
       "mcp__plugin_claude-mem_mcp-search__search",
       "mcp__plugin_claude-mem_mcp-search__get_observations",
       "Bash(powershell -Command \"Get-Date -Format 'yyyy_MM_dd_HHmmss'\")",
-      "Bash(get-childitem \"resources\\\\views\\\\conversations\")"
+      "Bash(get-childitem \"resources\\\\views\\\\conversations\")",
+      "Bash(pkill -f \"php artisan serve\")"
     ]
   }
 }
