@@ -10,7 +10,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Illuminate\Http\Reques
 });
 
 // SSE Endpoints (require authentication)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/sse/conversation/{conversationId}', [SSEController::class, 'subscribeToConversation']);
     Route::get('/sse/messages', [SSEController::class, 'subscribeToMessages']);
     Route::get('/sse/conversations', [SSEController::class, 'subscribeToConversations']);
