@@ -312,4 +312,34 @@ class ConversationController extends Controller
             ]),
         ]);
     }
+
+    public function pollAllStatus(Request $request)
+    {
+        $conversations = Conversation::with(['contact', 'assignedUser', 'activeClaim.user'])
+            ->whereIn('status', ['new', 'in_attendance'])
+            ->orderBy('last_message_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'conversations' => $conversations->map(fn($conv) => [
+                'id' => $conv->id,
+                'status' => $conv->status,
+                'claimed_by_name' => $conv->getActiveClaim()?->user->name,
+            ]),
+        ]);
+    }
+
+    public function pollMessageStatus(Request $request, $messageId)
+    {
+        $message = \App\Models\Message::find($messageId);
+
+        if (!$message) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        return response()->json([
+            'id' => $message->id,
+            'status' => $message->status,
+        ]);
+    }
 }

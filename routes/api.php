@@ -9,11 +9,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Illuminate\Http\Reques
     return $request->user();
 });
 
-// SSE Endpoints (require authentication)
-Route::middleware('auth')->group(function () {
+// SSE Endpoints (require authentication via session)
+Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/sse/conversation/{conversationId}', [SSEController::class, 'subscribeToConversation']);
     Route::get('/sse/messages', [SSEController::class, 'subscribeToMessages']);
     Route::get('/sse/conversations', [SSEController::class, 'subscribeToConversations']);
+});
+
+// Polling endpoints (fallback for SSE)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/conversations/status', [ConversationController::class, 'pollAllStatus']);
+    Route::get('/messages/{message}/status', [ConversationController::class, 'pollMessageStatus']);
 });
 
 // WhatsApp Webhook

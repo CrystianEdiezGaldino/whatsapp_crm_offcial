@@ -832,10 +832,8 @@
     const macrosMenu = document.getElementById('macrosMenu');
     const macrosMenuItems = document.getElementById('macrosMenuItems');
 
-    // Only initialize macros menu if the input exists (i.e., user has claimed the conversation)
-    if (!messageInput || !macrosMenu) {
-        console.log('Macros menu skipped: chat input not available');
-    } else {
+    // Only initialize macros menu if the elements exist in the DOM
+    if (messageInput && macrosMenu) {
     let allMacros = [];
     let selectedMacroIndex = -1;
 

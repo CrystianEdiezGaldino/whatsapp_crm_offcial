@@ -37,10 +37,14 @@ class MacroController extends Controller
             'category' => 'required|string|max:100',
         ]);
 
-        Macro::create([
+        $macro = Macro::create([
             ...$validated,
             'user_id' => Auth::id(),
         ]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'macro_id' => $macro->id, 'message' => 'Macro criada com sucesso!']);
+        }
 
         return redirect()->route('macros.index')->with('success', 'Macro criada com sucesso!');
     }

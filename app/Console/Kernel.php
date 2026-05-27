@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
     {
         // Executar retry de mensagens a cada minuto
         $schedule->command('messages:retry')->everyMinute();
+
+        // Verificar e renovar token WhatsApp a cada 6 horas
+        $schedule->command('whatsapp:refresh-token')->everyThreeHours();
     }
 
     /**

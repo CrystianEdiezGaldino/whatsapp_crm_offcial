@@ -52,6 +52,36 @@ class Conversation extends Model
         return $this->belongsTo(User::class, 'claimed_by');
     }
 
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function assignedBy()
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
+    }
+
+    public function sector()
+    {
+        return $this->belongsTo(Sector::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'conversation_tags');
+    }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
+
+    public function transfers()
+    {
+        return $this->hasMany(ConversationTransfer::class);
+    }
+
     public function isOpen(): bool
     {
         return $this->status === 'open';

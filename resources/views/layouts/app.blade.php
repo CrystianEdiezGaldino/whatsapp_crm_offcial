@@ -73,7 +73,7 @@
             </div>
 
             <nav class="flex-1 flex flex-col gap-1">
-                @php $current = request()->route()->getName() ?? ''; @endphp
+                @php $current = request()->route()?->getName() ?? ''; @endphp
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ $current === 'dashboard' ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span class="text-sm">Dashboard</span>
@@ -91,7 +91,7 @@
                     <span class="text-sm">Macros</span>
                 </a>
 
-                @if(auth()->user()->isAdmin())
+                @if(auth()->check() && auth()->user()->isAdmin())
                 <div class="border-t border-on-primary-container/10 my-2 pt-2">
                     <a href="{{ route('admin.sectors.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.sectors') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
                         <span class="material-symbols-outlined">category</span>
@@ -104,6 +104,26 @@
                     <a href="{{ route('admin.distribution.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.distribution') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
                         <span class="material-symbols-outlined">settings</span>
                         <span class="text-sm">Distribuição</span>
+                    </a>
+                    <a href="{{ route('admin.sla.dashboard') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.sla') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                        <span class="material-symbols-outlined">schedule</span>
+                        <span class="text-sm">SLA</span>
+                    </a>
+                    <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.tags') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                        <span class="material-symbols-outlined">label</span>
+                        <span class="text-sm">Tags</span>
+                    </a>
+                    <a href="{{ route('admin.complaints.dashboard') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.complaints') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                        <span class="material-symbols-outlined">warning</span>
+                        <span class="text-sm">Reclamações</span>
+                    </a>
+                    <a href="{{ route('admin.transfers.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.transfers') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                        <span class="material-symbols-outlined">compare_arrows</span>
+                        <span class="text-sm">Transferências</span>
+                    </a>
+                    <a href="{{ route('admin.whatsapp.token.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.whatsapp') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                        <span class="material-symbols-outlined">vpn_key</span>
+                        <span class="text-sm">Tokens WhatsApp</span>
                     </a>
                 </div>
                 @endif

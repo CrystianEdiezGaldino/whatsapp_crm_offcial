@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Macro;
+use App\Models\Sector;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,12 +15,37 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Create sectors first
+        $supportSector = Sector::firstOrCreate(
+            ['name' => 'Suporte'],
+            [
+                'keyboard_option' => 0,
+                'description' => 'Setor de Suporte Técnico',
+                'greeting_message' => 'Bem-vindo ao Suporte! Como posso ajudá-lo?',
+                'is_active' => true,
+                'order' => 1,
+            ]
+        );
+
+        $salesSector = Sector::firstOrCreate(
+            ['name' => 'Vendas'],
+            [
+                'keyboard_option' => 1,
+                'description' => 'Setor de Vendas',
+                'greeting_message' => 'Olá! Bem-vindo ao nosso setor de vendas!',
+                'is_active' => true,
+                'order' => 2,
+            ]
+        );
+
         $admin = User::create([
             'name' => 'Ricardo Silva',
             'email' => 'admin@erp.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'status' => 'online',
+            'sector_id' => $supportSector->id,
+            'is_active' => true,
         ]);
 
         $agent = User::create([
@@ -28,6 +54,8 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'agent',
             'status' => 'online',
+            'sector_id' => $supportSector->id,
+            'is_active' => true,
         ]);
 
         $contacts = Contact::factory()->count(10)->create()->each(function ($contact) use ($admin, $agent) {
@@ -80,5 +108,8 @@ class DatabaseSeeder extends Seeder
         Macro::create(['user_id' => $admin->id, 'name' => 'Encerramento', 'content' => 'Obrigado pelo contato! Se precisar de mais alguma coisa, estamos à disposição. Tenha um ótimo dia!', 'shortcut' => '/tchau', 'category' => 'encerramento']);
         Macro::create(['user_id' => $admin->id, 'name' => 'Link de Pagamento', 'content' => 'Segue o link para pagamento: {link}. Qualquer dúvida, nos avise!', 'shortcut' => '/pag', 'category' => 'financeiro']);
         Macro::create(['user_id' => $admin->id, 'name' => 'Rastreamento', 'content' => 'Seu pedido pode ser rastreado pelo código: {codigo}. Acesse: https://link.correios.com.br', 'shortcut' => '/rastreio', 'category' => 'logistica']);
+
+        // Seed initial data
+        $this->call(InitialDataSeeder::class);
     }
 }

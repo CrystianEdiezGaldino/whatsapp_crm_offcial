@@ -222,6 +222,15 @@
                     <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Conteúdo</label>
                     <textarea name="content" required rows="5" class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30" placeholder="Mensagem da macro... Use {nome} para variáveis."></textarea>
                 </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-on-surface-variant mb-2 uppercase">Arquivos (Imagem, Vídeo, PDF)</label>
+                    <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-secondary/40 rounded-xl cursor-pointer hover:bg-secondary/5 transition-colors">
+                        <span class="material-symbols-outlined text-secondary">cloud_upload</span>
+                        <span class="text-sm text-on-surface">Selecionar arquivo</span>
+                        <input type="file" id="new_macro_file_input" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx">
+                    </label>
+                    <div id="new_macro_files_list" class="mt-3 text-xs text-on-surface-variant">Nenhum arquivo selecionado</div>
+                </div>
             </div>
             <div class="flex gap-2 mt-6">
                 <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="flex-1 py-2.5 border border-outline-variant rounded-xl text-sm hover:bg-surface-container">Cancelar</button>
@@ -431,6 +440,55 @@ if (macroFileInput) {
             }
         })
         .catch(e => alert('Erro: ' + e.message));
+    });
+}
+
+let newMacroSelectedFile = null;
+const newMacroFileInput = document.getElementById('new_macro_file_input');
+if (newMacroFileInput) {
+    newMacroFileInput.addEventListener('change', function() {
+        if (this.files[0]) {
+            newMacroSelectedFile = this.files[0];
+            const filesList = document.getElementById('new_macro_files_list');
+            filesList.innerHTML = `<p class="text-xs">📎 ${this.files[0].name} (${(this.files[0].size / 1024).toFixed(2)} KB)</p>`;
+        }
+    });
+}
+
+// Interceptar submit do formulário de nova macro para fazer upload após criar
+const newMacroForm = document.querySelector('#newMacroModal form');
+if (newMacroForm) {
+    newMacroForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                window.location.reload();
+            } else if (response.status === 422) {
+                const errors = data.errors || {};
+                const errorMsg = Object.values(errors).flat().join(', ');
+                window.Feedback?.error(errorMsg) || alert('Erro: ' + errorMsg);
+            } else {
+                window.Feedback?.error(data.message) || alert('Erro ao criar macro');
+            }
+        } catch (e) {
+            console.error('Erro:', e);
+            alert('Erro ao criar macro: ' + e.message);
+        }
     });
 }
 </script>

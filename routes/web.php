@@ -36,6 +36,36 @@ Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')-
     Route::post('/distribution/settings', [\App\Http\Controllers\Admin\DistributionController::class, 'updateSettings'])->name('distribution.settings');
     Route::patch('/distribution/agents/{user}/capacity', [\App\Http\Controllers\Admin\DistributionController::class, 'updateAgentCapacity'])->name('distribution.agent.capacity');
     Route::get('/distribution/metrics', [\App\Http\Controllers\Admin\DistributionController::class, 'metrics'])->name('distribution.metrics');
+
+    // Tags
+    Route::resource('tags', \App\Http\Controllers\Admin\TagController::class);
+    Route::patch('/tags/{tag}/toggle-active', [\App\Http\Controllers\Admin\TagController::class, 'toggleActive'])->name('tags.toggle-active');
+
+    // Complaints (rotas fixas antes do resource para não conflitar com {complaint})
+    Route::get('/complaints/dashboard', [\App\Http\Controllers\Admin\ComplaintController::class, 'dashboard'])->name('complaints.dashboard');
+    Route::resource('complaints', \App\Http\Controllers\Admin\ComplaintController::class, ['only' => ['index', 'show']]);
+    Route::get('/complaints/{complaint}/review', [\App\Http\Controllers\Admin\ComplaintController::class, 'review'])->name('complaints.review');
+    Route::post('/complaints/{complaint}/resolve', [\App\Http\Controllers\Admin\ComplaintController::class, 'resolve'])->name('complaints.resolve');
+    Route::post('/complaints/{complaint}/dismiss', [\App\Http\Controllers\Admin\ComplaintController::class, 'dismiss'])->name('complaints.dismiss');
+
+    // Transfers (rotas fixas antes do resource)
+    Route::get('/transfers/pending', [\App\Http\Controllers\Admin\TransferController::class, 'pending'])->name('transfers.pending');
+    Route::get('/transfers/analytics', [\App\Http\Controllers\Admin\TransferController::class, 'analytics'])->name('transfers.analytics');
+    Route::resource('transfers', \App\Http\Controllers\Admin\TransferController::class, ['only' => ['index', 'show']]);
+    Route::post('/transfers/{transfer}/approve', [\App\Http\Controllers\Admin\TransferController::class, 'approve'])->name('transfers.approve');
+    Route::post('/transfers/{transfer}/reject', [\App\Http\Controllers\Admin\TransferController::class, 'reject'])->name('transfers.reject');
+    Route::post('/transfers/{transfer}/complete', [\App\Http\Controllers\Admin\TransferController::class, 'complete'])->name('transfers.complete');
+
+    // SLA
+    Route::get('/sla', [\App\Http\Controllers\Admin\SLAController::class, 'dashboard'])->name('sla.dashboard');
+    Route::get('/sla/metrics', [\App\Http\Controllers\Admin\SLAController::class, 'metrics'])->name('sla.metrics');
+    Route::post('/sla/check-breaches', [\App\Http\Controllers\Admin\SLAController::class, 'checkBreaches'])->name('sla.check-breaches');
+
+    // WhatsApp Token Management
+    Route::get('/whatsapp/tokens', [\App\Http\Controllers\Admin\WhatsAppTokenController::class, 'index'])->name('whatsapp.token.index');
+    Route::post('/whatsapp/tokens/refresh', [\App\Http\Controllers\Admin\WhatsAppTokenController::class, 'refresh'])->name('whatsapp.token.refresh');
+    Route::post('/whatsapp/tokens/store', [\App\Http\Controllers\Admin\WhatsAppTokenController::class, 'storeManual'])->name('whatsapp.token.store');
+    Route::post('/whatsapp/tokens/sync-env', [\App\Http\Controllers\Admin\WhatsAppTokenController::class, 'syncFromEnv'])->name('whatsapp.token.sync-env');
 });
 
 Route::middleware('auth')->group(function () {

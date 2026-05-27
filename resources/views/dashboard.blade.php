@@ -159,6 +159,7 @@
                     </thead>
                     <tbody class="divide-y divide-outline-variant/50">
                         @foreach($myChats->take(5) as $chat)
+                        @if($chat->contact)
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
@@ -183,6 +184,7 @@
                                 <a href="{{ route('conversations.index', ['conversation' => $chat->id]) }}" class="bg-primary text-on-primary text-xs font-semibold px-4 py-1.5 rounded-lg active:scale-95 transition-transform">Abrir</a>
                             </td>
                         </tr>
+                        @endif
                         @endforeach
                     </tbody>
                 </table>

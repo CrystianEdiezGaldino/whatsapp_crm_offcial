@@ -87,7 +87,17 @@
       "Bash(php -l app/Services/WhatsAppBlockingService.php)",
       "Bash(php -l app/Http/Controllers/Admin/SectorController.php)",
       "Bash(php -l app/Http/Controllers/Admin/AgentController.php)",
-      "Bash(php -l app/Models/Sector.php)"
+      "Bash(php -l app/Models/Sector.php)",
+      "Bash(php -l app/Http/Controllers/Admin/ComplaintController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/TagController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/TransferController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/SLAController.php)",
+      "Bash(php -l app/Services/SLAService.php)",
+      "Bash(php -l app/Services/PriorityService.php)",
+      "Bash(php -l app/Services/QueueService.php)",
+      "Bash(redis-cli --version)",
+      "Bash(php -m)",
+      "mcp__plugin_claude-mem_mcp-search__smart_outline"
     ]
   }
 }
