@@ -17,167 +17,27 @@ class SSEManager {
     }
 
     /**
-     * Connect to SSE stream for a conversation
+     * Connect to conversation - uses polling only (SSE disabled due to PHP timeout issues)
      */
     connectToConversation(conversationId) {
-        const key = `conversation_${conversationId}`;
-
-        if (this.connections.has(key)) {
-            console.log(`[SSE] Already connected to conversation ${conversationId}`);
-            return;
-        }
-
-        console.log(`[SSE] Attempting to connect to conversation ${conversationId}`);
-
-        const url = `/api/sse/conversation/${conversationId}`;
-        const eventSource = new EventSource(url);
-
-        const errorTimeout = setTimeout(() => {
-            console.warn(`[SSE] Connection timeout for conversation ${conversationId}, falling back to polling`);
-            eventSource.close();
-            this.connections.delete(key);
-            this.sseAvailable = false;
-            this.startPollingConversation(conversationId);
-        }, 5000);
-
-        eventSource.addEventListener('connected', (e) => {
-            clearTimeout(errorTimeout);
-            console.log('[SSE] Connected to conversation channel', JSON.parse(e.data));
-            this.reconnectAttempts.delete(key);
-        });
-
-        eventSource.addEventListener('message.status_changed', (e) => {
-            const data = JSON.parse(e.data);
-            console.log('[SSE] Message status changed', data);
-            this.handleMessageStatusChange(data);
-        });
-
-        eventSource.addEventListener('conversation.status_changed', (e) => {
-            const data = JSON.parse(e.data);
-            console.log('[SSE] Conversation status changed', data);
-            this.handleConversationStatusChange(data);
-        });
-
-        eventSource.addEventListener('error', (e) => {
-            clearTimeout(errorTimeout);
-            console.warn('[SSE] Connection error, falling back to polling', e);
-            eventSource.close();
-            this.connections.delete(key);
-            this.sseAvailable = false;
-            this.startPollingConversation(conversationId);
-        });
-
-        eventSource.onerror = () => {
-            if (eventSource.readyState === EventSource.CLOSED) {
-                clearTimeout(errorTimeout);
-                console.warn(`[SSE] Connection closed for conversation ${conversationId}, using polling`);
-                eventSource.close();
-                this.connections.delete(key);
-                if (this.sseAvailable) {
-                    this.attemptReconnect(key, () => this.connectToConversation(conversationId));
-                } else {
-                    this.startPollingConversation(conversationId);
-                }
-            }
-        };
-
-        this.connections.set(key, eventSource);
+        console.log(`[POLLING] Starting poll for conversation ${conversationId}`);
+        this.startPollingConversation(conversationId);
     }
 
     /**
-     * Connect to global messages status channel
+     * Connect to messages - uses polling only (SSE disabled)
      */
     connectToMessages() {
-        const key = 'messages_status';
-
-        if (this.connections.has(key)) {
-            console.log('[SSE] Already connected to messages channel');
-            return;
-        }
-
-        console.log('[SSE] Connecting to messages status channel');
-
-        const url = `/api/sse/messages`;
-        const eventSource = new EventSource(url);
-
-        const errorTimeout = setTimeout(() => {
-            console.warn('[SSE] Messages connection timeout, falling back to polling');
-            eventSource.close();
-            this.connections.delete(key);
-            this.sseAvailable = false;
-            this.startPollingMessages();
-        }, 5000);
-
-        eventSource.addEventListener('connected', (e) => {
-            clearTimeout(errorTimeout);
-            console.log('[SSE] Connected to messages channel', JSON.parse(e.data));
-            this.reconnectAttempts.delete(key);
-        });
-
-        eventSource.addEventListener('message.status_changed', (e) => {
-            const data = JSON.parse(e.data);
-            console.log('[SSE] Message status changed (global)', data);
-            this.handleMessageStatusChange(data);
-        });
-
-        eventSource.addEventListener('error', (e) => {
-            clearTimeout(errorTimeout);
-            console.warn('[SSE] Connection error on messages channel, falling back to polling', e);
-            eventSource.close();
-            this.connections.delete(key);
-            this.sseAvailable = false;
-            this.startPollingMessages();
-        });
-
-        this.connections.set(key, eventSource);
+        console.log('[POLLING] Starting poll for messages');
+        this.startPollingMessages();
     }
 
     /**
-     * Connect to global conversations status channel
+     * Connect to conversations - uses polling only (SSE disabled)
      */
     connectToConversations() {
-        const key = 'conversations_status';
-
-        if (this.connections.has(key)) {
-            console.log('[SSE] Already connected to conversations channel');
-            return;
-        }
-
-        console.log('[SSE] Connecting to conversations status channel');
-
-        const url = `/api/sse/conversations`;
-        const eventSource = new EventSource(url);
-
-        const errorTimeout = setTimeout(() => {
-            console.warn('[SSE] Conversations connection timeout, falling back to polling');
-            eventSource.close();
-            this.connections.delete(key);
-            this.sseAvailable = false;
-            this.startPollingConversations();
-        }, 5000);
-
-        eventSource.addEventListener('connected', (e) => {
-            clearTimeout(errorTimeout);
-            console.log('[SSE] Connected to conversations channel', JSON.parse(e.data));
-            this.reconnectAttempts.delete(key);
-        });
-
-        eventSource.addEventListener('conversation.status_changed', (e) => {
-            const data = JSON.parse(e.data);
-            console.log('[SSE] Conversation status changed (global)', data);
-            this.handleConversationStatusChange(data);
-        });
-
-        eventSource.addEventListener('error', (e) => {
-            clearTimeout(errorTimeout);
-            console.warn('[SSE] Connection error on conversations channel, falling back to polling', e);
-            eventSource.close();
-            this.connections.delete(key);
-            this.sseAvailable = false;
-            this.startPollingConversations();
-        });
-
-        this.connections.set(key, eventSource);
+        console.log('[POLLING] Starting poll for conversations');
+        this.startPollingConversations();
     }
 
     /**
