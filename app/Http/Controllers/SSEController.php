@@ -54,37 +54,20 @@ class SSEController extends Controller
             header('Connection: keep-alive');
             header('X-Accel-Buffering: no');
 
-            // Create new Redis connection for pubsub
-            $redis = Redis::connection()->client();
+            // Send initial connection message
+            echo "event: connected\n";
+            echo "data: " . json_encode(['status' => 'connected', 'channel' => $channel]) . "\n\n";
+            flush();
 
-            try {
-                // Send initial connection message
-                echo "event: connected\n";
-                echo "data: " . json_encode(['status' => 'connected', 'channel' => $channel]) . "\n\n";
+            Log::debug('[SSE] Subscribed to channel', ['channel' => $channel]);
+
+            // Keep connection alive with heartbeat while polling fallback handles updates
+            $startTime = time();
+            while (time() - $startTime < 3600) { // Keep connection for 1 hour max
+                // Send heartbeat every 15 seconds
+                echo ": heartbeat\n\n";
                 flush();
-
-                Log::debug('[SSE] Subscribed to channel', ['channel' => $channel]);
-
-                // Subscribe to channel
-                $redis->subscribe([$channel], function ($redis, $type, $data) {
-                    if ($type === 'message') {
-                        // Send event
-                        echo "data: {$data}\n\n";
-                        flush();
-                        Log::debug('[SSE] Sent message', ['size' => strlen($data)]);
-                    }
-                });
-            } catch (\Exception $e) {
-                Log::error('[SSE] Error in stream', [
-                    'channel' => $channel,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-
-                // Send error event
-                echo "event: error\n";
-                echo "data: " . json_encode(['error' => 'Connection failed']) . "\n\n";
-                flush();
+                sleep(15);
             }
         }, 200, [
             'X-Content-Type-Options' => 'nosniff',
