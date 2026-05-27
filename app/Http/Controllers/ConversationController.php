@@ -32,20 +32,14 @@ class ConversationController extends Controller
         }
         $activeConversation = null;
         $previousConversations = collect();
-
-        // Cache macros for 1 hour
-        $macros = \Illuminate\Support\Facades\Cache::remember(
-            'macros_' . Auth::id(),
-            3600,
-            fn() => Macro::where('user_id', Auth::id())->orWhereNull('user_id')->get()
-        );
+        $macros = Macro::where('user_id', Auth::id())->orWhereNull('user_id')->get();
 
         if ($request->filled('conversation')) {
             $activeConversation = Conversation::with([
                 'contact',
                 'assignedUser',
                 'activeClaim.user',
-                'messages' => fn($q) => $q->orderBy('created_at', 'asc')->limit(100),
+                'messages' => fn($q) => $q->orderBy('created_at', 'asc'),
             ])->find($request->conversation);
 
             // Load previous conversations with same contact
@@ -55,7 +49,7 @@ class ConversationController extends Controller
                     ->where('id', '!=', $activeConversation->id)
                     ->whereIn('status', ['closed', 'resolved'])
                     ->orderBy('created_at', 'desc')
-                    ->limit(5)
+                    ->limit(10)
                     ->get();
             }
         } elseif ($conversations->count() > 0) {
@@ -63,7 +57,7 @@ class ConversationController extends Controller
                 'contact',
                 'assignedUser',
                 'activeClaim.user',
-                'messages' => fn($q) => $q->orderBy('created_at', 'asc')->limit(100),
+                'messages' => fn($q) => $q->orderBy('created_at', 'asc'),
             ])->find($conversations->first()->id);
         }
 
@@ -222,18 +216,11 @@ class ConversationController extends Controller
         $messages = $conversation->messages()
             ->where('id', '>', $lastId)
             ->orderBy('id', 'asc')
-            ->select(['id', 'conversation_id', 'direction', 'content', 'status', 'type', 'wa_message_id', 'media_url', 'created_at'])
-            ->limit(50)
             ->get();
 
         return response()->json([
             'messages' => ChatInboxHelper::mapMessagesForClient($messages),
             'conversation_status' => $conversation->status,
-            'conversation' => [
-                'id' => $conversation->id,
-                'status' => $conversation->status,
-                'claimed_by_name' => $conversation->getActiveClaim()?->user->name,
-            ],
         ]);
     }
 

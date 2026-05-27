@@ -97,9 +97,7 @@
       "Bash(php -l app/Services/QueueService.php)",
       "Bash(redis-cli --version)",
       "Bash(php -m)",
-      "mcp__plugin_claude-mem_mcp-search__smart_outline",
-      "Bash(taskkill /F /IM php.exe)",
-      "PowerShell(Get-Process *)"
+      "mcp__plugin_claude-mem_mcp-search__smart_outline"
     ]
   }
 }
