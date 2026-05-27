@@ -27,7 +27,8 @@ class WhatsAppService
     public function __construct()
     {
         $this->phoneNumberId = config('services.whatsapp.phone_number_id');
-        $this->accessToken = config('services.whatsapp.access_token');
+        // Usar token do banco de dados se disponível, caso contrário usar .env
+        $this->accessToken = $this->getValidAccessToken();
         $this->apiVersion = config('services.whatsapp.api_version', 'v23.0');
         $this->baseUrl = config('services.whatsapp.base_url', 'https://graph.facebook.com');
 
@@ -40,6 +41,19 @@ class WhatsAppService
             'timeout' => 30,
             'verify' => storage_path('cacert.pem'),
         ]);
+    }
+
+    private function getValidAccessToken(): string
+    {
+        try {
+            $token = \App\Models\WhatsAppToken::where('token_type', 'access')->first();
+            if ($token && !$token->isExpired()) {
+                return $token->token_value;
+            }
+        } catch (\Exception $e) {
+            Log::warning('Erro ao buscar token do BD, usando .env', ['error' => $e->getMessage()]);
+        }
+        return config('services.whatsapp.access_token');
     }
 
     public function getLastError(): ?array

@@ -7,6 +7,8 @@ use Carbon\Carbon;
 
 class WhatsAppToken extends Model
 {
+    protected $table = 'whatsapp_tokens';
+
     protected $fillable = ['token_type', 'token_value', 'expires_in', 'expires_at', 'scope', 'notes', 'last_refreshed_at', 'refresh_attempts'];
 
     protected $casts = [
