@@ -13,6 +13,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'email', 'password', 'role', 'status', 'avatar',
+        'sector_id', 'is_active', 'notes',
     ];
 
     protected $hidden = [
@@ -22,7 +23,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_active' => 'boolean',
     ];
+
+    public function sector()
+    {
+        return $this->belongsTo(Sector::class);
+    }
 
     public function conversations()
     {
@@ -72,5 +79,38 @@ class User extends Authenticatable
     public function isOnline(): bool
     {
         return $this->status === 'online';
+    }
+
+    public function isSupervisor(): bool
+    {
+        return $this->role === 'supervisor';
+    }
+
+    public function isActive(): bool
+    {
+        return $this->is_active === true;
+    }
+
+    public function getSectorName(): string
+    {
+        return $this->sector?->name ?? 'Sem setor';
+    }
+
+    public function getStatusLabel(): string
+    {
+        if (!$this->isActive()) {
+            return '❌ Inativo';
+        }
+        return $this->status === 'online' ? '🟢 Online' : '⚪ Offline';
+    }
+
+    public function getRoleLabel(): string
+    {
+        return match ($this->role) {
+            'admin' => '👤 Administrador',
+            'supervisor' => '👨‍💼 Supervisor',
+            'agent' => '👨‍💻 Atendente',
+            default => $this->role,
+        };
     }
 }

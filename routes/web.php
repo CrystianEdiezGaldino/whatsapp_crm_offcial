@@ -21,8 +21,17 @@ Route::middleware('guest')->group(function () {
 
 // Admin Routes
 Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('agents', \App\Http\Controllers\Admin\AgentController::class);
+    // Sectors
+    Route::resource('sectors', \App\Http\Controllers\Admin\SectorController::class);
+    Route::patch('/sectors/{sector}/toggle-active', [\App\Http\Controllers\Admin\SectorController::class, 'toggleActive'])->name('sectors.toggle-active');
 
+    // Agents
+    Route::resource('agents', \App\Http\Controllers\Admin\AgentController::class);
+    Route::post('/agents/{user}/reset-password', [\App\Http\Controllers\Admin\AgentController::class, 'resetPassword'])->name('agents.reset-password');
+    Route::patch('/agents/{user}/toggle-active', [\App\Http\Controllers\Admin\AgentController::class, 'toggleActive'])->name('agents.toggle-active');
+    Route::get('/agents/export/csv', [\App\Http\Controllers\Admin\AgentController::class, 'export'])->name('agents.export');
+
+    // Distribution
     Route::get('/distribution', [\App\Http\Controllers\Admin\DistributionController::class, 'index'])->name('distribution.index');
     Route::post('/distribution/settings', [\App\Http\Controllers\Admin\DistributionController::class, 'updateSettings'])->name('distribution.settings');
     Route::patch('/distribution/agents/{user}/capacity', [\App\Http\Controllers\Admin\DistributionController::class, 'updateAgentCapacity'])->name('distribution.agent.capacity');

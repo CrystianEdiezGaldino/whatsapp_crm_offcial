@@ -58,12 +58,48 @@
                         @error('password_confirmation')<span class="text-error text-xs">{{ $message }}</span>@enderror
                     </div>
 
-                    <!-- Max Conversations -->
+                    <!-- Role -->
                     <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Máximo de Conversas Simultâneas</label>
-                        <input type="number" name="max_conversations" value="{{ old('max_conversations', 10) }}" min="1" max="100" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('max_conversations') ? 'border-error' : '' }}" required>
-                        @error('max_conversations')<span class="text-error text-xs">{{ $message }}</span>@enderror
-                        <p class="text-xs text-on-surface-variant mt-1">Quantas conversas este atendente pode atender simultaneamente</p>
+                        <label class="text-sm font-semibold text-on-surface block mb-2">Cargo</label>
+                        <select name="role" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('role') ? 'border-error' : '' }}" required onchange="this.form.dataset.role = this.value">
+                            <option value="">Selecione um cargo</option>
+                            @foreach($roles as $value => $label)
+                            <option value="{{ $value }}" {{ old('role') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('role')<span class="text-error text-xs">{{ $message }}</span>@enderror
+                    </div>
+
+                    <!-- Sector (required for agent/supervisor) -->
+                    <div id="sector-field">
+                        <label class="text-sm font-semibold text-on-surface block mb-2">Setor</label>
+                        <select name="sector_id" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('sector_id') ? 'border-error' : '' }}">
+                            <option value="">Selecione um setor</option>
+                            @foreach($sectors as $sector)
+                            <option value="{{ $sector->id }}" {{ old('sector_id') == $sector->id ? 'selected' : '' }}>
+                                {{ $sector->keyboard_option }}. {{ $sector->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('sector_id')<span class="text-error text-xs">{{ $message }}</span>@enderror
+                        <p class="text-xs text-on-surface-variant mt-1">Obrigatório para Atendentes e Supervisores</p>
+                    </div>
+
+                    <!-- Active Status -->
+                    <div>
+                        <label class="text-sm font-semibold text-on-surface block mb-2">Status</label>
+                        <label class="flex items-center gap-3 cursor-pointer">
+                            <input type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }} class="w-4 h-4 rounded border-outline-variant">
+                            <span class="text-sm text-on-surface">Ativado</span>
+                        </label>
+                        <p class="text-xs text-on-surface-variant mt-1">Atendentes inativos não recebem novas conversas</p>
+                    </div>
+
+                    <!-- Notes -->
+                    <div>
+                        <label class="text-sm font-semibold text-on-surface block mb-2">Observações</label>
+                        <textarea name="notes" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('notes') ? 'border-error' : '' }}" placeholder="Anotações sobre este atendente" rows="3">{{ old('notes') }}</textarea>
+                        @error('notes')<span class="text-error text-xs">{{ $message }}</span>@enderror
                     </div>
 
                     <!-- Form Actions -->

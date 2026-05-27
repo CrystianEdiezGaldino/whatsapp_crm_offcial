@@ -42,8 +42,9 @@
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Atendente</th>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Email</th>
+                                <th class="px-4 py-3 text-left font-semibold text-on-surface">Cargo</th>
+                                <th class="px-4 py-3 text-left font-semibold text-on-surface">Setor</th>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Status</th>
-                                <th class="px-4 py-3 text-left font-semibold text-on-surface">Capacidade</th>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Ativo</th>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Ações</th>
                             </tr>
@@ -61,17 +62,20 @@
                                 </td>
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $agent->email }}</td>
                                 <td class="px-4 py-3">
+                                    <span class="text-sm text-on-surface">{{ $agent->getRoleLabel() }}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="text-sm text-on-surface">{{ $agent->getSectorName() }}</span>
+                                </td>
+                                <td class="px-4 py-3">
                                     <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium {{ $agent->status === 'online' ? 'bg-secondary-container/20 text-secondary' : 'bg-outline-variant/20 text-on-surface-variant' }}">
                                         <span class="w-2 h-2 rounded-full {{ $agent->status === 'online' ? 'bg-secondary' : 'bg-on-surface-variant' }}"></span>
                                         {{ $agent->status === 'online' ? 'Online' : 'Offline' }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="text-on-surface">{{ $agent->agentCapacity?->max_conversations ?? 10 }}</span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <span class="px-2 py-1 rounded text-xs font-medium {{ $agent->agentCapacity?->is_active ? 'bg-secondary-container/20 text-secondary' : 'bg-outline-variant/20 text-on-surface-variant' }}">
-                                        {{ $agent->agentCapacity?->is_active ? 'Sim' : 'Não' }}
+                                    <span class="px-2 py-1 rounded text-xs font-medium {{ $agent->is_active ? 'bg-secondary-container/20 text-secondary' : 'bg-outline-variant/20 text-on-surface-variant' }}">
+                                        {{ $agent->is_active ? 'Sim' : 'Não' }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
@@ -79,6 +83,7 @@
                                         <a href="{{ route('admin.agents.edit', $agent->id) }}" class="text-secondary hover:text-secondary/80 font-semibold text-xs">
                                             <span class="material-symbols-outlined inline text-sm">edit</span> Editar
                                         </a>
+                                        @if($agent->conversations()->whereIn('status', ['new', 'in_attendance'])->count() === 0 && !$agent->isAdmin())
                                         <form action="{{ route('admin.agents.destroy', $agent->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este atendente?');" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -86,6 +91,7 @@
                                                 <span class="material-symbols-outlined inline text-sm">delete</span> Deletar
                                             </button>
                                         </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

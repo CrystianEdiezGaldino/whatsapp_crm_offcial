@@ -93,6 +93,10 @@
 
                 @if(auth()->user()->isAdmin())
                 <div class="border-t border-on-primary-container/10 my-2 pt-2">
+                    <a href="{{ route('admin.sectors.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.sectors') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                        <span class="material-symbols-outlined">category</span>
+                        <span class="text-sm">Setores</span>
+                    </a>
                     <a href="{{ route('admin.agents.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.agents') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
                         <span class="material-symbols-outlined">people</span>
                         <span class="text-sm">Atendentes</span>

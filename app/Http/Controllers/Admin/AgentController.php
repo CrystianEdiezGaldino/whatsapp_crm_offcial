@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\AgentCapacity;
+use App\Models\Sector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 
 class AgentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('ensure_is_admin');
+    }
+
     public function index()
     {
-        $agents = User::where('role', 'agent')
-            ->with('agentCapacity')
+        $agents = User::whereIn('role', ['agent', 'supervisor', 'admin'])
+            ->with('sector')
             ->orderBy('name')
             ->paginate(15);
 
@@ -23,139 +29,221 @@ class AgentController extends Controller
 
     public function create()
     {
-        return view('admin.agents.create');
+        $sectors = Sector::active()->byOption()->get();
+        $roles = [
+            'agent' => 'Atendente',
+            'supervisor' => 'Supervisor',
+            'admin' => 'Administrador',
+        ];
+
+        return view('admin.agents.create', compact('sectors', 'roles'));
     }
 
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:8|confirmed',
-                'max_conversations' => 'required|integer|min:1|max:100',
-            ]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|in:agent,supervisor,admin',
+            'sector_id' => 'required_if:role,agent,supervisor|exists:sectors,id|nullable',
+            'is_active' => 'boolean',
+            'notes' => 'nullable|string|max:1000',
+        ]);
 
-            // Create user with agent role
+        try {
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role' => 'agent',
+                'role' => $validated['role'],
+                'sector_id' => $validated['sector_id'] ?? null,
+                'is_active' => $validated['is_active'] ?? true,
+                'notes' => $validated['notes'] ?? null,
                 'status' => 'offline',
             ]);
 
-            // Create capacity record
-            AgentCapacity::create([
-                'user_id' => $user->id,
-                'max_conversations' => $validated['max_conversations'],
-                'is_active' => true,
-            ]);
+            if (in_array($validated['role'], ['agent', 'supervisor'])) {
+                $user->agentCapacity()->create([
+                    'max_conversations' => 10,
+                    'is_active' => true,
+                ]);
+            }
 
-            Log::info('[Agent] New agent registered', [
+            Log::info('[Admin] Agent created', [
                 'user_id' => $user->id,
                 'name' => $user->name,
-                'email' => $user->email,
+                'role' => $user->role,
+                'sector_id' => $user->sector_id,
+                'created_by' => auth()->user()->email,
             ]);
 
-            return redirect()->route('admin.agents.index')
+            return redirect()
+                ->route('admin.agents.show', $user)
                 ->with('success', "Atendente '{$user->name}' cadastrado com sucesso!");
         } catch (\Exception $e) {
-            Log::error('[Agent] Error registering agent', ['error' => $e->getMessage()]);
-            return redirect()->route('admin.agents.create')
-                ->withInput()
-                ->with('error', 'Erro ao cadastrar atendente: ' . $e->getMessage());
+            Log::error('[Admin] Error creating agent', ['error' => $e->getMessage()]);
+            return back()->withInput()->withError('Erro ao cadastrar atendente');
         }
     }
 
-    public function edit(User $agent)
+    public function show(User $user)
     {
-        if (!$agent->isAgent()) {
-            return redirect()->route('admin.agents.index')
-                ->with('error', 'Usuário não é um atendente');
-        }
-
-        return view('admin.agents.edit', compact('agent'));
+        $user->load('sector', 'agentCapacity', 'conversations');
+        return view('admin.agents.show', compact('user'));
     }
 
-    public function update(Request $request, User $agent)
+    public function edit(User $user)
     {
-        if (!$agent->isAgent()) {
-            return redirect()->route('admin.agents.index')
-                ->with('error', 'Usuário não é um atendente');
-        }
+        $sectors = Sector::active()->byOption()->get();
+        $roles = [
+            'agent' => 'Atendente',
+            'supervisor' => 'Supervisor',
+            'admin' => 'Administrador',
+        ];
+
+        return view('admin.agents.edit', compact('user', 'sectors', 'roles'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'required|in:agent,supervisor,admin',
+            'sector_id' => 'required_if:role,agent,supervisor|exists:sectors,id|nullable',
+            'is_active' => 'boolean',
+            'notes' => 'nullable|string|max:1000',
+        ]);
 
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . $agent->id,
-                'max_conversations' => 'required|integer|min:1|max:100',
-                'status' => 'required|in:online,offline',
-            ]);
-
-            // Update user info
-            $agent->update([
+            $user->update([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'status' => $validated['status'],
+                'role' => $validated['role'],
+                'sector_id' => $validated['sector_id'] ?? null,
+                'is_active' => $validated['is_active'] ?? true,
+                'notes' => $validated['notes'] ?? null,
             ]);
 
-            // Update capacity
-            $agent->agentCapacity->update([
-                'max_conversations' => $validated['max_conversations'],
+            if (in_array($validated['role'], ['agent', 'supervisor']) && !$user->agentCapacity) {
+                $user->agentCapacity()->create([
+                    'max_conversations' => 10,
+                    'is_active' => true,
+                ]);
+            }
+
+            Log::info('[Admin] Agent updated', [
+                'user_id' => $user->id,
+                'updated_by' => auth()->user()->email,
             ]);
 
-            Log::info('[Agent] Agent updated', [
-                'user_id' => $agent->id,
-                'name' => $agent->name,
-            ]);
-
-            return redirect()->route('admin.agents.index')
-                ->with('success', "Atendente '{$agent->name}' atualizado com sucesso!");
+            return redirect()
+                ->route('admin.agents.show', $user)
+                ->with('success', "Atendente '{$user->name}' atualizado!");
         } catch (\Exception $e) {
-            Log::error('[Agent] Error updating agent', ['error' => $e->getMessage()]);
-            return redirect()->route('admin.agents.edit', $agent->id)
-                ->withInput()
-                ->with('error', 'Erro ao atualizar atendente: ' . $e->getMessage());
+            Log::error('[Admin] Error updating agent', ['error' => $e->getMessage()]);
+            return back()->withInput()->withError('Erro ao atualizar atendente');
         }
     }
 
-    public function destroy(User $agent)
+    public function resetPassword(Request $request, User $user)
     {
-        if (!$agent->isAgent()) {
-            return redirect()->route('admin.agents.index')
-                ->with('error', 'Usuário não é um atendente');
-        }
-
-        // Check if agent has active conversations
-        $activeConversations = $agent->conversations()
-            ->whereIn('status', ['new', 'in_attendance'])
-            ->count();
-
-        if ($activeConversations > 0) {
-            return redirect()->route('admin.agents.index')
-                ->with('error', "Não é possível deletar atendente com {$activeConversations} conversa(s) ativa(s)");
-        }
+        $validated = $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
 
         try {
-            $agentName = $agent->name;
+            $user->update(['password' => Hash::make($validated['password'])]);
 
-            // Delete capacity record
-            $agent->agentCapacity?->delete();
-
-            // Delete user
-            $agent->delete();
-
-            Log::info('[Agent] Agent deleted', [
-                'name' => $agentName,
+            Log::warning('[Admin] Password reset', [
+                'user_id' => $user->id,
+                'reset_by' => auth()->user()->email,
             ]);
 
-            return redirect()->route('admin.agents.index')
-                ->with('success', "Atendente '{$agentName}' deletado com sucesso!");
+            return response()->json([
+                'success' => true,
+                'message' => 'Senha redefinida com sucesso!',
+            ]);
         } catch (\Exception $e) {
-            Log::error('[Agent] Error deleting agent', ['error' => $e->getMessage()]);
-            return redirect()->route('admin.agents.index')
-                ->with('error', 'Erro ao deletar atendente: ' . $e->getMessage());
+            return response()->json(['error' => 'Erro ao redefinir senha'], 500);
         }
+    }
+
+    public function toggleActive(User $user)
+    {
+        try {
+            $user->update(['is_active' => !$user->is_active]);
+
+            Log::info('[Admin] Agent toggled', [
+                'user_id' => $user->id,
+                'is_active' => $user->is_active,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'is_active' => $user->is_active,
+                'message' => $user->is_active ? 'Ativado' : 'Desativado',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao alterar status'], 500);
+        }
+    }
+
+    public function destroy(User $user)
+    {
+        try {
+            if ($user->isAdmin()) {
+                return back()->withError('Não pode deletar administrador');
+            }
+
+            $userName = $user->name;
+            Log::warning('[Admin] Agent deleted', [
+                'user_id' => $user->id,
+                'name' => $userName,
+            ]);
+
+            $user->delete();
+
+            return redirect()
+                ->route('admin.agents.index')
+                ->with('success', "Atendente '{$userName}' deletado!");
+        } catch (\Exception $e) {
+            Log::error('[Admin] Error deleting agent', ['error' => $e->getMessage()]);
+            return back()->withError('Erro ao deletar atendente');
+        }
+    }
+
+    public function export()
+    {
+        $agents = User::whereIn('role', ['agent', 'supervisor', 'admin'])
+            ->with('sector')
+            ->orderBy('name')
+            ->get();
+
+        $fileName = 'agents_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        return response()->stream(function () use ($agents) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, ['Nome', 'Email', 'Cargo', 'Setor', 'Status', 'Ativo', 'Criado']);
+
+            foreach ($agents as $agent) {
+                fputcsv($handle, [
+                    $agent->name,
+                    $agent->email,
+                    $agent->getRoleLabel(),
+                    $agent->getSectorName(),
+                    $agent->status,
+                    $agent->is_active ? 'Sim' : 'Não',
+                    $agent->created_at->format('d/m/Y H:i'),
+                ]);
+            }
+
+            fclose($handle);
+        }, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ]);
     }
 }

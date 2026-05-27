@@ -84,7 +84,10 @@
       "Bash(php -l app/Services/WhatsAppOTPBuilder.php)",
       "Bash(php -l app/Services/WhatsAppContactBuilder.php)",
       "Bash(php -l app/Services/WhatsAppCarouselBuilder.php)",
-      "Bash(php -l app/Services/WhatsAppBlockingService.php)"
+      "Bash(php -l app/Services/WhatsAppBlockingService.php)",
+      "Bash(php -l app/Http/Controllers/Admin/SectorController.php)",
+      "Bash(php -l app/Http/Controllers/Admin/AgentController.php)",
+      "Bash(php -l app/Models/Sector.php)"
     ]
   }
 }
