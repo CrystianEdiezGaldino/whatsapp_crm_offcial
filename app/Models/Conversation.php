@@ -89,10 +89,6 @@ class Conversation extends Model
 
     public function getActiveClaim(): ?ConversationClaim
     {
-        // If activeClaim was eager loaded, use it directly to avoid N+1 queries
-        if ($this->relationLoaded('activeClaim')) {
-            return $this->activeClaim;
-        }
         return $this->activeClaim()->first();
     }
 
