@@ -83,7 +83,8 @@
       "Bash(php -l app/Services/WhatsAppTemplateBuilder.php)",
       "Bash(php -l app/Services/WhatsAppOTPBuilder.php)",
       "Bash(php -l app/Services/WhatsAppContactBuilder.php)",
-      "Bash(php -l app/Services/WhatsAppCarouselBuilder.php)"
+      "Bash(php -l app/Services/WhatsAppCarouselBuilder.php)",
+      "Bash(php -l app/Services/WhatsAppBlockingService.php)"
     ]
   }
 }
