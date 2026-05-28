@@ -17,13 +17,12 @@ class ConversationController extends Controller
     public function index(Request $request)
     {
         $isAdmin = Auth::user()->isAdmin();
+        $showAllConversations = $isAdmin && !$request->filled('assigned') && !$request->filled('status');
+
         $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user', 'tags']);
 
         // Admin can see all conversations in "Todos" tab, agents only see active ones
-        if ($isAdmin && !$request->filled('assigned') && !$request->filled('status')) {
-            // Admin viewing "Todos" - show all conversations
-            // No status filter applied
-        } else {
+        if (!$showAllConversations) {
             // Agents or filtered views - only show active conversations
             $query->whereIn('status', ['new', 'in_attendance']);
         }
@@ -34,6 +33,11 @@ class ConversationController extends Controller
         }
 
         $conversations = $query->orderBy('last_message_at', 'desc')->get();
+
+        // For admin "Todos" tab, show only latest conversation per contact
+        if ($showAllConversations) {
+            $conversations = $conversations->unique('contact_id')->values();
+        }
 
         // Filter by status = pending (no active claim) - done in PHP to match the activeClaim() definition
         if ($request->filled('status') && $request->status === 'pending') {
