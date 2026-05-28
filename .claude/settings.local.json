@@ -99,7 +99,10 @@
       "Bash(php -m)",
       "mcp__plugin_claude-mem_mcp-search__smart_outline",
       "Bash(taskkill /F /IM php.exe)",
-      "PowerShell(Get-Process *)"
+      "PowerShell(Get-Process *)",
+      "Bash(grep -E \"\\\\.\\(php|md\\)$\")",
+      "Bash(awk '{print $2}')",
+      "Bash(xargs kill -9)"
     ]
   }
 }
