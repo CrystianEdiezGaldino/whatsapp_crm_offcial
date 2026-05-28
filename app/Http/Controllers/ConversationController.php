@@ -44,6 +44,11 @@ class ConversationController extends Controller
         if ($request->filled('status') && $request->status === 'pending') {
             $conversations = $conversations->filter(fn($c) => !$c->getActiveClaim());
         }
+
+        // Calculate counts after deduplication
+        $totalCount = $conversations->count();
+        $pendingCount = $conversations->filter(fn($c) => !$c->getActiveClaim())->count();
+
         $activeConversation = null;
         $previousConversations = collect();
 
@@ -83,7 +88,7 @@ class ConversationController extends Controller
             ])->find($conversations->first()->id);
         }
 
-        return view('conversations.index', compact('conversations', 'activeConversation', 'previousConversations', 'macros'));
+        return view('conversations.index', compact('conversations', 'activeConversation', 'previousConversations', 'macros', 'totalCount', 'pendingCount'));
     }
 
     public function sendMessage(Request $request)

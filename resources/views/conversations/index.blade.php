@@ -39,10 +39,6 @@
         <div class="p-4 border-b border-outline-variant">
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-lg font-semibold text-on-surface">Chats Ativos</h2>
-                @php
-                    $pendingCount = $conversations->filter(fn($c) => !$c->getActiveClaim())->count();
-                    $totalCount = $conversations->count();
-                @endphp
                 @if($pendingCount > 0)
                 <span class="bg-error text-on-error text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
                     {{ $pendingCount }} pendente{{ $pendingCount !== 1 ? 's' : '' }}
