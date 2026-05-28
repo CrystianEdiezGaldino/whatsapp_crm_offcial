@@ -155,6 +155,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/webhook/whatsapp', [WebhookController::class, 'verify'])->name('webhook.verify');
 Route::post('/webhook/whatsapp', [WebhookController::class, 'handle'])->name('webhook.handle');
 
+// WhatsApp Webhook Routes (com /api prefix)
+Route::get('/api/webhook/whatsapp', [WebhookController::class, 'verify']);
+Route::post('/api/webhook/whatsapp', [WebhookController::class, 'handle']);
+
 // Webhook Debug (apenas em desenvolvimento)
 Route::get('/webhook/debug', [WebhookController::class, 'debug'])->name('webhook.debug');
 Route::post('/webhook/debug', [WebhookController::class, 'debug']);
