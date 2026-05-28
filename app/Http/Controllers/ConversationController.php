@@ -16,8 +16,17 @@ class ConversationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user', 'tags'])
-            ->whereIn('status', ['new', 'in_attendance']);
+        $isAdmin = Auth::user()->isAdmin();
+        $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user', 'tags']);
+
+        // Admin can see all conversations in "Todos" tab, agents only see active ones
+        if ($isAdmin && !$request->filled('assigned') && !$request->filled('status')) {
+            // Admin viewing "Todos" - show all conversations
+            // No status filter applied
+        } else {
+            // Agents or filtered views - only show active conversations
+            $query->whereIn('status', ['new', 'in_attendance']);
+        }
 
         // Filter by "mine" = conversations with active claim by current user
         if ($request->filled('assigned') && $request->assigned === 'mine') {

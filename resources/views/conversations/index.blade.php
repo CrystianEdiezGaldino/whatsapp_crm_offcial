@@ -70,10 +70,11 @@
             @forelse($conversations as $conv)
             @php
                 $convPending = !$conv->getActiveClaim();
+                $convResolved = $conv->status === 'resolved' || $conv->status === 'closed';
                 $shouldShow = !request('status') || (request('status') === 'pending' && $convPending);
             @endphp
             @if($shouldShow && $conv->contact)
-            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : ($convPending ? 'bg-red-50 border-error hover:bg-red-100' : 'border-transparent hover:bg-surface-container-low') }}" data-claim-info="{{ $convPending ? '⏱️ Pendente' : '🔒 ' . ($conv->getActiveClaim()?->user->name ?? 'Sem atribuição') }}">
+            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : ($convPending ? 'bg-red-50 border-error hover:bg-red-100' : ($convResolved ? 'bg-gray-50 border-gray-400 opacity-60 hover:bg-gray-100' : 'border-transparent hover:bg-surface-container-low')) }}" data-claim-info="{{ $convPending ? '⏱️ Pendente' : ($convResolved ? '✓ Encerrada' : '🔒 ' . ($conv->getActiveClaim()?->user->name ?? 'Sem atribuição')) }}">
                 <div class="relative shrink-0">
                     <div class="w-12 h-12 rounded-full {{ $convPending ? 'bg-error' : 'bg-primary-fixed' }} flex items-center justify-center font-bold text-sm {{ $convPending ? 'text-on-error' : 'text-on-primary-fixed' }}">
                         {{ $conv->contact->initials }}
@@ -88,6 +89,8 @@
                             <h3 class="text-sm font-bold {{ $convPending ? 'text-error' : 'text-on-surface' }} truncate">{{ $conv->contact->name }}</h3>
                             @if($convPending)
                             <span class="text-[10px] text-error font-semibold">⏱️ Pendente</span>
+                            @elseif($convResolved)
+                            <span class="text-[10px] text-gray-500 font-semibold">✓ Encerrada</span>
                             @else
                             <span class="text-[10px] text-yellow-700 font-semibold">🔒 {{ $conv->getActiveClaim()?->user->name ?? 'Sem atribuição' }}</span>
                             @endif
