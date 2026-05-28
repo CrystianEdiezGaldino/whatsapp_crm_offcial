@@ -9,6 +9,8 @@ class WhatsAppNumber extends Model
 {
     use HasFactory;
 
+    protected $table = 'whatsapp_numbers';
+
     protected $fillable = [
         'phone_number',
         'display_name',
