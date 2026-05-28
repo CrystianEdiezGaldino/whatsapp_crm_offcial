@@ -27,9 +27,15 @@ class WebhookController extends Controller
     public function handle(Request $request)
     {
         $startTime = microtime(true);
-        $payload = $request->all();
         $ipAddress = $request->ip();
 
+        // Validar assinatura HMAC para segurança em produção
+        if (!$this->validateWebhookSignature($request)) {
+            Log::warning('Invalid webhook signature', ['ip' => $ipAddress]);
+            return response('Unauthorized', 401);
+        }
+
+        $payload = $request->all();
         Log::info('Webhook received', ['payload' => $payload]);
 
         $object = $payload['object'] ?? null;
@@ -106,5 +112,46 @@ class WebhookController extends Controller
             Log::error('DEBUG Webhook error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Validar assinatura HMAC do webhook da Meta
+     * Garante que o webhook vem realmente da Meta usando a chave secreta
+     */
+    private function validateWebhookSignature(Request $request): bool
+    {
+        // Em desenvolvimento, permitir sem validação (para facilitar testes)
+        if (app()->environment(['local', 'development', 'testing'])) {
+            return true;
+        }
+
+        $signature = $request->header('X-Hub-Signature-256');
+        if (!$signature) {
+            Log::warning('Missing X-Hub-Signature-256 header');
+            return false;
+        }
+
+        $appSecret = config('services.whatsapp.app_secret');
+        if (!$appSecret) {
+            Log::error('META_APP_SECRET not configured');
+            return false;
+        }
+
+        // Obter o payload raw do request
+        $payload = $request->getContent();
+
+        // Calcular a assinatura esperada
+        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $appSecret);
+
+        // Comparação segura (timing-safe)
+        if (!hash_equals($expectedSignature, $signature)) {
+            Log::warning('Invalid webhook signature', [
+                'expected' => $expectedSignature,
+                'received' => $signature,
+            ]);
+            return false;
+        }
+
+        return true;
     }
 }

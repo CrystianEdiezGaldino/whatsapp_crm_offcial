@@ -39,6 +39,8 @@ return [
         'api_version' => env('WA_API_VERSION', 'v23.0'),
         'base_url' => env('WA_BASE_URL', 'https://graph.facebook.com'),
         'ffmpeg_path' => env('WA_FFMPEG_PATH', 'ffmpeg'),
+        'app_id' => env('META_APP_ID', ''),
+        'app_secret' => env('META_APP_SECRET', ''),
     ],
 
 ];
