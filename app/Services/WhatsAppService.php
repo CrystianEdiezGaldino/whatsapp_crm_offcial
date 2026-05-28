@@ -507,10 +507,21 @@ class WhatsAppService
             }
         }
 
-        $conversation = Conversation::firstOrCreate(
-            ['contact_id' => $contact->id, 'status' => 'new'],
-            ['last_message_at' => now()]
-        );
+        // Find existing conversation or create new one
+        $conversation = Conversation::where('contact_id', $contact->id)
+            ->where('status', '!=', 'resolved')
+            ->latest()
+            ->first();
+
+        if (!$conversation) {
+            $conversation = Conversation::create([
+                'contact_id' => $contact->id,
+                'status' => 'new',
+                'last_message_at' => now(),
+            ]);
+        } else {
+            $conversation->update(['last_message_at' => now()]);
+        }
 
         // Apply automatic distribution if enabled
         \App\Services\DistributionService::assign($conversation);
