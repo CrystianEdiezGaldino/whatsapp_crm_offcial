@@ -151,6 +151,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/health/webhooks', [HealthController::class, 'webhookLogs'])->name('health.webhooks');
 });
 
+// WhatsApp Webhook Routes
+Route::get('/webhook/whatsapp', [WebhookController::class, 'verify'])->name('webhook.verify');
+Route::post('/webhook/whatsapp', [WebhookController::class, 'handle'])->name('webhook.handle');
+
 // Webhook Debug (apenas em desenvolvimento)
 Route::get('/webhook/debug', [WebhookController::class, 'debug'])->name('webhook.debug');
 Route::post('/webhook/debug', [WebhookController::class, 'debug']);
