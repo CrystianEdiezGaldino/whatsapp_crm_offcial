@@ -3,212 +3,302 @@
 @section('title', 'Dashboard')
 
 @section('content')
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(225, 227, 232, 0.6);
+    }
+    .glass-card:hover {
+        transform: translateY(-4px);
+        transition: all 0.3s ease-out;
+    }
+</style>
+
 <!-- Top Bar -->
-<header class="flex justify-between items-center h-16 px-6 w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
-    <div class="flex items-center gap-6">
-        <h2 class="text-xl font-extrabold text-primary font-headline">SisChat Dashboard</h2>
-        <div class="relative flex items-center">
-            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-lg">search</span>
-            <input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-sm w-64 focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="Buscar chats ou agentes..." type="text">
+<header class="flex justify-between items-center h-16 px-8 w-full sticky top-0 z-40 bg-surface border-b border-surface-container-highest">
+    <div class="flex items-center gap-8">
+        <h2 class="text-xl font-bold text-primary font-headline">SisChat Dashboard</h2>
+        <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+            <input class="pl-10 pr-4 py-2 bg-surface-container border-none rounded-xl focus:ring-2 focus:ring-primary-container transition-all text-sm w-80" placeholder="Buscar chats ou agentes..." type="text">
         </div>
     </div>
-    <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 px-2 py-1 bg-secondary-container/20 rounded-full border border-secondary-container/30">
-            <span class="w-2 h-2 bg-secondary rounded-full"></span>
-            <span class="text-xs font-semibold text-on-secondary-container">Online</span>
+    <div class="flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-6 text-on-surface-variant font-label-lg">
+            <a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">Visão Geral</a>
+            <a class="hover:text-primary transition-colors" href="#">Relatórios</a>
         </div>
-        <div class="h-8 w-px bg-outline-variant"></div>
-        <div class="flex items-center gap-2">
-            <div class="text-right">
-                <p class="text-xs font-semibold text-on-surface">{{ auth()->user()->name }}</p>
-                <p class="text-[11px] text-on-surface-variant">{{ auth()->user()->role === 'admin' ? 'Admin' : 'Agente' }}</p>
+        <div class="h-6 w-px bg-surface-container-highest"></div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 hover:bg-surface-container-low rounded-full transition-all text-on-surface-variant">
+                <span class="material-symbols-outlined">notifications</span>
+            </button>
+            <div class="flex items-center gap-2 pl-4">
+                <div class="text-right">
+                    <p class="font-label-lg text-sm">{{ auth()->user()->name }}</p>
+                    <p class="text-[10px] text-outline uppercase tracking-wider">{{ auth()->user()->role === 'admin' ? 'Admin' : 'Agente' }}</p>
+                </div>
             </div>
         </div>
     </div>
 </header>
 
 <!-- Dashboard Body -->
-<div class="p-6 overflow-y-auto custom-scrollbar flex-1">
+<div class="p-8 overflow-y-auto custom-scrollbar flex-1 space-y-8 max-w-[1600px]">
     <!-- Filtros -->
-    <div class="mb-6 p-4 bg-white rounded-xl border border-outline-variant shadow-sm">
+    <div class="glass-card rounded-xl p-6 shadow-sm">
         <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="date" id="startDate" name="start_date" class="px-3 py-2 border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="Data inicial">
-            <input type="date" id="endDate" name="end_date" class="px-3 py-2 border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="Data final">
-            <select id="agentSelect" name="agent_id" class="px-3 py-2 border border-outline-variant rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-secondary">
+            <input type="date" id="startDate" name="start_date" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Data inicial">
+            <input type="date" id="endDate" name="end_date" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Data final">
+            <select id="agentSelect" name="agent_id" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container">
                 <option value="">Todos os agentes</option>
                 @foreach ($agents as $agent)
                     <option value="{{ $agent->id }}">{{ $agent->name }}</option>
                 @endforeach
             </select>
             <div class="flex gap-2">
-                <button type="submit" class="flex-1 px-4 py-2 bg-secondary text-on-secondary rounded-lg font-semibold text-sm active:scale-95 transition-transform">Filtrar</button>
-                <button type="reset" class="px-4 py-2 bg-surface-container border border-outline-variant rounded-lg text-sm active:scale-95 transition-transform">Limpar</button>
+                <button type="submit" class="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl font-semibold text-sm active:scale-95 transition-transform">Filtrar</button>
+                <button type="reset" class="px-4 py-2 bg-surface-container border border-outline-variant rounded-xl text-sm active:scale-95 transition-transform">Limpar</button>
             </div>
         </form>
     </div>
-    <!-- Metrics KPIs -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-gradient-to-br from-primary to-primary-container p-6 rounded-xl border border-primary/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+    <!-- Metrics KPIs Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Card 1: Total Mensagens -->
+        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
-                    <span class="material-symbols-outlined text-white text-2xl">forum</span>
+                <div class="p-3 bg-primary-fixed text-primary rounded-xl">
+                    <span class="material-symbols-outlined">forum</span>
                 </div>
-                <span class="text-xs font-bold text-white/80 bg-white/10 px-2 py-1 rounded">Hoje</span>
+                <span class="text-on-tertiary-container bg-tertiary-fixed-dim/30 px-2 py-1 rounded-full text-[10px] font-bold" id="msgBadge">+12%</span>
             </div>
-            <p class="text-xs font-semibold text-white/80 uppercase tracking-wider">Total Mensagens</p>
-            <p id="totalMessages" class="text-4xl font-black text-white mt-2">--</p>
+            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Total Mensagens</p>
+            <p id="totalMessages" class="font-headline-lg text-headline-lg mt-2">--</p>
+            <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-primary w-3/4"></div>
+            </div>
         </div>
 
-        <div class="bg-gradient-to-br from-secondary-container to-secondary/50 p-6 rounded-xl border border-secondary/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+        <!-- Card 2: Tempo Médio Resposta -->
+        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
-                    <span class="material-symbols-outlined text-secondary text-2xl">chat_bubble</span>
+                <div class="p-3 bg-secondary-fixed text-secondary rounded-xl">
+                    <span class="material-symbols-outlined">schedule</span>
                 </div>
-                <span class="text-xs font-bold text-secondary/80 bg-white/10 px-2 py-1 rounded">Ativos</span>
+                <span class="text-error bg-error-container px-2 py-1 rounded-full text-[10px] font-bold" id="timeBadge">-5%</span>
             </div>
-            <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Chats Abertos</p>
-            <p id="openConversations" class="text-4xl font-black text-secondary mt-2">{{ $stats['open_conversations'] }}</p>
+            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Tempo Médio Resposta</p>
+            <p id="avgResponseTime" class="font-headline-lg text-headline-lg mt-2">--</p>
+            <div class="mt-4 flex items-center space-x-1">
+                <div class="h-4 w-1 bg-secondary rounded-full opacity-30"></div>
+                <div class="h-6 w-1 bg-secondary rounded-full opacity-50"></div>
+                <div class="h-8 w-1 bg-secondary rounded-full"></div>
+                <div class="h-5 w-1 bg-secondary rounded-full opacity-60"></div>
+                <div class="h-3 w-1 bg-secondary rounded-full opacity-20"></div>
+            </div>
         </div>
 
-        <div class="bg-gradient-to-br from-tertiary-container to-tertiary/50 p-6 rounded-xl border border-tertiary/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+        <!-- Card 3: Chats Abertos -->
+        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
-                    <span class="material-symbols-outlined text-tertiary text-2xl">schedule</span>
+                <div class="p-3 bg-tertiary-fixed-dim text-on-tertiary-fixed-variant rounded-xl">
+                    <span class="material-symbols-outlined">chat</span>
                 </div>
-                <span class="text-xs font-bold text-tertiary/80 bg-white/10 px-2 py-1 rounded">Média</span>
+                <span class="text-on-tertiary-container bg-tertiary-fixed-dim/30 px-2 py-1 rounded-full text-[10px] font-bold">LIVE</span>
             </div>
-            <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tempo Médio Resposta</p>
-            <p id="avgResponseTime" class="text-3xl font-black text-tertiary mt-2">--</p>
+            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Chats Abertos</p>
+            <p id="openConversations" class="font-headline-lg text-headline-lg mt-2">{{ $stats['open_conversations'] }}</p>
+            <div class="mt-4 flex -space-x-2">
+                <div class="w-6 h-6 rounded-full border-2 border-white bg-primary-fixed"></div>
+                <div class="w-6 h-6 rounded-full border-2 border-white bg-secondary-fixed"></div>
+                <div class="w-6 h-6 rounded-full border-2 border-white bg-tertiary-fixed"></div>
+                <div class="w-6 h-6 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-[8px] font-bold">+8</div>
+            </div>
         </div>
 
-        <div class="bg-gradient-to-br from-error-container to-error/50 p-6 rounded-xl border border-error/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+        <!-- Card 4: Taxa de Satisfação -->
+        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
-                    <span class="material-symbols-outlined text-error text-2xl">person</span>
+                <div class="p-3 bg-surface-container-highest text-on-surface-variant rounded-xl">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
                 </div>
-                <span class="text-xs font-bold text-error/80 bg-white/10 px-2 py-1 rounded">Top</span>
+                <span class="text-on-tertiary-container bg-tertiary-fixed-dim/30 px-2 py-1 rounded-full text-[10px] font-bold">98%</span>
             </div>
-            <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Contato Principal</p>
-            <p id="topContact" class="text-xl font-black text-error mt-2 truncate">--</p>
+            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Satisfação</p>
+            <p class="font-headline-lg text-headline-lg mt-2">4.9/5.0</p>
+            <div class="mt-4 flex space-x-1">
+                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+            </div>
         </div>
     </div>
 
-    <!-- Charts Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Chart 1: Mensagens por Hora -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-primary font-headline">Mensagens por Hora</h3>
-                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Hoje</span>
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Message Volume Chart -->
+        <div class="lg:col-span-2 glass-card rounded-xl p-8 shadow-sm">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h3 class="font-headline-md text-headline-md">Volume de Mensagens</h3>
+                    <p class="text-outline text-sm">Distribuição horária de mensagens recebidas</p>
+                </div>
+                <div class="flex bg-surface-container rounded-lg p-1">
+                    <button class="px-3 py-1 bg-white shadow-sm rounded-md text-xs font-bold">24h</button>
+                    <button class="px-3 py-1 text-xs hover:bg-white/50 rounded-md transition-all">7d</button>
+                    <button class="px-3 py-1 text-xs hover:bg-white/50 rounded-md transition-all">30d</button>
+                </div>
             </div>
-            <div style="height: 320px; position: relative;">
+            <div style="height: 300px; position: relative;">
                 <canvas id="messagesByHourChart"></canvas>
             </div>
         </div>
 
-        <!-- Chart 2: Tipo de Mensagem -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-primary font-headline">Distribuição por Tipo</h3>
-                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Resumo</span>
-            </div>
-            <div style="height: 320px; position: relative;">
-                <canvas id="messagesByTypeChart"></canvas>
+        <!-- Channel Distribution -->
+        <div class="glass-card rounded-xl p-8 shadow-sm">
+            <h3 class="font-headline-md text-headline-md mb-8">Distribuição por Canal</h3>
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-primary-container"></div>
+                            <span class="font-label-lg">WhatsApp</span>
+                        </div>
+                        <span class="font-bold">64%</span>
+                    </div>
+                    <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+                        <div class="h-full bg-primary-container w-[64%]"></div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-on-tertiary-container"></div>
+                            <span class="font-label-lg">Outros</span>
+                        </div>
+                        <span class="font-bold">36%</span>
+                    </div>
+                    <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+                        <div class="h-full bg-on-tertiary-container w-[36%]"></div>
+                    </div>
+                </div>
+                <div class="mt-12 flex justify-center">
+                    <div class="relative w-40 h-40">
+                        <canvas id="messagesByTypeChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
+    <!-- Bottom Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Chart 3: Inbound vs Outbound -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-primary font-headline">Fluxo de Mensagens</h3>
-                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Comparativo</span>
+        <div class="glass-card rounded-xl p-8 shadow-sm">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h3 class="font-headline-md text-headline-md">Fluxo de Mensagens</h3>
+                    <p class="text-outline text-sm">Comparativo inbound vs outbound</p>
+                </div>
             </div>
-            <div style="height: 320px; position: relative;">
+            <div style="height: 300px; position: relative;">
                 <canvas id="directionChart"></canvas>
             </div>
         </div>
 
         <!-- Chart 4: Atividade por Agente -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-primary font-headline">Atividade por Agente</h3>
-                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Ranking</span>
+        <div class="glass-card rounded-xl p-8 shadow-sm">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h3 class="font-headline-md text-headline-md">Atividade por Agente</h3>
+                    <p class="text-outline text-sm">Ranking de conversas</p>
+                </div>
             </div>
-            <div style="height: 320px; position: relative;">
+            <div style="height: 300px; position: relative;">
                 <canvas id="byAgentChart"></canvas>
             </div>
         </div>
     </div>
 
     <!-- Top Contatos -->
-    <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm mb-6">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-on-surface">Top 10 Contatos</h3>
-            <a href="{{ route('conversations.index') }}?view=reports" class="text-sm font-semibold text-secondary hover:underline">Ver Relatório Completo</a>
+    <div class="glass-card rounded-xl shadow-sm overflow-hidden">
+        <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
+            <div>
+                <h3 class="font-headline-md text-headline-md">Top 10 Contatos</h3>
+                <p class="text-outline text-sm">Contatos com mais interações</p>
+            </div>
+            <a href="{{ route('conversations.index') }}?view=reports" class="text-primary font-bold hover:underline flex items-center space-x-1">
+                <span>Ver Todos</span>
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+            </a>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="border-b bg-slate-50">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-surface-container-low text-on-surface-variant font-label-lg">
                     <tr>
-                        <th class="text-left px-4 py-3">Nome</th>
-                        <th class="text-left px-4 py-3">Telefone</th>
-                        <th class="text-right px-4 py-3">Mensagens</th>
-                        <th class="text-right px-4 py-3">Conversas</th>
+                        <th class="px-8 py-4">Nome</th>
+                        <th class="px-8 py-4">Telefone</th>
+                        <th class="px-8 py-4 text-right">Mensagens</th>
+                        <th class="px-8 py-4 text-right">Conversas</th>
                     </tr>
                 </thead>
-                <tbody id="topContactsTable">
+                <tbody id="topContactsTable" class="divide-y divide-surface-container-highest">
                     <tr><td colspan="4" class="text-center p-4 text-on-surface-variant">Carregando...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <!-- My Chats -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-outline-variant shadow-sm flex flex-col">
-            <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div class="lg:col-span-2 glass-card rounded-xl shadow-sm flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
                 <div>
-                    <h3 class="text-lg font-semibold text-on-surface">Meus Atendimentos</h3>
-                    <p class="text-xs text-on-surface-variant">{{ $myChats->count() }} chats ativos</p>
+                    <h3 class="font-headline-md text-headline-md">Meus Atendimentos</h3>
+                    <p class="text-outline text-sm">{{ $myChats->count() }} chats ativos</p>
                 </div>
-                <a href="{{ route('conversations.index') }}" class="text-sm font-semibold text-secondary hover:underline">Ver Todos</a>
+                <a href="{{ route('conversations.index') }}" class="text-primary font-bold hover:underline flex items-center space-x-1">
+                    <span>Ver Todos</span>
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                </a>
             </div>
             <div class="overflow-x-auto">
                 @if($myChats->count() > 0)
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b border-outline-variant">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-surface-container-low text-on-surface-variant font-label-lg">
                         <tr>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase">Cliente</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase">Ultima Mensagem</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase">Tempo</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase text-right">Acao</th>
+                            <th class="px-8 py-4">Cliente</th>
+                            <th class="px-8 py-4">Última Mensagem</th>
+                            <th class="px-8 py-4">Tempo</th>
+                            <th class="px-8 py-4 text-right">Ação</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-outline-variant/50">
+                    <tbody class="divide-y divide-surface-container-highest">
                         @foreach($myChats->take(5) as $chat)
                         @if($chat->contact)
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-on-primary-fixed">
+                        <tr class="hover:bg-surface-container-lowest transition-all group">
+                            <td class="px-8 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
                                         {{ $chat->contact->initials }}
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold text-on-surface">{{ $chat->contact->name }}</p>
-                                        <p class="text-xs text-on-surface-variant">{{ $chat->contact->phone }}</p>
+                                        <p class="font-bold">{{ $chat->contact->name }}</p>
+                                        <p class="text-[10px] text-outline">{{ $chat->contact->phone }}</p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-8 py-4">
                                 <p class="text-sm text-on-surface-variant truncate max-w-[250px]">
                                     {{ $chat->lastMessage?->content ?? 'Sem mensagens' }}
                                 </p>
                             </td>
-                            <td class="px-6 py-4 text-sm text-on-surface-variant">
-                                {{ $chat->last_message_at?->diffForHumans() }}
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <a href="{{ route('conversations.index', ['conversation' => $chat->id]) }}" class="bg-primary text-on-primary text-xs font-semibold px-4 py-1.5 rounded-lg active:scale-95 transition-transform">Abrir</a>
+                            <td class="px-8 py-4 text-sm">{{ $chat->last_message_at?->diffForHumans() }}</td>
+                            <td class="px-8 py-4 text-right">
+                                <a href="{{ route('conversations.index', ['conversation' => $chat->id]) }}" class="bg-primary text-on-primary text-xs font-semibold px-4 py-1.5 rounded-xl active:scale-95 transition-transform">Abrir</a>
                             </td>
                         </tr>
                         @endif
@@ -224,25 +314,27 @@
         </div>
 
         <!-- Online Agents -->
-        <div class="bg-white rounded-xl border border-outline-variant shadow-sm flex flex-col">
-            <div class="p-6 border-b border-outline-variant flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-on-surface">Agentes Online</h3>
-                <span class="text-xs font-semibold text-on-surface-variant">{{ $onlineAgents->count() }}</span>
+        <div class="glass-card rounded-xl shadow-sm flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
+                <div>
+                    <h3 class="font-headline-md text-headline-md">Agentes Online</h3>
+                    <p class="text-outline text-sm">{{ $onlineAgents->count() }} agentes conectados</p>
+                </div>
             </div>
             <div class="p-4 flex flex-col gap-2 max-h-[400px] overflow-y-auto custom-scrollbar">
                 @foreach($onlineAgents as $agent)
-                <div class="flex items-center gap-4 p-2 hover:bg-surface-container-low rounded-lg transition-colors">
+                <div class="flex items-center gap-4 p-3 hover:bg-surface-container-low rounded-lg transition-colors">
                     <div class="relative">
-                        <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-on-primary-fixed">
+                        <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-primary">
                             {{ strtoupper(substr($agent->name, 0, 1)) }}
                         </div>
-                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-secondary rounded-full border-2 border-white"></span>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-tertiary-container rounded-full border-2 border-white"></span>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-on-surface truncate">{{ $agent->name }}</p>
-                        <p class="text-xs text-secondary">Ativo agora</p>
+                        <p class="font-bold text-sm truncate">{{ $agent->name }}</p>
+                        <p class="text-[10px] text-tertiary">Online</p>
                     </div>
-                    <span class="text-xs text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">{{ $agent->conversations_count }} chats</span>
+                    <span class="text-xs font-semibold text-on-surface-variant bg-surface-container px-2 py-1 rounded">{{ $agent->conversations_count }} chats</span>
                 </div>
                 @endforeach
                 @if($onlineAgents->isEmpty())
@@ -252,51 +344,51 @@
         </div>
 
         <!-- Pending Chats -->
-        <div class="lg:col-span-3 bg-white rounded-xl border border-outline-variant shadow-sm flex flex-col">
-            <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+        <div class="lg:col-span-3 glass-card rounded-xl shadow-sm flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
                 <div>
-                    <h3 class="text-lg font-semibold text-on-surface">Atendimentos Pendentes</h3>
-                    <p class="text-xs text-on-surface-variant">Chats aguardando distribuicao</p>
+                    <h3 class="font-headline-md text-headline-md">Atendimentos Pendentes</h3>
+                    <p class="text-outline text-sm">Chats aguardando distribuição</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 @if($pendingChats->count() > 0)
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b border-outline-variant">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-surface-container-low text-on-surface-variant font-label-lg">
                         <tr>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase">Cliente</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase">Ultima Mensagem</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase">Tempo de Espera</th>
-                            <th class="px-6 py-3 text-xs font-semibold text-on-surface-variant uppercase text-right">Acao</th>
+                            <th class="px-8 py-4">Cliente</th>
+                            <th class="px-8 py-4">Última Mensagem</th>
+                            <th class="px-8 py-4">Tempo de Espera</th>
+                            <th class="px-8 py-4 text-right">Ação</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-outline-variant/50">
+                    <tbody class="divide-y divide-surface-container-highest">
                         @foreach($pendingChats as $chat)
                         @if($chat->contact)
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-sm text-on-secondary-fixed">
+                        <tr class="hover:bg-surface-container-lowest transition-all group">
+                            <td class="px-8 py-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-sm text-secondary">
                                         {{ $chat->contact->initials }}
                                     </div>
                                     <div>
-                                        <p class="text-sm font-semibold text-on-surface">{{ $chat->contact->name }}</p>
-                                        <p class="text-xs text-on-surface-variant">{{ $chat->contact->phone }}</p>
+                                        <p class="font-bold">{{ $chat->contact->name }}</p>
+                                        <p class="text-[10px] text-outline">{{ $chat->contact->phone }}</p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-8 py-4">
                                 <p class="text-sm text-on-surface-variant truncate max-w-[300px]">
                                     "{{ $chat->lastMessage?->content ?? 'Aguardando...' }}"
                                 </p>
                             </td>
-                            <td class="px-6 py-4 text-sm @if($chat->last_message_at?->diffInMinutes() > 10) text-error font-semibold @else text-on-surface-variant @endif">
+                            <td class="px-8 py-4 text-sm @if($chat->last_message_at?->diffInMinutes() > 10) text-error font-bold @else text-on-surface-variant @endif">
                                 {{ $chat->last_message_at?->diffForHumans() }}
                             </td>
-                            <td class="px-6 py-4 text-right">
+                            <td class="px-8 py-4 text-right">
                                 <form method="POST" action="{{ route('conversations.assign', $chat) }}" class="inline">
                                     @csrf @method('PATCH')
-                                    <button type="submit" class="bg-primary text-on-primary text-xs font-semibold px-4 py-1.5 rounded-lg active:scale-95 transition-transform">Assumir</button>
+                                    <button type="submit" class="bg-primary text-on-primary text-xs font-semibold px-4 py-1.5 rounded-xl active:scale-95 transition-transform">Assumir</button>
                                 </form>
                             </td>
                         </tr>
