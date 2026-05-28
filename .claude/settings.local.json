@@ -102,7 +102,8 @@
       "PowerShell(Get-Process *)",
       "Bash(grep -E \"\\\\.\\(php|md\\)$\")",
       "Bash(awk '{print $2}')",
-      "Bash(xargs kill -9)"
+      "Bash(xargs kill -9)",
+      "Bash(truncate -s 0 \"F:/BACKUP/whatsapp/smcc-whatsapp/storage/logs/laravel.log\")"
     ]
   }
 }
