@@ -1333,12 +1333,35 @@
             }
 
             const conv = data.conversation;
+            const events = data.events || [];
             const messages = data.messages || [];
 
             // Create modal
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
             modal.id = 'historyModal';
+
+            // Render events timeline
+            let eventsHtml = '';
+            events.forEach((event, idx) => {
+                const icon = event.icon || 'info';
+                const colorClass = `text-${event.color}`;
+                eventsHtml += `
+                    <div class="flex gap-4 mb-6">
+                        <div class="flex flex-col items-center">
+                            <div class="w-10 h-10 rounded-full bg-${event.color}/20 flex items-center justify-center mb-2">
+                                <span class="material-symbols-outlined text-sm text-${event.color}">${icon}</span>
+                            </div>
+                            ${idx < events.length - 1 ? '<div class="w-1 h-12 bg-surface-container"></div>' : ''}
+                        </div>
+                        <div class="pt-1">
+                            <h4 class="font-semibold text-on-surface">${event.title}</h4>
+                            <p class="text-xs text-on-surface-variant mt-0.5">${event.description}</p>
+                            <p class="text-[10px] text-outline mt-1">${new Date(event.timestamp).toLocaleString('pt-BR')}</p>
+                        </div>
+                    </div>
+                `;
+            });
 
             let messagesHtml = '';
             messages.forEach(msg => {
@@ -1369,21 +1392,36 @@
             });
 
             modal.innerHTML = `
-                <div class="bg-white rounded-xl shadow-xl flex flex-col w-full max-w-2xl max-h-[80vh]">
-                    <div class="p-4 border-b border-outline-variant flex justify-between items-center">
+                <style>
+                    .glass-modal { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
+                </style>
+                <div class="glass-modal rounded-xl shadow-2xl flex flex-col w-full max-w-4xl max-h-[85vh] border border-white/30">
+                    <div class="p-6 border-b border-surface-container-highest flex justify-between items-start">
                         <div>
-                            <h2 class="text-lg font-bold text-on-surface">Histórico: ${conv.contact_name}</h2>
-                            <p class="text-xs text-on-surface-variant mt-1">
-                                ${conv.created_at} até ${conv.closed_at} • Atendido por: ${conv.claimed_by} • ${conv.message_count} mensagens
-                            </p>
+                            <h2 class="text-2xl font-bold text-on-surface">📋 Histórico: ${conv.contact_name}</h2>
+                            <div class="flex gap-6 mt-3 text-sm text-on-surface-variant">
+                                <span>📞 ${conv.contact_phone}</span>
+                                <span>⏱️ Duração: ${conv.duration}</span>
+                                <span>💬 ${conv.message_count} mensagens</span>
+                                <span>👤 Atendido por: ${conv.claimed_by}</span>
+                            </div>
                         </div>
                         <button onclick="document.getElementById('historyModal').remove()" class="text-on-surface-variant hover:text-on-surface text-2xl">✕</button>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
-                        ${messagesHtml || '<div class="text-center text-on-surface-variant text-sm py-8">Nenhuma mensagem neste atendimento</div>'}
+                    <div class="flex-1 overflow-y-auto custom-scrollbar flex gap-4">
+                        <div class="w-1/3 p-6 border-r border-surface-container-highest bg-surface-bright">
+                            <h3 class="font-bold text-on-surface mb-4">Timeline de Eventos</h3>
+                            <div class="space-y-2">
+                                ${eventsHtml || '<p class="text-sm text-on-surface-variant">Nenhum evento registrado</p>'}
+                            </div>
+                        </div>
+                        <div class="w-2/3 p-6 space-y-2">
+                            <h3 class="font-bold text-on-surface mb-4">Mensagens (${messages.length})</h3>
+                            ${messagesHtml || '<div class="text-center text-on-surface-variant text-sm py-8">Nenhuma mensagem neste atendimento</div>'}
+                        </div>
                     </div>
-                    <div class="p-4 border-t border-outline-variant flex justify-end gap-2">
-                        <button onclick="document.getElementById('historyModal').remove()" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors">
+                    <div class="p-6 border-t border-surface-container-highest flex justify-end">
+                        <button onclick="document.getElementById('historyModal').remove()" class="px-6 py-2 bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-all">
                             Fechar
                         </button>
                     </div>

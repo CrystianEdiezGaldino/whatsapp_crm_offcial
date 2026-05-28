@@ -380,7 +380,60 @@ class ConversationController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $claim = $conversation->claims()->latest('claimed_at')->first();
+        $claims = $conversation->claims()->orderBy('claimed_at', 'asc')->get();
+        $firstClaim = $claims->first();
+        $lastClaim = $claims->last();
+
+        // Construir timeline de eventos
+        $events = collect();
+
+        // Evento: Conversa criada
+        $events->push([
+            'type' => 'created',
+            'title' => 'Conversa iniciada',
+            'description' => 'Contato enviou a primeira mensagem',
+            'timestamp' => $conversation->created_at,
+            'icon' => 'chat',
+            'color' => 'primary',
+        ]);
+
+        // Eventos: Clamadas
+        foreach ($claims as $claim) {
+            $events->push([
+                'type' => 'claimed',
+                'title' => 'Atendimento clamado',
+                'description' => 'Clamado por ' . ($claim->user->name ?? 'Agente desconhecido'),
+                'timestamp' => $claim->claimed_at,
+                'icon' => 'assignment',
+                'color' => 'secondary',
+            ]);
+
+            if ($claim->released_at) {
+                $events->push([
+                    'type' => 'released',
+                    'title' => 'Atendimento liberado',
+                    'description' => 'Liberado por ' . ($claim->user->name ?? 'Agente'),
+                    'timestamp' => $claim->released_at,
+                    'icon' => 'lock_open',
+                    'color' => 'warning',
+                ]);
+            }
+        }
+
+        // Evento: Conversa encerrada
+        if ($conversation->status === 'resolved' || $conversation->status === 'closed') {
+            $events->push([
+                'type' => 'resolved',
+                'title' => 'Atendimento encerrado',
+                'description' => 'Motivo: ' . ($conversation->resolution_category ?? 'Não especificado'),
+                'timestamp' => $conversation->updated_at,
+                'icon' => 'done_all',
+                'color' => 'tertiary',
+            ]);
+        }
+
+        // Ordenar eventos por timestamp
+        $events = $events->sortBy('timestamp')->values();
 
         return response()->json([
             'success' => true,
@@ -388,18 +441,33 @@ class ConversationController extends Controller
                 'id' => $conversation->id,
                 'contact_name' => $conversation->contact->name,
                 'contact_initials' => $conversation->contact->initials,
+                'contact_phone' => $conversation->contact->phone,
                 'created_at' => $conversation->created_at->format('d/m/Y H:i'),
                 'closed_at' => $conversation->updated_at->format('d/m/Y H:i'),
-                'claimed_by' => $claim?->user->name ?? 'Desconhecido',
+                'claimed_by' => $firstClaim?->user->name ?? 'Desconhecido',
                 'message_count' => $messages->count(),
+                'status' => $conversation->status,
+                'duration' => $this->formatDuration($conversation->created_at, $conversation->updated_at),
             ],
+            'events' => $events,
             'messages' => $messages->map(fn($msg) => [
                 'direction' => $msg->direction,
                 'content' => $msg->content,
                 'created_at' => $msg->created_at->format('H:i'),
+                'status' => $msg->status,
                 'has_media' => !is_null($msg->media_url),
             ]),
         ]);
+    }
+
+    private function formatDuration($start, $end)
+    {
+        $diff = $end->diffInMinutes($start);
+        if ($diff < 1) return 'menos de 1 minuto';
+        if ($diff < 60) return $diff . ' min';
+        $hours = intdiv($diff, 60);
+        $mins = $diff % 60;
+        return $hours . 'h ' . $mins . 'm';
     }
 
     public function pollAllStatus(Request $request)
