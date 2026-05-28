@@ -447,9 +447,15 @@ async function loadDashboardData() {
 }
 
 function renderMessagesByHourChart(data) {
-    const ctx = document.getElementById('messagesByHourChart').getContext('2d');
+    const canvas = document.getElementById('messagesByHourChart');
+    const ctx = canvas.getContext('2d');
 
     if (charts.byHour) charts.byHour.destroy();
+
+    // Criar gradiente para o fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, 'rgba(20, 44, 142, 0.15)');
+    gradient.addColorStop(1, 'rgba(20, 44, 142, 0)');
 
     charts.byHour = new Chart(ctx, {
         type: 'line',
@@ -458,32 +464,53 @@ function renderMessagesByHourChart(data) {
             datasets: [{
                 label: 'Mensagens',
                 data: data.map(d => d.count),
-                borderColor: '#001769',
-                backgroundColor: 'rgba(0, 23, 105, 0.08)',
-                borderWidth: 3,
+                borderColor: '#142c8e',
+                backgroundColor: gradient,
+                borderWidth: 4,
                 tension: 0.4,
                 fill: true,
-                pointBackgroundColor: '#142c8e',
+                pointBackgroundColor: '#001769',
                 pointBorderColor: '#ffffff',
-                pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
+                pointBorderWidth: 3,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointHoverBackgroundColor: '#142c8e',
+                pointHoverBorderWidth: 4,
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
             plugins: {
                 legend: { display: false },
-                filler: { propagate: true }
+                filler: { propagate: true },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 23, 105, 0.9)',
+                    padding: 12,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    borderColor: '#142c8e',
+                    borderWidth: 1,
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' mensagens';
+                        }
+                    }
+                }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    grid: { color: 'rgba(0, 0, 0, 0.05)', drawBorder: false },
+                    ticks: { font: { size: 11, weight: 500 } }
                 },
                 x: {
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    grid: { display: false, drawBorder: false },
+                    ticks: { font: { size: 11, weight: 500 } }
                 }
             }
         }
@@ -491,7 +518,8 @@ function renderMessagesByHourChart(data) {
 }
 
 function renderMessagesByTypeChart(data) {
-    const ctx = document.getElementById('messagesByTypeChart').getContext('2d');
+    const canvas = document.getElementById('messagesByTypeChart');
+    const ctx = canvas.getContext('2d');
 
     if (charts.byType) charts.byType.destroy();
 
@@ -504,7 +532,15 @@ function renderMessagesByTypeChart(data) {
         'sticker': 'Sticker'
     };
 
-    const colors = ['#001769', '#142c8e', '#4d5e83', '#8bf9b2', '#879aff', '#dee1ff'];
+    const colors = ['#142c8e', '#46b575', '#4d5e83', '#8bf9b2', '#879aff', '#dee1ff'];
+
+    // Criar gradientes para cada cor
+    const gradients = colors.map((color, i) => {
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, color + '99');
+        return grad;
+    });
 
     charts.byType = new Chart(ctx, {
         type: 'doughnut',
@@ -514,7 +550,8 @@ function renderMessagesByTypeChart(data) {
                 data: data.map(d => d.count),
                 backgroundColor: colors.slice(0, data.length),
                 borderColor: '#ffffff',
-                borderWidth: 2,
+                borderWidth: 3,
+                borderRadius: 8,
             }]
         },
         options: {
@@ -525,9 +562,10 @@ function renderMessagesByTypeChart(data) {
                     position: 'bottom',
                     labels: {
                         padding: 15,
-                        font: { size: 12, weight: 500 },
+                        font: { size: 12, weight: 600 },
                         usePointStyle: true,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        pointRadius: 6
                     }
                 }
             }
@@ -547,25 +585,39 @@ function renderDirectionChart(data) {
             datasets: [{
                 label: 'Quantidade',
                 data: data.map(d => d.count),
-                backgroundColor: data.map(d => d.direction === 'inbound' ? '#8bf9b2' : '#001769'),
-                borderColor: data.map(d => d.direction === 'inbound' ? '#004122' : '#142c8e'),
+                backgroundColor: data.map(d => d.direction === 'inbound' ? '#46b575' : '#142c8e'),
+                borderColor: data.map(d => d.direction === 'inbound' ? '#004122' : '#001769'),
                 borderWidth: 2,
                 borderRadius: 8,
+                barThickness: 50,
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 23, 105, 0.9)',
+                    padding: 12,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' mensagens';
+                        }
+                    }
+                }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    grid: { color: 'rgba(0, 0, 0, 0.05)', drawBorder: false },
+                    ticks: { font: { size: 11, weight: 500 } }
                 },
                 x: {
-                    grid: { display: false }
+                    grid: { display: false, drawBorder: false },
+                    ticks: { font: { size: 11, weight: 500 } }
                 }
             }
         }
@@ -588,6 +640,7 @@ function renderByAgentChart(data) {
                 borderColor: '#001769',
                 borderWidth: 2,
                 borderRadius: 8,
+                barThickness: 35,
             }]
         },
         options: {
@@ -595,15 +648,28 @@ function renderByAgentChart(data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 23, 105, 0.9)',
+                    padding: 12,
+                    titleFont: { size: 13, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.x + ' conversas';
+                        }
+                    }
+                }
             },
             scales: {
                 x: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    grid: { color: 'rgba(0, 0, 0, 0.05)', drawBorder: false },
+                    ticks: { font: { size: 11, weight: 500 } }
                 },
                 y: {
-                    grid: { display: false }
+                    grid: { display: false, drawBorder: false },
+                    ticks: { font: { size: 11, weight: 500 } }
                 }
             }
         }
