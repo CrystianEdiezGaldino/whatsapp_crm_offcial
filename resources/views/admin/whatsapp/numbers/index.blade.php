@@ -91,15 +91,10 @@
     <div id="syncMetaModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
             <h3 class="text-lg font-bold text-on-surface mb-4">Importar Números da Meta</h3>
-            <p class="text-sm text-on-surface-variant mb-6">Insira suas credenciais da Meta para importar automaticamente todos os números cadastrados</p>
+            <p class="text-sm text-on-surface-variant mb-6">Cole seu access token da Meta e nós buscaremos automaticamente todos os números cadastrados</p>
 
             <form id="syncMetaForm" class="space-y-4">
                 @csrf
-                <div>
-                    <label class="text-sm font-semibold text-on-surface block mb-2">ID da Conta Comercial *</label>
-                    <input type="text" name="business_account_id" required placeholder="ID da sua conta" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info">
-                </div>
-
                 <div>
                     <label class="text-sm font-semibold text-on-surface block mb-2">Access Token *</label>
                     <textarea name="access_token" required class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info font-mono text-xs" rows="3" placeholder="Cole seu access token da Meta"></textarea>
