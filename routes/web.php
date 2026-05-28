@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/conversations/start', [ConversationController::class, 'startConversation'])->name('conversations.start');
     Route::patch('/conversations/{conversation}/assign', [ConversationController::class, 'assign'])->name('conversations.assign');
     Route::patch('/conversations/{conversation}/resolve', [ConversationController::class, 'resolve'])->name('conversations.resolve');
+    Route::post('/conversations/resolve-with-reason', [ConversationController::class, 'resolveWithReason'])->name('conversations.resolve-with-reason');
     Route::get('/conversations/{conversation}/history', [ConversationController::class, 'history'])->name('conversations.history');
     Route::get('/conversations/{conversation}/history-view', [ConversationController::class, 'showHistoryConversation'])->name('conversations.history-view');
 

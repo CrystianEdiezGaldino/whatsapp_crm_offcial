@@ -274,6 +274,54 @@ class ConversationController extends Controller
         return redirect()->route('conversations.index');
     }
 
+    public function resolveWithReason(Request $request)
+    {
+        $validated = $request->validate([
+            'conversation_id' => 'required|exists:conversations,id',
+            'resolution_reason' => 'required|in:problem_solved,customer_satisfied,follow_up_needed,transferred,duplicate,spam,no_response,other',
+            'resolution_notes' => 'required|string|min:5',
+            'internal_comments' => 'nullable|string',
+        ]);
+
+        try {
+            $conversation = Conversation::findOrFail($validated['conversation_id']);
+            $oldStatus = $conversation->status;
+
+            // Create resolution record
+            \App\Models\ConversationResolution::create([
+                'conversation_id' => $validated['conversation_id'],
+                'resolved_by' => Auth::id(),
+                'resolution_reason' => $validated['resolution_reason'],
+                'resolution_notes' => $validated['resolution_notes'],
+                'internal_comments' => $validated['internal_comments'],
+            ]);
+
+            // Update conversation status
+            $conversation->update(['status' => 'resolved']);
+
+            // Dispatch event for real-time update
+            event(new \App\Events\ConversationStatusChanged($conversation, $oldStatus));
+
+            // Log action
+            \Illuminate\Support\Facades\Log::info('[Conversation] Resolved with reason', [
+                'conversation_id' => $conversation->id,
+                'resolved_by' => Auth::id(),
+                'reason' => $validated['resolution_reason'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Conversa encerrada com sucesso!',
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[Conversation] Resolution failed', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao encerrar conversa: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function history(Conversation $conversation)
     {
         $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])

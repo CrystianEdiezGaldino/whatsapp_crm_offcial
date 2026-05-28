@@ -82,6 +82,11 @@ class Conversation extends Model
         return $this->hasMany(ConversationTransfer::class);
     }
 
+    public function resolution()
+    {
+        return $this->hasOne(ConversationResolution::class);
+    }
+
     public function isOpen(): bool
     {
         return $this->status === 'open';
