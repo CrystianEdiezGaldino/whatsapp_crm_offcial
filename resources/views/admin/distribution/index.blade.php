@@ -105,7 +105,12 @@
                         </p>
                     </div>
 
-                    <div class="flex justify-end">
+                    <div class="flex justify-between items-center">
+                        @if($settings->isAutomatic() && $queuedLeads->count() > 0)
+                        <button type="button" onclick="processDistributionQueue()" class="px-4 py-2 bg-tertiary text-on-tertiary rounded-lg font-semibold hover:bg-tertiary/90 active:scale-95 transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base">smart_toy</span> Processar Fila ({{ $queuedLeads->count() }})
+                        </button>
+                        @endif
                         <button type="submit" class="px-4 py-2 bg-secondary text-on-secondary rounded-lg font-semibold hover:bg-secondary/90 active:scale-95 transition-all">
                             <span class="material-symbols-outlined inline text-sm mr-1">save</span> Salvar
                         </button>
@@ -333,6 +338,32 @@
     const checkedRadio = document.querySelector('.mode-radio:checked');
     if (checkedRadio) {
         checkedRadio.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    // Process distribution queue
+    async function processDistributionQueue() {
+        if (confirm('Processar fila de conversas pendentes?')) {
+            try {
+                const response = await fetch('{{ route("admin.distribution.process-queue") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            } catch (error) {
+                alert('Erro ao processar fila: ' + error.message);
+            }
+        }
     }
 
     // Edit Capacity

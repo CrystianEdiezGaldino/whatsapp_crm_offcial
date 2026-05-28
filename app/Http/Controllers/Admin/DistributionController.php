@@ -122,6 +122,45 @@ class DistributionController extends Controller
         ]);
     }
 
+    public function processQueue()
+    {
+        try {
+            // Get pending conversations without active claims
+            $pendingConversations = \App\Models\Conversation::where('status', 'new')
+                ->whereDoesntHave('activeClaim')
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            if ($pendingConversations->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Nenhuma conversa pendente para distribuir',
+                    'processed' => 0,
+                ]);
+            }
+
+            $distributed = 0;
+            foreach ($pendingConversations as $conversation) {
+                DistributionService::assign($conversation);
+                $distributed++;
+            }
+
+            \Log::info('[Distribution] Queue processed', ['distributed' => $distributed]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$distributed} conversa(s) distribuída(s) com sucesso!",
+                'processed' => $distributed,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('[Distribution] Queue processing failed', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar fila: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function metrics()
     {
         $settings = DistributionSetting::current();
