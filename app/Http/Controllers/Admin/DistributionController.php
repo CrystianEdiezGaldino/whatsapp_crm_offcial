@@ -83,15 +83,23 @@ class DistributionController extends Controller
         }
 
         $validated = $request->validate([
-            'max_conversations' => 'required|integer|min:1|max:100',
+            'max_conversations' => 'sometimes|integer|min:1|max:100',
             'is_active' => 'sometimes|boolean',
         ]);
+
+        // If no valid fields provided, return error
+        if (empty($validated)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nenhum campo para atualizar',
+            ], 422);
+        }
 
         $capacity = AgentCapacity::where('user_id', $user->id)->first();
         if (!$capacity) {
             $capacity = AgentCapacity::create([
                 'user_id' => $user->id,
-                'max_conversations' => $validated['max_conversations'],
+                'max_conversations' => $validated['max_conversations'] ?? 10,
                 'is_active' => $validated['is_active'] ?? true,
             ]);
         } else {

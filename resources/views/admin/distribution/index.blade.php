@@ -66,32 +66,43 @@
                                 <span class="text-xs text-on-surface-variant">(Agentes clamam conversas)</span>
                             </label>
 
-                            <label class="flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer {{ $settings->isAutomatic() ? 'border-secondary bg-secondary/10' : 'border-outline-variant' }}">
+                            <label class="flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer {{ $settings->isAutomatic() ? 'border-secondary bg-secondary/10' : 'border-outline-variant' }}" title="Novos leads são automaticamente atribuídos aos agentes em ordem round-robin">
                                 <input type="radio" name="mode" value="automatic" {{ $settings->isAutomatic() ? 'checked' : '' }} class="w-4 h-4">
                                 <span class="text-sm font-medium">
                                     <span class="material-symbols-outlined inline text-base">smart_toy</span> Automático
                                 </span>
-                                <span class="text-xs text-on-surface-variant">(Sistema distribui)</span>
+                                <span class="text-xs text-on-surface-variant">(Sistema distribui em round-robin)</span>
                             </label>
                         </div>
                     </div>
 
                     <!-- Overflow Action (só mostrar se automático) -->
                     @if($settings->isAutomatic())
-                    <div class="space-y-2 pt-4 border-t border-outline-variant">
+                    <div class="space-y-4 pt-4 border-t border-outline-variant">
+                        <div class="bg-secondary/10 border border-secondary/20 rounded-lg p-3">
+                            <p class="text-sm font-medium text-on-surface mb-2">📋 Como funciona o modo automático:</p>
+                            <ul class="text-xs text-on-surface-variant space-y-1 ml-4 list-disc">
+                                <li>Novos leads são distribuídos em <strong>round-robin</strong> (alternando entre agentes)</li>
+                                <li>Apenas agentes <strong>"Ativo"</strong> recebem novas atribuições</li>
+                                <li>Respeita a <strong>capacidade máxima</strong> de cada agente</li>
+                                <li>Usa a <strong>ordem round-robin position</strong> para justiça na distribuição</li>
+                                <li>Quando agente atinge limite → ativa <strong>ação de overflow</strong> abaixo</li>
+                            </ul>
+                        </div>
+
                         <label class="text-sm font-semibold text-on-surface">Quando todos agentes estão cheios</label>
                         <select name="overflow_action" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary">
                             <option value="next_agent" {{ $settings->isNextAgentOverflow() ? 'selected' : '' }}>
-                                Atribuir ao agente com menor carga (ignora máximo)
+                                ↗️ Atribuir ao agente com menor carga (ignora máximo)
                             </option>
                             <option value="queue" {{ $settings->isQueueOverflow() ? 'selected' : '' }}>
-                                Deixar na fila aguardando disponibilidade
+                                ⏳ Deixar na fila aguardando disponibilidade
                             </option>
                         </select>
                         <p class="text-xs text-on-surface-variant">
                             {{ $settings->isNextAgentOverflow()
-                                ? '→ Novos leads serão atribuídos ao agente menos ocupado'
-                                : '→ Novos leads ficarão na fila até haver espaço' }}
+                                ? '↗️ Novos leads serão atribuídos ao agente menos ocupado (mesmo acima do limite)'
+                                : '⏳ Novos leads ficarão na fila até haver espaço disponível' }}
                         </p>
                     </div>
                     @endif
@@ -346,24 +357,36 @@
             const isActive = this.checked;
 
             try {
+                const csrfToken = document.querySelector('input[name="_token"]')?.value;
+                if (!csrfToken) {
+                    alert('Token de segurança ausente. Por favor, recarregue a página.');
+                    this.checked = !isActive;
+                    return;
+                }
+
                 const response = await fetch(`/admin/distribution/agents/${userId}/capacity`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'X-CSRF-TOKEN': csrfToken,
                     },
                     body: JSON.stringify({
                         is_active: isActive,
                     }),
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    alert('Erro ao atualizar status do agente');
+                    console.error('Erro na resposta:', data);
+                    alert(data.message || 'Erro ao atualizar status do agente');
                     this.checked = !isActive;
+                } else {
+                    console.log('Status atualizado:', data);
                 }
             } catch (error) {
-                console.error(error);
-                alert('Erro ao atualizar status do agente');
+                console.error('Erro ao atualizar status:', error);
+                alert('Erro ao atualizar status do agente: ' + error.message);
                 this.checked = !isActive;
             }
         });
