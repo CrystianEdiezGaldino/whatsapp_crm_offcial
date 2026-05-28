@@ -181,18 +181,28 @@
                         </button>
                     @endif
                 @elseif($hasMyClaim)
+                    @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
                     <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-warning text-on-warning px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
                         <span class="material-symbols-outlined text-base">lock_open</span> Liberar
                     </button>
+                    @endif
                 @endif
                 @if($isAdmin && $activeClaim && !$hasMyClaim)
+                    @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
                     <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
                         <span class="material-symbols-outlined text-base">person_add</span> Reatribuir
                     </button>
+                    @endif
                 @endif
+                @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
                 <button type="button" onclick="openResolutionModal({{ $activeConversation->id }})" class="bg-error text-on-error px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
                     <span class="material-symbols-outlined text-base">done_all</span> Encerrar
                 </button>
+                @else
+                <button type="button" onclick="openReopenRequestModal({{ $activeConversation->id }})" class="bg-info text-on-info px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                    <span class="material-symbols-outlined text-base">lock_clock</span> Pedir Reabertura
+                </button>
+                @endif
             </div>
         </div>
 
@@ -501,6 +511,33 @@
         </div>
     </div>
 
+    <!-- Reopen Request Modal -->
+    <div id="reopenRequestModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+            <h3 class="text-lg font-bold text-on-surface mb-4">Pedir Reabertura</h3>
+            <p class="text-sm text-on-surface-variant mb-6">Explique por que esta conversa precisa ser reaberта</p>
+
+            <form id="reopenRequestForm" class="space-y-4">
+                @csrf
+                <input type="hidden" id="reopenConversationId" name="conversation_id">
+
+                <div>
+                    <label class="text-sm font-semibold text-on-surface block mb-2">Motivo da Reabertura</label>
+                    <textarea name="reason" rows="4" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary resize-none" placeholder="Descreva por que a conversa precisa ser reaberта..." required minlength="10"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeReopenRequestModal()" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-info text-on-info rounded-lg font-semibold hover:opacity-90 transition-all">
+                        Enviar Pedido
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Right: Contact Details -->
     @if($activeConversation?->contact)
     <section class="w-[300px] border-l border-outline-variant bg-white flex flex-col overflow-y-auto custom-scrollbar shrink-0">
@@ -646,6 +683,49 @@
     // Close modal on outside click
     document.getElementById('resolutionModal')?.addEventListener('click', function(e) {
         if (e.target === this) closeResolutionModal();
+    });
+
+    // ===== Reopen Request Modal =====
+    function openReopenRequestModal(conversationId) {
+        document.getElementById('reopenConversationId').value = conversationId;
+        document.getElementById('reopenRequestForm').reset();
+        document.getElementById('reopenRequestModal').classList.remove('hidden');
+    }
+
+    function closeReopenRequestModal() {
+        document.getElementById('reopenRequestModal').classList.add('hidden');
+    }
+
+    document.getElementById('reopenRequestForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('{{ route("conversations.reopen.request") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(formData)),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Pedido de reabertura enviado! O administrador será notificado.');
+                closeReopenRequestModal();
+            } else {
+                alert('Erro: ' + (data.message || 'Erro ao enviar pedido'));
+            }
+        } catch (error) {
+            alert('Erro: ' + error.message);
+        }
+    });
+
+    // Close modal on outside click
+    document.getElementById('reopenRequestModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeReopenRequestModal();
     });
 
     function applyMacro(content) {

@@ -98,6 +98,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/tags', [TagController::class, 'store'])->name('tags.store');
     Route::post('/conversations/{conversation}/tags', [TagController::class, 'attachToConversation'])->name('conversations.tags.attach');
     Route::delete('/conversations/{conversation}/tags/{tag}', [TagController::class, 'detachFromConversation'])->name('conversations.tags.detach');
+
+    Route::post('/conversations/reopen/request', [\App\Http\Controllers\ConversationReopenController::class, 'request'])->name('conversations.reopen.request');
+    Route::get('/conversations/reopen/pending', [\App\Http\Controllers\ConversationReopenController::class, 'pending'])->name('conversations.reopen.pending');
+    Route::post('/conversations/reopen/{reopenRequest}/approve', [\App\Http\Controllers\ConversationReopenController::class, 'approve'])->name('conversations.reopen.approve');
+    Route::post('/conversations/reopen/{reopenRequest}/reject', [\App\Http\Controllers\ConversationReopenController::class, 'reject'])->name('conversations.reopen.reject');
     Route::get('/audit/conversations', [AuditController::class, 'conversation'])->name('audit.conversations');
     Route::get('/audit/activity', [AuditController::class, 'agentActivity'])->name('audit.activity');
 
