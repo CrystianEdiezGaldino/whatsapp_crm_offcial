@@ -47,17 +47,17 @@
     <!-- Content -->
     <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div class="grid grid-cols-1 gap-6 max-w-7xl">
-            <!-- Help Card -->
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <!-- Help Card (Dynamic) -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4" id="infoCard">
                 <div class="flex gap-3">
                     <span class="text-2xl flex-shrink-0">ℹ️</span>
                     <div>
                         <p class="text-sm font-semibold text-blue-900">Como funciona a distribuição de leads?</p>
                         <div class="mt-2 space-y-1">
-                            <p class="text-xs text-blue-800">
+                            <p class="text-xs text-blue-800" id="modeDescription">
                                 <strong>👤 Manual:</strong> Agentes clamam conversas manualmente (modo padrão, sem automação)
                             </p>
-                            <p class="text-xs text-blue-800">
+                            <p class="text-xs text-blue-800" id="modeDetails" style="display: none;">
                                 <strong>🤖 Automático:</strong> Sistema distribui novos leads automaticamente usando round-robin (alternando entre agentes ativos, respeitando capacidade máxima)
                             </p>
                         </div>
@@ -76,16 +76,16 @@
                     <div class="space-y-2">
                         <label class="text-sm font-semibold text-on-surface">Modo</label>
                         <div class="flex gap-2">
-                            <label class="flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer {{ $settings->isManual() ? 'border-secondary bg-secondary/10' : 'border-outline-variant' }}">
-                                <input type="radio" name="mode" value="manual" {{ $settings->isManual() ? 'checked' : '' }} class="w-4 h-4">
+                            <label class="flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer mode-label {{ $settings->isManual() ? 'border-secondary bg-secondary/10' : 'border-outline-variant' }}" data-mode="manual">
+                                <input type="radio" name="mode" value="manual" {{ $settings->isManual() ? 'checked' : '' }} class="w-4 h-4 mode-radio">
                                 <span class="text-sm font-medium">
                                     <span class="material-symbols-outlined inline text-base">person</span> Manual
                                 </span>
                                 <span class="text-xs text-on-surface-variant">(Agentes clamam conversas)</span>
                             </label>
 
-                            <label class="flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer {{ $settings->isAutomatic() ? 'border-secondary bg-secondary/10' : 'border-outline-variant' }}" title="Novos leads são automaticamente atribuídos aos agentes em ordem round-robin">
-                                <input type="radio" name="mode" value="automatic" {{ $settings->isAutomatic() ? 'checked' : '' }} class="w-4 h-4">
+                            <label class="flex items-center gap-2 p-3 border-2 rounded-lg cursor-pointer mode-label {{ $settings->isAutomatic() ? 'border-secondary bg-secondary/10' : 'border-outline-variant' }}" data-mode="automatic" title="Novos leads são automaticamente atribuídos aos agentes em ordem round-robin">
+                                <input type="radio" name="mode" value="automatic" {{ $settings->isAutomatic() ? 'checked' : '' }} class="w-4 h-4 mode-radio">
                                 <span class="text-sm font-medium">
                                     <span class="material-symbols-outlined inline text-base">smart_toy</span> Automático
                                 </span>
@@ -95,8 +95,7 @@
                     </div>
 
                     <!-- Overflow Action (só mostrar se automático) -->
-                    @if($settings->isAutomatic())
-                    <div class="space-y-4 pt-4 border-t border-outline-variant">
+                    <div class="space-y-4 pt-4 border-t border-outline-variant" id="overflowSection" style="{{ !$settings->isAutomatic() ? 'display: none;' : '' }}">
                         <div class="bg-secondary/10 border border-secondary/20 rounded-lg p-3">
                             <p class="text-sm font-medium text-on-surface mb-2">📋 Como funciona o modo automático:</p>
                             <ul class="text-xs text-on-surface-variant space-y-1 ml-4 list-disc">
@@ -123,7 +122,6 @@
                                 : '⏳ Novos leads ficarão na fila até haver espaço disponível' }}
                         </p>
                     </div>
-                    @endif
 
                     <div class="flex justify-end">
                         <button type="submit" class="px-4 py-2 bg-secondary text-on-secondary rounded-lg font-semibold hover:bg-secondary/90 active:scale-95 transition-all">
@@ -326,6 +324,41 @@
 
 @push('scripts')
 <script>
+    // Update info card when mode changes
+    document.querySelectorAll('.mode-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const mode = this.value;
+            const modeDesc = document.getElementById('modeDescription');
+            const modeDetails = document.getElementById('modeDetails');
+            const overflowSection = document.getElementById('overflowSection');
+
+            // Update label styling
+            document.querySelectorAll('.mode-label').forEach(label => {
+                label.classList.remove('border-secondary', 'bg-secondary/10');
+                label.classList.add('border-outline-variant');
+            });
+            this.closest('.mode-label').classList.remove('border-outline-variant');
+            this.closest('.mode-label').classList.add('border-secondary', 'bg-secondary/10');
+
+            // Update info card text
+            if (mode === 'manual') {
+                modeDesc.style.display = 'block';
+                modeDetails.style.display = 'none';
+                if (overflowSection) overflowSection.style.display = 'none';
+            } else {
+                modeDesc.style.display = 'none';
+                modeDetails.style.display = 'block';
+                if (overflowSection) overflowSection.style.display = 'block';
+            }
+        });
+    });
+
+    // Set initial state
+    const checkedRadio = document.querySelector('.mode-radio:checked');
+    if (checkedRadio) {
+        checkedRadio.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
     // Edit Capacity
     document.querySelectorAll('.edit-capacity').forEach(btn => {
         btn.addEventListener('click', function() {

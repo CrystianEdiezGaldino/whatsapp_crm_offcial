@@ -51,11 +51,16 @@ class DistributionController extends Controller
         try {
             $validated = $request->validate([
                 'mode' => 'required|in:manual,automatic',
-                'overflow_action' => 'required_if:mode,automatic|in:next_agent,queue',
+                'overflow_action' => 'sometimes|in:next_agent,queue',
             ]);
 
-            // If manual mode, set a default overflow_action
-            if ($validated['mode'] === 'manual') {
+            // If mode is automatic, ensure overflow_action is set
+            if ($validated['mode'] === 'automatic') {
+                if (!isset($validated['overflow_action']) || empty($validated['overflow_action'])) {
+                    $validated['overflow_action'] = 'next_agent'; // Default
+                }
+            } else {
+                // Manual mode - set default overflow_action
                 $validated['overflow_action'] = $validated['overflow_action'] ?? 'next_agent';
             }
 
