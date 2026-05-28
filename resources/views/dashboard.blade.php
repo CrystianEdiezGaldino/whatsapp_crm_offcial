@@ -418,31 +418,57 @@ async function loadDashboardData() {
 
     try {
         const response = await fetch(`/reports/dashboard-data?${params}`, {
+            credentials: 'include',
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
             },
         });
+
         if (!response.ok) {
-            throw new Error('HTTP ' + response.status);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        const text = await response.text();
-        const data = JSON.parse(text);
+
+        const data = await response.json();
+
+        // Validar dados
+        if (!data || !data.by_direction) {
+            console.warn('Dados inválidos retornados:', data);
+            return;
+        }
 
         // Atualizar KPIs
         const totalMessages = data.by_direction.reduce((sum, d) => sum + d.count, 0);
         document.getElementById('totalMessages').textContent = totalMessages.toLocaleString('pt-BR');
         document.getElementById('avgResponseTime').textContent = formatSeconds(data.avg_response_time_seconds);
-        document.getElementById('topContact').textContent = (data.top_contacts[0]?.name || '--');
+        document.getElementById('topContact').textContent = (data.top_contacts?.[0]?.name || '--');
 
-        // Renderizar charts
-        renderMessagesByHourChart(data.by_hour);
-        renderMessagesByTypeChart(data.by_type);
-        renderDirectionChart(data.by_direction);
-        renderByAgentChart(data.by_agent);
-        renderTopContactsTable(data.top_contacts);
+        // Renderizar charts apenas se tiver dados
+        if (data.by_hour && data.by_hour.length > 0) {
+            renderMessagesByHourChart(data.by_hour);
+        } else {
+            console.warn('Sem dados de mensagens por hora');
+        }
+
+        if (data.by_type && data.by_type.length > 0) {
+            renderMessagesByTypeChart(data.by_type);
+        }
+
+        if (data.by_direction && data.by_direction.length > 0) {
+            renderDirectionChart(data.by_direction);
+        }
+
+        if (data.by_agent && data.by_agent.length > 0) {
+            renderByAgentChart(data.by_agent);
+        }
+
+        if (data.top_contacts && data.top_contacts.length > 0) {
+            renderTopContactsTable(data.top_contacts);
+        }
+
     } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        console.error('Erro ao carregar dados do dashboard:', error);
+        console.error('Detalhes:', error.message);
     }
 }
 
