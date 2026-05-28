@@ -132,9 +132,13 @@ class WhatsAppService
             return null;
         }
 
+        // Adicionar nome do agente em frente à mensagem
+        $agentName = auth()->user()->name ?? 'Agente';
+        $messageBody = "[{$agentName}] {$text}";
+
         return $this->postToRecipients($normalizedPhone, [
             'type' => 'text',
-            'text' => ['body' => $text, 'preview_url' => false],
+            'text' => ['body' => $messageBody, 'preview_url' => false],
         ]);
     }
 
