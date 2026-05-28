@@ -121,9 +121,13 @@
                         <span class="material-symbols-outlined">compare_arrows</span>
                         <span class="text-sm">Transferências</span>
                     </a>
-                    <a href="{{ route('admin.whatsapp.token.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.whatsapp') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                    <a href="{{ route('admin.whatsapp.token.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.whatsapp.token') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
                         <span class="material-symbols-outlined">vpn_key</span>
                         <span class="text-sm">Tokens WhatsApp</span>
+                    </a>
+                    <a href="{{ route('admin.whatsapp.numbers.index') }}" class="flex items-center gap-4 py-2 px-4 rounded-lg transition-colors duration-200 {{ str_starts_with($current, 'admin.whatsapp.numbers') ? 'border-l-2 border-secondary-container bg-surface-container-highest/10 text-on-primary font-semibold' : 'text-on-primary-container/70 hover:text-on-primary hover:bg-primary/50' }}">
+                        <span class="material-symbols-outlined">phone</span>
+                        <span class="text-sm">Números WhatsApp</span>
                     </a>
                 </div>
                 @endif

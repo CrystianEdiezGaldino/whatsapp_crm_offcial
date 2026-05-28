@@ -26,9 +26,18 @@ class WhatsAppService
 
     public function __construct()
     {
-        $this->phoneNumberId = config('services.whatsapp.phone_number_id');
-        // Usar token do banco de dados se disponível, caso contrário usar .env
-        $this->accessToken = $this->getValidAccessToken();
+        // Buscar número ativo do WhatsApp
+        $activeNumber = \App\Models\WhatsAppNumber::active();
+
+        if ($activeNumber) {
+            $this->phoneNumberId = $activeNumber->phone_number_id ?? config('services.whatsapp.phone_number_id');
+            $this->accessToken = $activeNumber->access_token;
+        } else {
+            // Fallback para configuração do banco de dados ou .env
+            $this->phoneNumberId = config('services.whatsapp.phone_number_id');
+            $this->accessToken = $this->getValidAccessToken();
+        }
+
         $this->apiVersion = config('services.whatsapp.api_version', 'v23.0');
         $this->baseUrl = config('services.whatsapp.base_url', 'https://graph.facebook.com');
 

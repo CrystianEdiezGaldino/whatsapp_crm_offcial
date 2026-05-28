@@ -68,6 +68,14 @@ Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')-
     Route::post('/whatsapp/tokens/refresh', [\App\Http\Controllers\Admin\WhatsAppTokenController::class, 'refresh'])->name('whatsapp.token.refresh');
     Route::post('/whatsapp/tokens/store', [\App\Http\Controllers\Admin\WhatsAppTokenController::class, 'storeManual'])->name('whatsapp.token.store');
     Route::post('/whatsapp/tokens/sync-env', [\App\Http\Controllers\Admin\WhatsAppTokenController::class, 'syncFromEnv'])->name('whatsapp.token.sync-env');
+
+    // WhatsApp Numbers Management
+    Route::get('/whatsapp/numbers', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'index'])->name('whatsapp.numbers.index');
+    Route::get('/whatsapp/numbers/create', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'create'])->name('whatsapp.numbers.create');
+    Route::post('/whatsapp/numbers', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'store'])->name('whatsapp.numbers.store');
+    Route::post('/whatsapp/numbers/{whatsAppNumber}/set-active', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'setActive'])->name('whatsapp.numbers.set-active');
+    Route::post('/whatsapp/numbers/{whatsAppNumber}/verify', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'verify'])->name('whatsapp.numbers.verify');
+    Route::delete('/whatsapp/numbers/{whatsAppNumber}', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'destroy'])->name('whatsapp.numbers.destroy');
 });
 
 Route::middleware('auth')->group(function () {
