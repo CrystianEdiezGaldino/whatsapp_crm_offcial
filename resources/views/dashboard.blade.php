@@ -6,7 +6,7 @@
 <!-- Top Bar -->
 <header class="flex justify-between items-center h-16 px-6 w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
     <div class="flex items-center gap-6">
-        <h2 class="text-xl font-extrabold text-primary">WhatsApp ERP</h2>
+        <h2 class="text-xl font-extrabold text-primary font-headline">SisChat Dashboard</h2>
         <div class="relative flex items-center">
             <span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-lg">search</span>
             <input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-sm w-64 focus:outline-none focus:ring-1 focus:ring-secondary" placeholder="Buscar chats ou agentes..." type="text">
@@ -48,66 +48,93 @@
     </div>
     <!-- Metrics KPIs -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:border-secondary transition-colors">
-            <div class="flex justify-between items-start">
-                <span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg">forum</span>
+        <div class="bg-gradient-to-br from-primary to-primary-container p-6 rounded-xl border border-primary/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
+                    <span class="material-symbols-outlined text-white text-2xl">forum</span>
+                </div>
+                <span class="text-xs font-bold text-white/80 bg-white/10 px-2 py-1 rounded">Hoje</span>
             </div>
-            <p class="text-xs font-semibold text-on-surface-variant mt-4 uppercase">Total Mensagens</p>
-            <p id="totalMessages" class="text-3xl font-bold text-on-surface">--</p>
+            <p class="text-xs font-semibold text-white/80 uppercase tracking-wider">Total Mensagens</p>
+            <p id="totalMessages" class="text-4xl font-black text-white mt-2">--</p>
         </div>
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:border-secondary transition-colors">
-            <div class="flex justify-between items-start">
-                <span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg">chat</span>
+
+        <div class="bg-gradient-to-br from-secondary-container to-secondary/50 p-6 rounded-xl border border-secondary/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
+                    <span class="material-symbols-outlined text-secondary text-2xl">chat_bubble</span>
+                </div>
+                <span class="text-xs font-bold text-secondary/80 bg-white/10 px-2 py-1 rounded">Ativos</span>
             </div>
-            <p class="text-xs font-semibold text-on-surface-variant mt-4 uppercase">Chats Abertos</p>
-            <p id="openConversations" class="text-3xl font-bold text-on-surface">{{ $stats['open_conversations'] }}</p>
+            <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Chats Abertos</p>
+            <p id="openConversations" class="text-4xl font-black text-secondary mt-2">{{ $stats['open_conversations'] }}</p>
         </div>
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:border-secondary transition-colors">
-            <div class="flex justify-between items-start">
-                <span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg">timer</span>
+
+        <div class="bg-gradient-to-br from-tertiary-container to-tertiary/50 p-6 rounded-xl border border-tertiary/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
+                    <span class="material-symbols-outlined text-tertiary text-2xl">schedule</span>
+                </div>
+                <span class="text-xs font-bold text-tertiary/80 bg-white/10 px-2 py-1 rounded">Média</span>
             </div>
-            <p class="text-xs font-semibold text-on-surface-variant mt-4 uppercase">Tempo Médio Resposta</p>
-            <p id="avgResponseTime" class="text-3xl font-bold text-on-surface">--</p>
+            <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tempo Médio Resposta</p>
+            <p id="avgResponseTime" class="text-3xl font-black text-tertiary mt-2">--</p>
         </div>
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:border-secondary transition-colors">
-            <div class="flex justify-between items-start">
-                <span class="material-symbols-outlined text-primary p-2 bg-slate-50 rounded-lg">person_add</span>
+
+        <div class="bg-gradient-to-br from-error-container to-error/50 p-6 rounded-xl border border-error/20 shadow-lg hover:shadow-xl transition-all hover:scale-105">
+            <div class="flex justify-between items-start mb-4">
+                <div class="p-3 bg-white/20 rounded-lg backdrop-blur">
+                    <span class="material-symbols-outlined text-error text-2xl">person</span>
+                </div>
+                <span class="text-xs font-bold text-error/80 bg-white/10 px-2 py-1 rounded">Top</span>
             </div>
-            <p class="text-xs font-semibold text-on-surface-variant mt-4 uppercase">Top Contato</p>
-            <p id="topContact" class="text-lg font-bold text-on-surface">--</p>
+            <p class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Contato Principal</p>
+            <p id="topContact" class="text-xl font-black text-error mt-2 truncate">--</p>
         </div>
     </div>
 
     <!-- Charts Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Chart 1: Mensagens por Hora -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
-            <h3 class="text-lg font-semibold text-on-surface mb-4">Mensagens por Hora</h3>
-            <div style="height: 300px; position: relative;">
+        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-primary font-headline">Mensagens por Hora</h3>
+                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Hoje</span>
+            </div>
+            <div style="height: 320px; position: relative;">
                 <canvas id="messagesByHourChart"></canvas>
             </div>
         </div>
 
         <!-- Chart 2: Tipo de Mensagem -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
-            <h3 class="text-lg font-semibold text-on-surface mb-4">Distribuição por Tipo</h3>
-            <div style="height: 300px; position: relative;">
+        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-primary font-headline">Distribuição por Tipo</h3>
+                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Resumo</span>
+            </div>
+            <div style="height: 320px; position: relative;">
                 <canvas id="messagesByTypeChart"></canvas>
             </div>
         </div>
 
         <!-- Chart 3: Inbound vs Outbound -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
-            <h3 class="text-lg font-semibold text-on-surface mb-4">Inbound vs Outbound</h3>
-            <div style="height: 300px; position: relative;">
+        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-primary font-headline">Fluxo de Mensagens</h3>
+                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Comparativo</span>
+            </div>
+            <div style="height: 320px; position: relative;">
                 <canvas id="directionChart"></canvas>
             </div>
         </div>
 
         <!-- Chart 4: Atividade por Agente -->
-        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
-            <h3 class="text-lg font-semibold text-on-surface mb-4">Atividade por Agente</h3>
-            <div style="height: 300px; position: relative;">
+        <div class="bg-white p-6 rounded-xl border border-outline-variant shadow-md hover:shadow-lg transition-shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-primary font-headline">Atividade por Agente</h3>
+                <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full">Ranking</span>
+            </div>
+            <div style="height: 320px; position: relative;">
                 <canvas id="byAgentChart"></canvas>
             </div>
         </div>
@@ -339,17 +366,33 @@ function renderMessagesByHourChart(data) {
             datasets: [{
                 label: 'Mensagens',
                 data: data.map(d => d.count),
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderColor: '#001769',
+                backgroundColor: 'rgba(0, 23, 105, 0.08)',
+                borderWidth: 3,
                 tension: 0.4,
                 fill: true,
+                pointBackgroundColor: '#142c8e',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } },
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                filler: { propagate: true }
+            },
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                }
             }
         }
     });
@@ -369,7 +412,7 @@ function renderMessagesByTypeChart(data) {
         'sticker': 'Sticker'
     };
 
-    const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+    const colors = ['#001769', '#142c8e', '#4d5e83', '#8bf9b2', '#879aff', '#dee1ff'];
 
     charts.byType = new Chart(ctx, {
         type: 'doughnut',
@@ -378,13 +421,23 @@ function renderMessagesByTypeChart(data) {
             datasets: [{
                 data: data.map(d => d.count),
                 backgroundColor: colors.slice(0, data.length),
+                borderColor: '#ffffff',
+                borderWidth: 2,
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 12, weight: 500 },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                }
             }
         }
     });
@@ -402,14 +455,26 @@ function renderDirectionChart(data) {
             datasets: [{
                 label: 'Quantidade',
                 data: data.map(d => d.count),
-                backgroundColor: data.map(d => d.direction === 'inbound' ? '#10b981' : '#3b82f6'),
+                backgroundColor: data.map(d => d.direction === 'inbound' ? '#8bf9b2' : '#001769'),
+                borderColor: data.map(d => d.direction === 'inbound' ? '#004122' : '#142c8e'),
+                borderWidth: 2,
+                borderRadius: 8,
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } },
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
             scales: {
-                y: { beginAtZero: true }
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
             }
         }
     });
@@ -427,16 +492,27 @@ function renderByAgentChart(data) {
             datasets: [{
                 label: 'Conversas',
                 data: data.map(d => d.count),
-                backgroundColor: '#f59e0b',
+                backgroundColor: '#142c8e',
+                borderColor: '#001769',
+                borderWidth: 2,
+                borderRadius: 8,
             }]
         },
         options: {
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: {
+                legend: { display: false }
+            },
             scales: {
-                x: { beginAtZero: true }
+                x: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                },
+                y: {
+                    grid: { display: false }
+                }
             }
         }
     });
