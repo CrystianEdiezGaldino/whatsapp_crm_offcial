@@ -156,7 +156,7 @@
                             </span>
                         @else
                             <span class="text-[11px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded flex items-center gap-1">
-                                <span>🔒</span> Clamado por: {{ $activeClaim->user->name }}
+                                <span>🔒</span> Clamado por: {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'Outro agente' }}
                                 @if($hasMyClaim)
                                 <span class="ml-1 text-green-600 font-bold">(Você)</span>
                                 @endif
@@ -393,7 +393,7 @@
                 @csrf
                 <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
                 <div class="relative">
-                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim) disabled @if($isAdmin) title="Clique em 'Transferir para mim' para reivindicar esta conversa" @else title="Este atendimento foi clamado por {{ $activeClaim->user->name }}" @endif @endif></textarea>
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim) disabled @if($isAdmin) title="Clique em 'Transferir para mim' para reivindicar esta conversa" @else title="Este atendimento foi clamado por {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'outro agente' }}" @endif @endif></textarea>
 
                     <!-- Macros Menu -->
                     <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
@@ -432,7 +432,11 @@
             <div class="text-center">
                 <span class="material-symbols-outlined text-4xl text-red-500 block mb-2">lock</span>
                 <h3 class="text-sm font-semibold text-red-900 mb-1">Atendimento Indisponível</h3>
-                <p class="text-xs text-red-700 mb-4">Este atendimento foi reivindicado por <strong>{{ $activeClaim->user->name }}</strong></p>
+                @if($activeClaim && $activeClaim->user)
+                    <p class="text-xs text-red-700 mb-4">Este atendimento foi reivindicado por <strong>{{ $activeClaim->user->name }}</strong></p>
+                @else
+                    <p class="text-xs text-red-700 mb-4">Este atendimento foi reivindicado por outro agente</p>
+                @endif
                 <p class="text-xs text-red-600">Você precisa reivindicar este atendimento para poder responder.</p>
             </div>
             <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1.5 transition-all active:scale-95">
