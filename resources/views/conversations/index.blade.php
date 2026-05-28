@@ -50,10 +50,12 @@
                 @endif
             </div>
             <div class="flex gap-1 flex-wrap">
+                @if(auth()->user()->isAdmin())
                 <a href="{{ route('conversations.index') }}" class="px-2 py-1 text-xs rounded {{ !request('assigned') && !request('status') ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">
                     Todos
                     <span class="text-[10px] ml-1 opacity-75">({{ $totalCount }})</span>
                 </a>
+                @endif
                 <a href="{{ route('conversations.index', ['status' => 'pending']) }}" class="px-2 py-1 text-xs rounded flex items-center gap-1 {{ request('status') === 'pending' ? 'bg-error text-on-error font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">
                     <span class="material-symbols-outlined text-[14px]">schedule</span>
                     Pendentes
