@@ -106,7 +106,8 @@
       "Bash(truncate -s 0 \"F:/BACKUP/whatsapp/smcc-whatsapp/storage/logs/laravel.log\")",
       "Bash(mysql *)",
       "Bash(php -r 'require '\\\\''vendor/autoload.php'\\\\''; $app = require_once '\\\\''bootstrap/app.php'\\\\''; $app->make\\('\\\\''Illuminate\\\\Contracts\\\\Console\\\\Kernel'\\\\''\\)->bootstrap\\(\\); echo \\\\App\\\\Models\\\\Tag::count\\(\\);')",
-      "Bash(php -d memory_limit=512M artisan db:seed --class=TagSeeder)"
+      "Bash(php -d memory_limit=512M artisan db:seed --class=TagSeeder)",
+      "WebFetch(domain:essenciatech.com.br)"
     ]
   }
 }

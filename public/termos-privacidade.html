@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso e Política de Privacidade - EssenciaTech</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2275d7;
+            --primary-dark: #1a5aa8;
+            --primary-light: #5a94e8;
+            --secondary: #f5f7fa;
+            --text-dark: #1a1a1a;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: #ffffff;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header .logo {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Navigation */
+        nav.toc {
+            background: var(--secondary);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+
+        nav.toc h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        nav.toc ul {
+            list-style: none;
+        }
+
+        nav.toc li {
+            margin: 8px 0;
+        }
+
+        nav.toc a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav.toc a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Sections */
+        section {
+            margin: 40px 0;
+            padding: 30px;
+            background: var(--secondary);
+            border-radius: 8px;
+            border-left: 5px solid var(--primary);
+        }
+
+        section h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        section h3 {
+            color: var(--primary-dark);
+            margin: 20px 0 10px 0;
+            font-size: 1.3em;
+        }
+
+        section p {
+            margin-bottom: 15px;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        section ul, section ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        section li {
+            margin-bottom: 10px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* Highlights */
+        .highlight {
+            background: rgba(34, 117, 215, 0.1);
+            border-left: 3px solid var(--primary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .highlight strong {
+            color: var(--primary-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        footer p {
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            section {
+                padding: 20px;
+            }
+
+            section h2 {
+                font-size: 1.4em;
+            }
+        }
+
+        /* Links */
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        /* Última atualização */
+        .last-updated {
+            text-align: center;
+            color: var(--text-light);
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <img src="https://essenciatech.com.br/assets/logo-essenciatech-CPa_JSgA.png" alt="EssenciaTech" class="logo">
+        <h1>Termos de Uso e Política de Privacidade</h1>
+        <p>EssenciaTech - Desenvolvimento de Sistemas, Apps e Sites</p>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Sumário -->
+        <nav class="toc">
+            <h2>📑 Índice</h2>
+            <ul>
+                <li><a href="#termos">1. Termos de Uso</a></li>
+                <li><a href="#privacidade">2. Política de Privacidade</a></li>
+                <li><a href="#direitos">3. Direitos e Responsabilidades</a></li>
+                <li><a href="#dados">4. Proteção de Dados</a></li>
+                <li><a href="#limitacoes">5. Limitações de Responsabilidade</a></li>
+                <li><a href="#contato">6. Contato e Suporte</a></li>
+            </ul>
+        </nav>
+
+        <!-- 1. Termos de Uso -->
+        <section id="termos">
+            <h2>📋 1. Termos de Uso</h2>
+
+            <h3>1.1 Aceitação dos Termos</h3>
+            <p>Ao acessar e utilizar os serviços oferecidos pela <strong>EssenciaTech</strong>, você concorda em estar vinculado por estes Termos de Uso. Se não concordar com qualquer parte destes termos, por favor, não utilize nossos serviços.</p>
+
+            <h3>1.2 Descrição dos Serviços</h3>
+            <p>A EssenciaTech oferece os seguintes serviços:</p>
+            <ul>
+                <li>Desenvolvimento de Sistemas</li>
+                <li>Desenvolvimento de Aplicativos Mobile e Web</li>
+                <li>Criação de Websites</li>
+                <li>Consultoria em Tecnologia</li>
+                <li>Suporte e Manutenção de Plataformas</li>
+            </ul>
+
+            <h3>1.3 Uso Permitido</h3>
+            <p>Você concorda em utilizar nossos serviços apenas para fins legais e de forma que não viole os direitos de terceiros ou restrinja seu uso e prazer. Condutas proibidas incluem:</p>
+            <ul>
+                <li>Assediar, causar constrangimento ou ameaçar qualquer pessoa</li>
+                <li>Transmitir conteúdo obsceno ou sexual</li>
+                <li>Interferir ou interromper a integridade ou a segurança da rede</li>
+                <li>Tentar obter acesso não autorizado aos sistemas</li>
+                <li>Transmitir vírus ou código malicioso</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>⚠️ Importante:</strong> O uso inadequado dos serviços resultará em cessação imediata da prestação de serviços.
+            </div>
+
+            <h3>1.4 Propriedade Intelectual</h3>
+            <p>Todo o conteúdo, funcionalidades e recursos disponibilizados através dos serviços, incluindo mas não limitado a, código-fonte, design, texto e gráficos, são propriedade exclusiva da EssenciaTech ou de seus fornecedores de conteúdo e estão protegidos por leis de propriedade intelectual internacionais.</p>
+
+            <h3>1.5 Alterações nos Serviços</h3>
+            <p>A EssenciaTech se reserva o direito de modificar ou descontinuar os serviços, no todo ou em parte, com ou sem aviso prévio. Você concorda que a EssenciaTech não será responsável por qualquer modificação ou descontinuação dos serviços.</p>
+        </section>
+
+        <!-- 2. Política de Privacidade -->
+        <section id="privacidade">
+            <h2>🔒 2. Política de Privacidade</h2>
+
+            <h3>2.1 Coleta de Informações</h3>
+            <p>A EssenciaTech coleta informações de várias formas durante o uso dos serviços, incluindo:</p>
+            <ul>
+                <li><strong>Informações Fornecidas Voluntariamente:</strong> Nome, email, telefone, endereço e dados de negócio</li>
+                <li><strong>Informações Automáticas:</strong> Endereço IP, tipo de navegador, páginas visitadas, tempo de permanência</li>
+                <li><strong>Cookies e Tecnologias Similares:</strong> Para melhorar experiência do usuário</li>
+                <li><strong>Informações de Terceiros:</strong> Dados fornecidos por parceiros e integrações</li>
+            </ul>
+
+            <h3>2.2 Uso das Informações</h3>
+            <p>As informações coletadas são utilizadas para:</p>
+            <ul>
+                <li>Fornecer e melhorar nossos serviços</li>
+                <li>Processar transações e enviar informações relacionadas</li>
+                <li>Responder às suas dúvidas e solicitações</li>
+                <li>Enviar atualizações e comunicações de marketing (com consentimento)</li>
+                <li>Analisar tendências e melhorar a experiência do usuário</li>
+                <li>Garantir conformidade legal e segurança</li>
+            </ul>
+
+            <h3>2.3 Compartilhamento de Dados</h3>
+            <p>Não compartilhamos suas informações pessoais com terceiros, exceto:</p>
+            <ul>
+                <li>Com seu consentimento explícito</li>
+                <li>Para fornecedores de serviços que trabalham em nome da EssenciaTech</li>
+                <li>Quando obrigado por lei ou para proteger direitos legais</li>
+                <li>Em caso de fusão, aquisição ou venda de ativos</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>🛡️ Segurança:</strong> Implementamos medidas de segurança rigorosas para proteger suas informações contra acesso não autorizado.
+            </div>
+
+            <h3>2.4 Retenção de Dados</h3>
+            <p>Retemos suas informações pessoais pelo tempo necessário para fornecer os serviços e cumprir obrigações legais. Você pode solicitar a exclusão de seus dados a qualquer momento.</p>
+
+            <h3>2.5 Seus Direitos</h3>
+            <p>Você tem direito a:</p>
+            <ul>
+                <li>Acessar suas informações pessoais</li>
+                <li>Corrigir dados inexatos</li>
+                <li>Solicitar exclusão de seus dados</li>
+                <li>Revogar consentimento em qualquer momento</li>
+                <li>Transferir seus dados (portabilidade)</li>
+            </ul>
+        </section>
+
+        <!-- 3. Direitos e Responsabilidades -->
+        <section id="direitos">
+            <h2>⚖️ 3. Direitos e Responsabilidades</h2>
+
+            <h3>3.1 Seus Direitos</h3>
+            <ul>
+                <li>Acessar os serviços conforme descrito nestes Termos</li>
+                <li>Rescindir o serviço a qualquer momento com aviso apropriado</li>
+                <li>Receber suporte técnico durante o período contratado</li>
+                <li>Privacidade de suas informações pessoais</li>
+            </ul>
+
+            <h3>3.2 Suas Responsabilidades</h3>
+            <ul>
+                <li>Fornecer informações precisas e atualizadas</li>
+                <li>Manter a confidencialidade de credenciais de acesso</li>
+                <li>Não usar os serviços para atividades ilícitas</li>
+                <li>Reportar imediatamente qualquer acesso não autorizado</li>
+                <li>Cumprir com todas as leis e regulamentações aplicáveis</li>
+            </ul>
+
+            <h3>3.3 Responsabilidades da EssenciaTech</h3>
+            <ul>
+                <li>Manter os serviços seguros e funcionais</li>
+                <li>Proteger as informações fornecidas</li>
+                <li>Fornecer suporte técnico adequado</li>
+                <li>Respeitar privacidade e conformidade de dados</li>
+                <li>Notificar sobre mudanças significativas nos serviços</li>
+            </ul>
+        </section>
+
+        <!-- 4. Proteção de Dados -->
+        <section id="dados">
+            <h2>🔐 4. Proteção de Dados</h2>
+
+            <h3>4.1 Medidas de Segurança</h3>
+            <p>A EssenciaTech implementa as seguintes medidas para proteger seus dados:</p>
+            <ul>
+                <li>Criptografia de dados em trânsito (SSL/TLS)</li>
+                <li>Criptografia de dados em repouso</li>
+                <li>Firewalls e sistemas de detecção de intrusão</li>
+                <li>Controle de acesso baseado em funções</li>
+                <li>Auditorias de segurança regulares</li>
+                <li>Conformidade com LGPD e GDPR</li>
+            </ul>
+
+            <h3>4.2 Conformidade Legal</h3>
+            <p>Nossas políticas estão em conformidade com:</p>
+            <ul>
+                <li><strong>LGPD:</strong> Lei Geral de Proteção de Dados (Brasil)</li>
+                <li><strong>GDPR:</strong> Regulamento Geral sobre Proteção de Dados (União Europeia)</li>
+                <li>Legislação brasileira aplicável</li>
+                <li>Padrões internacionais de segurança de dados</li>
+            </ul>
+
+            <h3>4.3 Violação de Dados</h3>
+            <p>Em caso de violação de segurança que comprometa suas informações pessoais, notificaremos você dentro de 72 horas, conforme exigido pela lei.</p>
+        </section>
+
+        <!-- 5. Limitações de Responsabilidade -->
+        <section id="limitacoes">
+            <h2>⚠️ 5. Limitações de Responsabilidade</h2>
+
+            <h3>5.1 Disclaimer</h3>
+            <p>Os serviços são fornecidos "no estado em que se encontram" sem garantias de nenhum tipo, expressas ou implícitas, incluindo mas não limitado a garantias de comercialização, adequação a um propósito específico ou não infração.</p>
+
+            <h3>5.2 Limitação de Responsabilidade</h3>
+            <p>Exceto quando proibido por lei, a EssenciaTech não será responsável por:</p>
+            <ul>
+                <li>Danos indiretos, incidentais, especiais ou consequentes</li>
+                <li>Perda de lucros, receita, dados ou uso</li>
+                <li>Tempo de inatividade ou indisponibilidade dos serviços</li>
+                <li>Erros de terceiros ou ações fora de nosso controle</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>Responsabilidade Total:</strong> Em qualquer caso, a responsabilidade total da EssenciaTech não excederá o valor pago pelos serviços nos últimos 12 meses.
+            </div>
+
+            <h3>5.3 Força Maior</h3>
+            <p>A EssenciaTech não será responsável por qualquer falha ou atraso na execução de obrigações devido a circunstâncias além de nosso controle razoável, incluindo mas não limitado a desastres naturais, guerra, terrorismo, atos governamentais ou falhas de infraestrutura.</p>
+        </section>
+
+        <!-- 6. Contato e Suporte -->
+        <section id="contato">
+            <h2>📞 6. Contato e Suporte</h2>
+
+            <h3>6.1 Informações de Contato</h3>
+            <p>Para dúvidas sobre estes Termos de Uso e Política de Privacidade, entre em contato conosco:</p>
+            <ul>
+                <li><strong>Website:</strong> <a href="https://essenciatech.com.br" target="_blank">https://essenciatech.com.br</a></li>
+                <li><strong>Email:</strong> contato@essenciatech.com.br</li>
+                <li><strong>Localização:</strong> Curitiba, Paraná, Brasil</li>
+            </ul>
+
+            <h3>6.2 Suporte ao Usuário</h3>
+            <p>Nossa equipe de suporte está disponível para ajudá-lo com:</p>
+            <ul>
+                <li>Questões técnicas sobre os serviços</li>
+                <li>Solicitações de dados pessoais</li>
+                <li>Reclamações sobre privacidade</li>
+                <li>Feedbacks e sugestões</li>
+            </ul>
+
+            <h3>6.3 Resolução de Disputas</h3>
+            <p>Qualquer disputa relacionada a estes Termos será regida pelas leis da República Federativa do Brasil, especificamente pelo estado de São Paulo.</p>
+        </section>
+
+        <!-- Rodapé com data de atualização -->
+        <div class="last-updated">
+            <p>📅 <strong>Última atualização:</strong> 28 de maio de 2026</p>
+            <p>Estes Termos e Política de Privacidade podem ser alterados a qualquer momento. Notificaremos sobre mudanças significativas através do nosso website ou email.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 EssenciaTech - Desenvolvimento de Sistemas, Apps e Sites.</p>
+        <p>Todos os direitos reservados. | <a href="#termos">Termos de Uso</a> | <a href="#privacidade">Privacidade</a></p>
+        <p>Criado com ❤️ em Curitiba</p>
+    </footer>
+</body>
+</html>

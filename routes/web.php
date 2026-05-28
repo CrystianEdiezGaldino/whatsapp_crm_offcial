@@ -155,6 +155,11 @@ Route::middleware('auth')->group(function () {
 Route::get('/webhook/debug', [WebhookController::class, 'debug'])->name('webhook.debug');
 Route::post('/webhook/debug', [WebhookController::class, 'debug']);
 
+// Termos e Privacidade
+Route::get('/termos-privacidade', function () {
+    return file_get_contents(public_path('termos-privacidade.html'));
+})->name('termos-privacidade');
+
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
