@@ -35,34 +35,33 @@
     </aside>
 
     <!-- Left: Conversation List -->
-    <section class="w-[360px] border-r border-outline-variant bg-white flex flex-col overflow-hidden shrink-0">
-        <div class="p-4 border-b border-outline-variant">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-lg font-semibold text-on-surface">Chats Ativos</h2>
+    <section class="w-[360px] border-r border-outline-variant bg-gradient-to-b from-white to-slate-50/50 flex flex-col overflow-hidden shrink-0">
+        <div class="p-4 border-b border-outline-variant/50 bg-white/70 backdrop-blur-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-on-surface">💬 Chats Ativos</h2>
                 @if($pendingCount > 0)
-                <span class="bg-error text-on-error text-xs font-bold px-2.5 py-1 rounded-full animate-pulse">
+                <span class="bg-error text-on-error text-xs font-bold px-3 py-1 rounded-full animate-pulse shadow-md">
                     {{ $pendingCount }} pendente{{ $pendingCount !== 1 ? 's' : '' }}
                 </span>
                 @endif
             </div>
-            <div class="flex gap-1 flex-wrap">
+            <div class="flex gap-2 flex-wrap">
                 @if(auth()->user()->isAdmin())
-                <a href="{{ route('conversations.index') }}" class="px-2 py-1 text-xs rounded {{ !request('assigned') && !request('status') ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">
-                    Todos
-                    <span class="text-[10px] ml-1 opacity-75">({{ $totalCount }})</span>
+                <a href="{{ route('conversations.index') }}" class="px-3 py-1.5 text-xs rounded-lg font-medium transition-all {{ !request('assigned') && !request('status') ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container border border-outline-variant/50' }}">
+                    Todos <span class="text-[10px] ml-1 opacity-75">({{ $totalCount }})</span>
                 </a>
                 @endif
-                <a href="{{ route('conversations.index', ['status' => 'pending']) }}" class="px-2 py-1 text-xs rounded flex items-center gap-1 {{ request('status') === 'pending' ? 'bg-error text-on-error font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">
+                <a href="{{ route('conversations.index', ['status' => 'pending']) }}" class="px-3 py-1.5 text-xs rounded-lg font-medium transition-all flex items-center gap-1 {{ request('status') === 'pending' ? 'bg-error text-on-error shadow-md' : 'text-on-surface-variant hover:bg-surface-container border border-outline-variant/50' }}">
                     <span class="material-symbols-outlined text-[14px]">schedule</span>
                     Pendentes
                     @if($pendingCount > 0)
                     <span class="text-[10px] ml-1 font-bold">{{ $pendingCount }}</span>
                     @endif
                 </a>
-                <a href="{{ route('conversations.index', ['assigned' => 'mine']) }}" class="px-2 py-1 text-xs rounded {{ request('assigned') === 'mine' ? 'bg-primary text-on-primary font-semibold' : 'text-on-surface-variant hover:bg-surface-container' }}">Meus</a>
+                <a href="{{ route('conversations.index', ['assigned' => 'mine']) }}" class="px-3 py-1.5 text-xs rounded-lg font-medium transition-all {{ request('assigned') === 'mine' ? 'bg-primary text-on-primary shadow-md' : 'text-on-surface-variant hover:bg-surface-container border border-outline-variant/50' }}">Meus</a>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto custom-scrollbar">
+        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 p-2">
             @forelse($conversations as $conv)
             @php
                 $convPending = !$conv->getActiveClaim();
@@ -70,35 +69,36 @@
                 $shouldShow = !request('status') || (request('status') === 'pending' && $convPending);
             @endphp
             @if($shouldShow && $conv->contact)
-            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="block p-4 flex gap-3 cursor-pointer transition-colors border-l-4 {{ ($activeConversation?->id === $conv->id) ? 'bg-surface-container-low border-secondary' : ($convPending ? 'bg-red-50 border-error hover:bg-red-100' : ($convResolved ? 'bg-gray-50 border-gray-400 opacity-60 hover:bg-gray-100' : 'border-transparent hover:bg-surface-container-low')) }}" data-claim-info="{{ $convPending ? '⏱️ Pendente' : ($convResolved ? '✓ Encerrada' : '🔒 ' . ($conv->getActiveClaim()?->user->name ?? 'Sem atribuição')) }}">
+            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="group flex gap-3 p-3 cursor-pointer transition-all rounded-lg backdrop-blur-sm border {{ ($activeConversation?->id === $conv->id) ? 'bg-primary/10 border-primary/30 shadow-md' : ($convPending ? 'bg-error/10 border-error/30 hover:bg-error/20 hover:shadow-sm' : ($convResolved ? 'bg-surface-container border-surface-container opacity-60 hover:opacity-80 hover:shadow-sm' : 'bg-white/60 border-outline-variant/30 hover:bg-white/80 hover:shadow-sm hover:border-outline-variant/50')) }}">
                 <div class="relative shrink-0">
-                    <div class="w-12 h-12 rounded-full {{ $convPending ? 'bg-error' : 'bg-primary-fixed' }} flex items-center justify-center font-bold text-sm {{ $convPending ? 'text-on-error' : 'text-on-primary-fixed' }}">
+                    <div class="w-12 h-12 rounded-full {{ $convPending ? 'bg-gradient-to-br from-error to-error/80' : 'bg-gradient-to-br from-primary-fixed to-primary-fixed/80' }} flex items-center justify-center font-bold text-sm {{ $convPending ? 'text-on-error' : 'text-on-primary-fixed' }} shadow-sm">
                         {{ $conv->contact->initials }}
                     </div>
                     @if($convPending)
-                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-error text-on-error rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white">!</span>
+                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-error text-on-error rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white shadow-md animate-bounce">!</span>
                     @endif
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-start gap-2">
+                    <div class="flex justify-between items-start gap-2 mb-1">
                         <div class="flex-1 min-w-0">
                             <h3 class="text-sm font-bold {{ $convPending ? 'text-error' : 'text-on-surface' }} truncate">{{ $conv->contact->name }}</h3>
                             @if($convPending)
-                            <span class="text-[10px] text-error font-semibold">⏱️ Pendente</span>
+                            <span class="text-[10px] text-error font-semibold">⏱️ Pendente de atendimento</span>
                             @elseif($convResolved)
                             <span class="text-[10px] text-gray-500 font-semibold">✓ Encerrada</span>
                             @else
-                            <span class="text-[10px] text-yellow-700 font-semibold">🔒 {{ $conv->getActiveClaim()?->user->name ?? 'Sem atribuição' }}</span>
+                            <span class="text-[10px] text-secondary font-semibold">🔒 {{ $conv->getActiveClaim()?->user->name ?? 'Sem atribuição' }}</span>
                             @endif
                         </div>
-                        <span class="text-[11px] text-on-surface-variant shrink-0">{{ $conv->last_message_at?->diffForHumans(short: true) }}</span>
+                        <span class="text-[11px] text-on-surface-variant shrink-0 font-medium">{{ $conv->last_message_at?->diffForHumans(short: true) ?? '-' }}</span>
                     </div>
-                    <p class="text-sm text-on-surface-variant truncate mt-0.5">{{ $conv->lastMessage?->content ?? 'Sem mensagens' }}</p>
+                    <p class="text-xs text-on-surface-variant truncate mt-1 line-clamp-1">{{ $conv->lastMessage?->content ?? '(sem mensagens)' }}</p>
                 </div>
             </a>
             @endif
             @empty
-            <div class="p-8 text-center text-on-surface-variant text-sm">
+            <div class="p-12 text-center text-on-surface-variant text-sm">
+                <span class="text-3xl block mb-2">💭</span>
                 @if(request('status') === 'pending')
                     ✓ Nenhum atendimento pendente!
                 @else
@@ -110,13 +110,13 @@
     </section>
 
     <!-- Center: Chat -->
-    <section class="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
+    <section class="flex-1 flex flex-col bg-gradient-to-b from-white/50 to-slate-50/50 relative overflow-hidden">
         <!-- Toast de Notificação -->
-        <div id="notificationToast" class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 z-50 max-w-xs animate-slideInUp">
+        <div id="notificationToast" class="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 z-50 max-w-xs animate-slideInUp">
             <div class="flex items-center gap-3">
                 <span class="text-lg" id="toastIcon">📩</span>
                 <div class="flex-1">
-                    <p class="text-sm font-semibold" id="toastSender">Novo contato</p>
+                    <p class="text-sm font-semibold" id="toastSender">Nova mensagem</p>
                     <p class="text-xs opacity-90" id="toastMessage">Você tem uma mensagem</p>
                 </div>
                 <button onclick="document.getElementById('notificationToast').classList.add('hidden')" class="text-white hover:opacity-75 flex-shrink-0">✕</button>
@@ -124,11 +124,11 @@
         </div>
 
         <!-- Notification Badge for Pending Chats -->
-        <div id="pendingBadge" class="fixed top-20 right-6 bg-error text-on-error p-4 rounded-xl shadow-lg hidden transition-all duration-300 z-50 max-w-xs">
+        <div id="pendingBadge" class="fixed top-20 right-6 bg-gradient-to-r from-error to-error/80 text-on-error p-4 rounded-xl shadow-lg hidden transition-all duration-300 z-50 max-w-xs">
             <div class="flex items-center gap-3">
                 <span class="material-symbols-outlined text-2xl">schedule</span>
                 <div class="flex-1">
-                    <p class="text-sm font-semibold">Novo Atendimento Pendente</p>
+                    <p class="text-sm font-semibold">Novo Pendente</p>
                     <p class="text-xs opacity-90" id="pendingName">Aguardando sua ação</p>
                 </div>
                 <button onclick="document.getElementById('pendingBadge').classList.add('hidden')" class="text-on-error hover:opacity-75 flex-shrink-0">✕</button>
@@ -137,70 +137,84 @@
 
         @if($activeConversation?->contact)
         <!-- Chat Header -->
-        <div class="p-4 bg-white border-b border-outline-variant flex justify-between items-center shadow-sm">
-            <div class="flex items-center gap-3 flex-1">
-                <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-on-primary-fixed">
+        <div class="p-5 bg-white/70 backdrop-blur-md border-b border-outline-variant/50 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-fixed to-primary-fixed/80 flex items-center justify-center font-bold text-sm text-on-primary-fixed shadow-md shrink-0">
                     {{ $activeConversation->contact->initials }}
                 </div>
-                <div class="flex-1">
-                    <h2 class="text-sm font-bold text-on-surface">{{ $activeConversation->contact->name }}</h2>
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <p class="text-xs text-secondary font-semibold">{{ $activeConversation->contact->phone }}</p>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <h2 class="text-sm font-bold text-on-surface">{{ $activeConversation->contact->name }}</h2>
                         @php
                             $activeClaim = $activeConversation->getActiveClaim();
                             $isAdmin = Auth::user()->isAdmin();
                             $hasMyClaim = $activeClaim && $activeClaim->user_id === Auth::id();
                         @endphp
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="text-xs text-secondary font-semibold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">phone</span>
+                            {{ $activeConversation->contact->phone }}
+                        </span>
                         @if(!$activeClaim)
-                            <span class="text-[11px] bg-red-100 text-red-800 px-2 py-0.5 rounded flex items-center gap-1">
-                                <span>⏱️</span> Aguardando atendimento
+                            <span class="text-[11px] bg-error/20 text-error px-2.5 py-0.5 rounded-full flex items-center gap-1 font-semibold">
+                                <span class="material-symbols-outlined text-[12px]">schedule</span>
+                                Aguardando
                             </span>
                         @else
-                            <span class="text-[11px] bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded flex items-center gap-1">
-                                <span>🔒</span> Clamado por: {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'Outro agente' }}
+                            <span class="text-[11px] bg-secondary/20 text-secondary px-2.5 py-0.5 rounded-full flex items-center gap-1 font-semibold">
+                                <span class="material-symbols-outlined text-[12px]">person</span>
+                                {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'Outro agente' }}
                                 @if($hasMyClaim)
-                                <span class="ml-1 text-green-600 font-bold">(Você)</span>
+                                <span class="ml-1 font-bold opacity-75">(Você)</span>
                                 @endif
                             </span>
                         @endif
                     </div>
                 </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 ml-4 shrink-0 flex-wrap justify-end">
                 @if(!$activeClaim)
                     @if($isAdmin)
-                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                            <span class="material-symbols-outlined text-base">assignment</span> Transferir para Mim
+                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-tertiary/90 text-on-tertiary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-tertiary shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-sm">assignment</span>
+                            <span class="hidden sm:inline">Para Mim</span>
                         </button>
-                        <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                            <span class="material-symbols-outlined text-base">person_add</span> Transferir Para
+                        <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary/90 text-on-tertiary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-tertiary shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-sm">person_add</span>
+                            <span class="hidden sm:inline">Transferir</span>
                         </button>
                     @else
-                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                            <span class="material-symbols-outlined text-base">done</span> Clamar
+                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary/90 text-on-secondary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-secondary shadow-md flex items-center gap-1.5 transition-all active:scale-95">
+                            <span class="material-symbols-outlined text-sm">done</span>
+                            <span class="hidden sm:inline">Clamar</span>
                         </button>
                     @endif
                 @elseif($hasMyClaim)
                     @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
-                    <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-warning text-on-warning px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                        <span class="material-symbols-outlined text-base">lock_open</span> Liberar
+                    <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-warning/90 text-on-warning px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-warning shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-sm">lock_open</span>
+                        <span class="hidden sm:inline">Liberar</span>
                     </button>
                     @endif
                 @endif
                 @if($isAdmin && $activeClaim && !$hasMyClaim)
                     @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
-                    <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary text-on-tertiary px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                        <span class="material-symbols-outlined text-base">person_add</span> Reatribuir
+                    <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary/90 text-on-tertiary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-tertiary shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-sm">person_add</span>
+                        <span class="hidden sm:inline">Reatribuir</span>
                     </button>
                     @endif
                 @endif
                 @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
-                <button type="button" onclick="openResolutionModal({{ $activeConversation->id }})" class="bg-error text-on-error px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                    <span class="material-symbols-outlined text-base">done_all</span> Encerrar
+                <button type="button" onclick="openResolutionModal({{ $activeConversation->id }})" class="bg-error/90 text-on-error px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-error shadow-md flex items-center gap-1.5 transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-sm">done_all</span>
+                    <span class="hidden sm:inline">Encerrar</span>
                 </button>
                 @else
-                <button type="button" onclick="openReopenRequestModal({{ $activeConversation->id }})" class="bg-info text-on-info px-4 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
-                    <span class="material-symbols-outlined text-base">lock_clock</span> Pedir Reabertura
+                <button type="button" onclick="openReopenRequestModal({{ $activeConversation->id }})" class="bg-info/90 text-on-info px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-info shadow-md flex items-center gap-1.5 transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-sm">lock_clock</span>
+                    <span class="hidden sm:inline">Reabrir</span>
                 </button>
                 @endif
             </div>
@@ -252,9 +266,9 @@
 
         <!-- Messages -->
         <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-            <div class="flex justify-center">
-                <span class="text-[11px] uppercase text-on-surface-variant bg-surface-container py-1 px-3 rounded-full tracking-wider">
-                    {{ $activeConversation->created_at->format('d/m/Y') }}
+            <div class="flex justify-center sticky top-0">
+                <span class="text-[10px] uppercase text-on-surface-variant bg-white/60 backdrop-blur-sm py-1.5 px-4 rounded-full tracking-wider border border-outline-variant/30 shadow-sm">
+                    📅 {{ $activeConversation->created_at->format('d \d\e M \d\e Y') }}
                 </span>
             </div>
             @foreach($activeConversation->messages as $msg)
@@ -370,10 +384,11 @@
 
         <!-- Macros Quick Bar -->
         @if($macros->count() > 0)
-        <div class="px-4 py-2 bg-white border-t border-outline-variant">
+        <div class="px-4 py-3 bg-white/60 backdrop-blur-sm border-t border-outline-variant/50">
             <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
+                <span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider whitespace-nowrap mr-2 flex items-center">⚡ Rápido:</span>
                 @foreach($macros as $macro)
-                <button onclick="applyMacro('{{ addslashes($macro->content) }}')" class="whitespace-nowrap bg-surface-container-low border border-outline-variant px-3 py-1.5 rounded-full text-xs text-on-surface hover:bg-surface-container transition-colors shrink-0">
+                <button onclick="applyMacro('{{ addslashes($macro->content) }}')" class="whitespace-nowrap bg-white/80 border border-outline-variant/50 px-3 py-1.5 rounded-full text-xs text-on-surface hover:bg-white hover:border-outline-variant/80 transition-all shadow-sm hover:shadow-md shrink-0">
                     {{ $macro->name }}
                 </button>
                 @endforeach
@@ -383,9 +398,9 @@
 
         <!-- Chat Input -->
         @if($hasMyClaim || $isAdmin)
-        <div class="p-4 bg-white border-t border-outline-variant">
+        <div class="p-4 bg-white/70 backdrop-blur-sm border-t border-outline-variant/50 space-y-3">
             <!-- File Preview -->
-            <div id="filePreview" class="hidden mb-2 bg-surface-container-low border border-outline-variant rounded-lg p-3 flex items-center gap-3">
+            <div id="filePreview" class="hidden bg-white/80 backdrop-blur-sm border border-outline-variant/50 rounded-lg p-3 flex items-center gap-3 shadow-sm">
                 <div id="filePreviewThumb" class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden shrink-0">
                     <span id="filePreviewIcon" class="material-symbols-outlined text-on-surface-variant text-xl">description</span>
                     <img id="filePreviewImg" class="w-full h-full object-cover hidden">
@@ -401,32 +416,32 @@
                 @csrf
                 <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
                 <div class="relative">
-                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim || $activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') title="Esta conversa foi encerrada e não pode mais receber mensagens" @elseif($isAdmin) title="Clique em 'Transferir para mim' para reivindicar esta conversa" @else title="Este atendimento foi clamado por {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'outro agente' }}" @endif @endif></textarea>
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-white/80 backdrop-blur-sm border border-outline-variant/50 rounded-xl p-4 pr-48 focus:ring-2 focus:ring-secondary-container/50 focus:border-secondary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm" placeholder="Escreva uma mensagem... (/ para macros)" @if(!$hasMyClaim || $activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') title="Esta conversa foi encerrada" @elseif($isAdmin) title="Clique em 'Para Mim' para reivindicar" @else title="Clamado por {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'outro agente' }}" @endif @endif></textarea>
 
                     <!-- Macros Menu -->
-                    <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
+                    <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white/95 backdrop-blur-sm border border-outline-variant/50 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
                         <div id="macrosMenuItems" class="space-y-1 p-2"></div>
                     </div>
 
                     <div class="absolute right-4 bottom-4 flex items-center gap-2 text-on-surface-variant" id="chatActions">
-                        <button type="button" id="emojiBtn" class="hover:text-primary transition-colors relative {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Adicionar emoji" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
-                            <span class="text-xl">😊</span>
+                        <button type="button" id="emojiBtn" class="hover:text-secondary transition-colors relative text-lg {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Emoji" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
+                            😊
                         </button>
-                        <label class="cursor-pointer hover:text-primary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Enviar arquivo">
+                        <label class="cursor-pointer hover:text-secondary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Arquivo">
                             <span class="material-symbols-outlined">attach_file</span>
                             <input type="file" name="attachment" id="fileInput" class="hidden" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                         </label>
-                        <button type="button" id="audioRecordBtn" class="hover:text-primary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Gravar audio" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
+                        <button type="button" id="audioRecordBtn" class="hover:text-secondary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Áudio" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="material-symbols-outlined">mic</span>
                         </button>
-                        <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
+                        <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md hover:shadow-lg active:scale-95 transition-all {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="material-symbols-outlined">send</span>
                         </button>
                     </div>
 
                     <!-- Emoji Picker -->
-                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 w-96 h-96 flex flex-col">
-                        <div class="flex gap-1 p-2 border-b border-outline-variant overflow-x-auto custom-scrollbar flex-shrink-0" id="emojiCategories"></div>
+                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white/95 backdrop-blur-md border border-outline-variant/50 rounded-xl shadow-lg z-50 w-96 h-96 flex flex-col">
+                        <div class="flex gap-1 p-2 border-b border-outline-variant/50 overflow-x-auto custom-scrollbar flex-shrink-0" id="emojiCategories"></div>
                         <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
                             <div class="grid grid-cols-7 gap-2" id="emojiGrid"></div>
                         </div>
@@ -436,20 +451,20 @@
         </div>
         @else
         <!-- Chat Bloqueado - Precisa Clamar -->
-        <div class="p-6 bg-red-50 border-t border-red-200 flex flex-col items-center justify-center gap-4">
+        <div class="p-8 bg-gradient-to-r from-error/10 to-error/5 border-t border-error/20 flex flex-col items-center justify-center gap-4">
             <div class="text-center">
-                <span class="material-symbols-outlined text-4xl text-red-500 block mb-2">lock</span>
-                <h3 class="text-sm font-semibold text-red-900 mb-1">Atendimento Indisponível</h3>
+                <span class="material-symbols-outlined text-5xl text-error block mb-3">lock</span>
+                <h3 class="text-base font-semibold text-on-surface mb-2">Atendimento Indisponível</h3>
                 @if($activeClaim && $activeClaim->user)
-                    <p class="text-xs text-red-700 mb-4">Este atendimento foi reivindicado por <strong>{{ $activeClaim->user->name }}</strong></p>
+                    <p class="text-sm text-on-surface-variant mb-4">Reivindicado por <strong>{{ $activeClaim->user->name }}</strong></p>
                 @else
-                    <p class="text-xs text-red-700 mb-4">Este atendimento foi reivindicado por outro agente</p>
+                    <p class="text-sm text-on-surface-variant mb-4">Reivindicado por outro agente</p>
                 @endif
-                <p class="text-xs text-red-600">Você precisa reivindicar este atendimento para poder responder.</p>
+                <p class="text-xs text-on-surface-variant/80">Você precisa reivindicar este atendimento para responder</p>
             </div>
-            <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-xs font-semibold hover:opacity-90 flex items-center gap-1.5 transition-all active:scale-95">
+            <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary text-on-secondary px-5 py-2.5 rounded-lg text-sm font-semibold hover:shadow-md shadow-sm flex items-center gap-2 transition-all active:scale-95">
                 <span class="material-symbols-outlined text-base">done</span>
-                Reivindicar Atendimento
+                Reivindicar Agora
             </button>
         </div>
         @endif
@@ -466,9 +481,12 @@
 
     <!-- Resolution Modal -->
     <div id="resolutionModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-on-surface mb-4">Encerrar Conversa</h3>
-            <p class="text-sm text-on-surface-variant mb-6">Por favor, registre o motivo do encerramento para gerar relatórios precisos</p>
+        <style>
+            .glass-modal { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
+        </style>
+        <div class="glass-modal rounded-xl shadow-2xl max-w-md w-full p-6 border border-white/30">
+            <h3 class="text-lg font-bold text-on-surface mb-2">✔️ Encerrar Conversa</h3>
+            <p class="text-sm text-on-surface-variant mb-6">Registre o motivo do encerramento para gerar relatórios precisos</p>
 
             <form id="resolutionForm" class="space-y-4">
                 @csrf
@@ -513,8 +531,8 @@
 
     <!-- Reopen Request Modal -->
     <div id="reopenRequestModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
-            <h3 class="text-lg font-bold text-on-surface mb-4">Pedir Reabertura</h3>
+        <div class="glass-modal rounded-xl shadow-2xl max-w-md w-full p-6 border border-white/30">
+            <h3 class="text-lg font-bold text-on-surface mb-2">🔓 Pedir Reabertura</h3>
             <p class="text-sm text-on-surface-variant mb-6">Explique por que esta conversa precisa ser reaberта</p>
 
             <form id="reopenRequestForm" class="space-y-4">
@@ -540,75 +558,77 @@
 
     <!-- Right: Contact Details -->
     @if($activeConversation?->contact)
-    <section class="w-[300px] border-l border-outline-variant bg-white flex flex-col overflow-y-auto custom-scrollbar shrink-0">
+    <section class="w-[300px] border-l border-outline-variant/50 bg-gradient-to-b from-white to-slate-50/50 flex flex-col overflow-y-auto custom-scrollbar shrink-0">
         <div class="p-6 space-y-6">
             <!-- Contact Identity -->
-            <div class="text-center">
-                <div class="w-20 h-20 rounded-2xl mx-auto mb-3 bg-primary-fixed flex items-center justify-center font-bold text-2xl text-on-primary-fixed">
+            <div class="text-center p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-outline-variant/30 shadow-sm">
+                <div class="w-20 h-20 rounded-2xl mx-auto mb-4 bg-gradient-to-br from-primary-fixed to-primary-fixed/80 flex items-center justify-center font-bold text-2xl text-on-primary-fixed shadow-md">
                     {{ $activeConversation->contact->initials }}
                 </div>
-                <h2 class="text-lg font-semibold text-on-surface">{{ $activeConversation->contact->name }}</h2>
-                <p class="text-sm text-on-surface-variant">{{ $activeConversation->contact->email ?? 'Sem email' }}</p>
-                <div class="flex justify-center gap-1 mt-2 flex-wrap">
+                <h2 class="text-base font-bold text-on-surface mb-1">{{ $activeConversation->contact->name }}</h2>
+                <p class="text-xs text-on-surface-variant">{{ $activeConversation->contact->email ?? '(sem email)' }}</p>
+                @if($activeConversation->contact->tags && count($activeConversation->contact->tags) > 0)
+                <div class="flex justify-center gap-1 mt-3 flex-wrap">
                     @foreach($activeConversation->contact->tags ?? [] as $tag)
-                    <span class="bg-secondary-container/30 text-on-secondary-container px-2 py-0.5 rounded-full text-xs font-semibold">{{ $tag }}</span>
+                    <span class="bg-secondary-container/40 text-on-secondary-container px-2.5 py-0.5 rounded-full text-xs font-semibold backdrop-blur-sm">{{ $tag }}</span>
                     @endforeach
                 </div>
+                @endif
             </div>
 
             <!-- Contact Details -->
-            <div class="space-y-3">
-                <div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg">
-                    <span class="material-symbols-outlined text-on-surface-variant text-lg">call</span>
-                    <div>
-                        <p class="text-[11px] text-on-surface-variant">WhatsApp</p>
-                        <p class="text-sm font-semibold">{{ $activeConversation->contact->phone }}</p>
+            <div class="space-y-2.5">
+                <div class="flex items-center gap-3 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-outline-variant/20 hover:bg-white/80 transition-all">
+                    <span class="material-symbols-outlined text-secondary text-lg">call</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[11px] text-on-surface-variant font-medium">WhatsApp</p>
+                        <p class="text-sm font-semibold text-on-surface truncate">{{ $activeConversation->contact->phone }}</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg">
+                <div class="flex items-center gap-3 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-outline-variant/20 hover:bg-white/80 transition-all">
                     <span class="material-symbols-outlined text-on-surface-variant text-lg">person</span>
-                    <div>
-                        <p class="text-[11px] text-on-surface-variant">Agente</p>
-                        <p class="text-sm font-semibold">{{ $activeConversation->assignedUser?->name ?? 'Nenhum' }}</p>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[11px] text-on-surface-variant font-medium">Agente Ativo</p>
+                        <p class="text-sm font-semibold text-on-surface">{{ $activeConversation->assignedUser?->name ?? '(nenhum)' }}</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 p-2 bg-surface-container-low rounded-lg">
+                <div class="flex items-center gap-3 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-outline-variant/20 hover:bg-white/80 transition-all">
                     <span class="material-symbols-outlined text-on-surface-variant text-lg">schedule</span>
-                    <div>
-                        <p class="text-[11px] text-on-surface-variant">Ultima mensagem</p>
-                        <p class="text-sm font-semibold">{{ $activeConversation->last_message_at?->diffForHumans() ?? '-' }}</p>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[11px] text-on-surface-variant font-medium">Última Mensagem</p>
+                        <p class="text-sm font-semibold text-on-surface">{{ $activeConversation->last_message_at?->diffForHumans(short: true) ?? '-' }}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Notes -->
-            <div>
-                <h3 class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Notas</h3>
-                <div class="bg-surface-container p-3 rounded-lg text-sm text-on-surface-variant">
-                    {{ $activeConversation->contact->notes ?? 'Sem notas' }}
+            <div class="space-y-2">
+                <h3 class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">📝 Notas</h3>
+                <div class="bg-white/60 backdrop-blur-sm p-3 rounded-lg text-xs text-on-surface-variant border border-outline-variant/20 leading-relaxed">
+                    {{ $activeConversation->contact->notes ?? '(sem notas)' }}
                 </div>
             </div>
 
             <!-- Conversation Tags -->
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tipo de Atendimento</h3>
-                    <button onclick="openTagsModal({{ $activeConversation->id }})" class="text-xs text-secondary hover:text-secondary-dark transition-colors font-semibold">
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">🏷️ Atendimento</h3>
+                    <button onclick="openTagsModal({{ $activeConversation->id }})" class="text-xs text-secondary hover:text-secondary/80 transition-colors font-semibold flex items-center gap-1">
                         <span class="material-symbols-outlined text-sm">add</span>
                     </button>
                 </div>
                 <div id="conversationTags" class="flex flex-wrap gap-2">
                     @forelse($activeConversation->tags as $tag)
                     <div class="group relative">
-                        <span class="px-3 py-1.5 rounded-full text-xs font-semibold text-white transition-all" style="background-color: {{ $tag->color }}">
+                        <span class="px-3 py-1.5 rounded-full text-xs font-semibold text-white transition-all shadow-sm" style="background-color: {{ $tag->color }}; opacity: 0.9;">
                             {{ $tag->name }}
                         </span>
-                        <button onclick="removeTag({{ $activeConversation->id }}, {{ $tag->id }})" class="absolute -top-2 -right-2 hidden group-hover:flex w-5 h-5 rounded-full bg-error text-on-error items-center justify-center text-[10px] font-bold transition-all hover:scale-110">
-                            ×
+                        <button onclick="removeTag({{ $activeConversation->id }}, {{ $tag->id }})" class="absolute -top-2 -right-2 hidden group-hover:flex w-5 h-5 rounded-full bg-error text-on-error items-center justify-center text-[10px] font-bold transition-all hover:scale-110 shadow-md">
+                            ✕
                         </button>
                     </div>
                     @empty
-                    <p class="text-xs text-on-surface-variant italic">Nenhuma tag selecionada</p>
+                    <p class="text-xs text-on-surface-variant italic">(nenhuma)</p>
                     @endforelse
                 </div>
             </div>
@@ -617,8 +637,8 @@
 
     <!-- Tags Modal -->
     <div id="tagsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 max-h-96 flex flex-col">
-            <h3 class="text-lg font-bold text-on-surface mb-4">Selecionar Tipo de Atendimento</h3>
+        <div class="glass-modal rounded-xl shadow-2xl max-w-md w-full p-6 max-h-96 flex flex-col border border-white/30">
+            <h3 class="text-lg font-bold text-on-surface mb-4">🏷️ Tipo de Atendimento</h3>
             <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 mb-4" id="tagsContainer">
                 <!-- Tags will be loaded here -->
             </div>
