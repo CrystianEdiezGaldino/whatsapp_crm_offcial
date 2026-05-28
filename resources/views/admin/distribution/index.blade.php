@@ -47,6 +47,24 @@
     <!-- Content -->
     <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div class="grid grid-cols-1 gap-6 max-w-7xl">
+            <!-- Help Card -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div class="flex gap-3">
+                    <span class="text-2xl flex-shrink-0">ℹ️</span>
+                    <div>
+                        <p class="text-sm font-semibold text-blue-900">Como funciona a distribuição de leads?</p>
+                        <div class="mt-2 space-y-1">
+                            <p class="text-xs text-blue-800">
+                                <strong>👤 Manual:</strong> Agentes clamam conversas manualmente (modo padrão, sem automação)
+                            </p>
+                            <p class="text-xs text-blue-800">
+                                <strong>🤖 Automático:</strong> Sistema distribui novos leads automaticamente usando round-robin (alternando entre agentes ativos, respeitando capacidade máxima)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modo de Distribuição Card -->
             <div class="bg-white rounded-xl border border-outline-variant shadow-sm p-6">
                 <h2 class="text-lg font-bold text-on-surface mb-4">⚙️ Modo de Distribuição</h2>
