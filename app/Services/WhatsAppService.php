@@ -582,6 +582,23 @@ class WhatsAppService
         Cache::flush(); // Simplificado: limpa todo o cache de relatórios
     }
 
+    public function getPhoneNumbersFromMeta(string $businessAccountId): array
+    {
+        try {
+            $response = $this->client->get("{$businessAccountId}/phone_numbers");
+            $data = json_decode((string)$response->getBody(), true);
+
+            return $data['data'] ?? [];
+        } catch (ClientException $e) {
+            $this->parseApiError($e);
+            Log::error('Erro ao buscar números da Meta', [
+                'error' => $this->lastError,
+                'business_account_id' => $businessAccountId,
+            ]);
+            return [];
+        }
+    }
+
     private static function handleStatusUpdate(array $status): void
     {
         $waMsgId = $status['id'] ?? null;

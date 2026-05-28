@@ -73,6 +73,7 @@ Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')-
     Route::get('/whatsapp/numbers', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'index'])->name('whatsapp.numbers.index');
     Route::get('/whatsapp/numbers/create', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'create'])->name('whatsapp.numbers.create');
     Route::post('/whatsapp/numbers', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'store'])->name('whatsapp.numbers.store');
+    Route::post('/whatsapp/numbers/sync-meta', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'syncFromMeta'])->name('whatsapp.numbers.sync-meta');
     Route::post('/whatsapp/numbers/{whatsAppNumber}/set-active', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'setActive'])->name('whatsapp.numbers.set-active');
     Route::post('/whatsapp/numbers/{whatsAppNumber}/verify', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'verify'])->name('whatsapp.numbers.verify');
     Route::delete('/whatsapp/numbers/{whatsAppNumber}', [\App\Http\Controllers\Admin\WhatsAppNumberController::class, 'destroy'])->name('whatsapp.numbers.destroy');

@@ -76,4 +76,67 @@ class WhatsAppNumberController extends Controller
             'message' => 'Número removido com sucesso!',
         ]);
     }
+
+    public function syncFromMeta(Request $request)
+    {
+        $validated = $request->validate([
+            'business_account_id' => 'required|string',
+            'access_token' => 'required|string',
+        ]);
+
+        try {
+            $whatsapp = new \App\Services\WhatsAppService();
+
+            // Usar token fornecido para fazer a chamada
+            $client = new \GuzzleHttp\Client([
+                'base_uri' => 'https://graph.facebook.com/v23.0/',
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $validated['access_token'],
+                    'Content-Type' => 'application/json',
+                ],
+                'timeout' => 30,
+                'verify' => storage_path('cacert.pem'),
+            ]);
+
+            $response = $client->get($validated['business_account_id'] . '/phone_numbers');
+            $data = json_decode((string)$response->getBody(), true);
+            $numbers = $data['data'] ?? [];
+
+            if (empty($numbers)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nenhum número encontrado na conta Meta.',
+                ], 422);
+            }
+
+            $imported = 0;
+            foreach ($numbers as $number) {
+                $phoneNumber = $number['phone_number'] ?? null;
+                $displayName = $number['display_name'] ?? $phoneNumber;
+                $phoneNumberId = $number['id'] ?? null;
+
+                if ($phoneNumber && !WhatsAppNumber::where('phone_number', $phoneNumber)->exists()) {
+                    WhatsAppNumber::create([
+                        'phone_number' => $phoneNumber,
+                        'display_name' => $displayName,
+                        'phone_number_id' => $phoneNumberId,
+                        'business_account_id' => $validated['business_account_id'],
+                        'access_token' => $validated['access_token'],
+                    ]);
+                    $imported++;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Importados {$imported} número(s) da Meta com sucesso!",
+                'imported_count' => $imported,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao buscar números: ' . $e->getMessage(),
+            ], 422);
+        }
+    }
 }

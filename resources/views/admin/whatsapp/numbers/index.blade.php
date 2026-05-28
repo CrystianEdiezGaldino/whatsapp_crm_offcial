@@ -6,9 +6,14 @@
 <div class="max-w-6xl mx-auto px-4 py-6">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-3xl font-bold text-on-surface">Números WhatsApp</h1>
-        <a href="{{ route('admin.whatsapp.numbers.create') }}" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-semibold hover:opacity-90 flex items-center gap-2 transition-all">
-            <span class="material-symbols-outlined">add</span> Novo Número
-        </a>
+        <div class="flex gap-2">
+            <button onclick="openSyncModal()" class="bg-info text-on-info px-4 py-2 rounded-lg font-semibold hover:opacity-90 flex items-center gap-2 transition-all">
+                <span class="material-symbols-outlined">sync</span> Importar da Meta
+            </button>
+            <a href="{{ route('admin.whatsapp.numbers.create') }}" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-semibold hover:opacity-90 flex items-center gap-2 transition-all">
+                <span class="material-symbols-outlined">add</span> Novo Número
+            </a>
+        </div>
     </div>
 
     @if(session('success'))
@@ -82,7 +87,78 @@
     @endif
 </div>
 
+    <!-- Sync Meta Modal -->
+    <div id="syncMetaModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+            <h3 class="text-lg font-bold text-on-surface mb-4">Importar Números da Meta</h3>
+            <p class="text-sm text-on-surface-variant mb-6">Insira suas credenciais da Meta para importar automaticamente todos os números cadastrados</p>
+
+            <form id="syncMetaForm" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="text-sm font-semibold text-on-surface block mb-2">ID da Conta Comercial *</label>
+                    <input type="text" name="business_account_id" required placeholder="ID da sua conta" class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info">
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-on-surface block mb-2">Access Token *</label>
+                    <textarea name="access_token" required class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info font-mono text-xs" rows="3" placeholder="Cole seu access token da Meta"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeSyncModal()" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-info text-on-info rounded-lg font-semibold hover:opacity-90 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-base">sync</span> Importar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 <script>
+    function openSyncModal() {
+        document.getElementById('syncMetaModal').classList.remove('hidden');
+    }
+
+    function closeSyncModal() {
+        document.getElementById('syncMetaModal').classList.add('hidden');
+        document.getElementById('syncMetaForm').reset();
+    }
+
+    document.getElementById('syncMetaForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('{{ route("admin.whatsapp.numbers.sync-meta") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(formData)),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                closeSyncModal();
+                location.reload();
+            } else {
+                alert('Erro: ' + (data.message || 'Erro ao importar números'));
+            }
+        } catch (error) {
+            alert('Erro: ' + error.message);
+        }
+    });
+
+    // Close modal on outside click
+    document.getElementById('syncMetaModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeSyncModal();
+    });
+
     async function setActive(numberId) {
         if (!confirm('Definir este número como ativo? Isso afetará todo o sistema.')) return;
 
