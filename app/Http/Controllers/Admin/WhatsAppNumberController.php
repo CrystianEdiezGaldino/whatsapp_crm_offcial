@@ -80,14 +80,10 @@ class WhatsAppNumberController extends Controller
     public function syncFromMeta(Request $request)
     {
         $validated = $request->validate([
-            'business_account_id' => 'required|string',
             'access_token' => 'required|string',
         ]);
 
         try {
-            $whatsapp = new \App\Services\WhatsAppService();
-
-            // Usar token fornecido para fazer a chamada
             $client = new \GuzzleHttp\Client([
                 'base_uri' => 'https://graph.facebook.com/v23.0/',
                 'headers' => [
@@ -98,7 +94,20 @@ class WhatsAppNumberController extends Controller
                 'verify' => storage_path('cacert.pem'),
             ]);
 
-            $response = $client->get($validated['business_account_id'] . '/phone_numbers');
+            // Obter o Business Account ID do token
+            $meResponse = $client->get('me');
+            $meData = json_decode((string)$meResponse->getBody(), true);
+            $businessAccountId = $meData['id'] ?? null;
+
+            if (!$businessAccountId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Não foi possível obter o ID da conta. Verifique o token.',
+                ], 422);
+            }
+
+            // Buscar números da conta
+            $response = $client->get($businessAccountId . '/phone_numbers');
             $data = json_decode((string)$response->getBody(), true);
             $numbers = $data['data'] ?? [];
 
@@ -120,7 +129,7 @@ class WhatsAppNumberController extends Controller
                         'phone_number' => $phoneNumber,
                         'display_name' => $displayName,
                         'phone_number_id' => $phoneNumberId,
-                        'business_account_id' => $validated['business_account_id'],
+                        'business_account_id' => $businessAccountId,
                         'access_token' => $validated['access_token'],
                     ]);
                     $imported++;
