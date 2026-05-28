@@ -16,7 +16,7 @@ class ConversationController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user'])
+        $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user', 'tags'])
             ->whereIn('status', ['new', 'in_attendance']);
 
         // Filter by "mine" = conversations with active claim by current user
@@ -45,6 +45,7 @@ class ConversationController extends Controller
                 'contact',
                 'assignedUser',
                 'activeClaim.user',
+                'tags',
                 'messages' => fn($q) => $q->orderBy('created_at', 'asc')->limit(100),
             ])->find($request->conversation);
 
@@ -63,6 +64,7 @@ class ConversationController extends Controller
                 'contact',
                 'assignedUser',
                 'activeClaim.user',
+                'tags',
                 'messages' => fn($q) => $q->orderBy('created_at', 'asc')->limit(100),
             ])->find($conversations->first()->id);
         }

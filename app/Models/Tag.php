@@ -16,6 +16,7 @@ class Tag extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'category' => 'string',
     ];
 
     public function conversations(): BelongsToMany

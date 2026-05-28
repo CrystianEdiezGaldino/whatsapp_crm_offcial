@@ -550,8 +550,47 @@
                     {{ $activeConversation->contact->notes ?? 'Sem notas' }}
                 </div>
             </div>
+
+            <!-- Conversation Tags -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tipo de Atendimento</h3>
+                    <button onclick="openTagsModal({{ $activeConversation->id }})" class="text-xs text-secondary hover:text-secondary-dark transition-colors font-semibold">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                    </button>
+                </div>
+                <div id="conversationTags" class="flex flex-wrap gap-2">
+                    @forelse($activeConversation->tags as $tag)
+                    <div class="group relative">
+                        <span class="px-3 py-1.5 rounded-full text-xs font-semibold text-white transition-all" style="background-color: {{ $tag->color }}">
+                            {{ $tag->name }}
+                        </span>
+                        <button onclick="removeTag({{ $activeConversation->id }}, {{ $tag->id }})" class="absolute -top-2 -right-2 hidden group-hover:flex w-5 h-5 rounded-full bg-error text-on-error items-center justify-center text-[10px] font-bold transition-all hover:scale-110">
+                            ×
+                        </button>
+                    </div>
+                    @empty
+                    <p class="text-xs text-on-surface-variant italic">Nenhuma tag selecionada</p>
+                    @endforelse
+                </div>
+            </div>
         </div>
     </section>
+
+    <!-- Tags Modal -->
+    <div id="tagsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6 max-h-96 flex flex-col">
+            <h3 class="text-lg font-bold text-on-surface mb-4">Selecionar Tipo de Atendimento</h3>
+            <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 mb-4" id="tagsContainer">
+                <!-- Tags will be loaded here -->
+            </div>
+            <div class="flex justify-end gap-2 pt-4 border-t border-outline-variant">
+                <button type="button" onclick="closeTagsModal()" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
     @endif
 </div>
 @endsection
@@ -1281,6 +1320,121 @@
             alert('Erro ao carregar histórico: ' + e.message);
         }
     }
+
+    // ===== Tags Management =====
+    async function openTagsModal(conversationId) {
+        const modal = document.getElementById('tagsModal');
+        const container = document.getElementById('tagsContainer');
+
+        try {
+            const response = await fetch('{{ route("tags.index") }}');
+            const data = await response.json();
+
+            if (!data.success) throw new Error('Failed to load tags');
+
+            // Get current conversation tags
+            const conversationResponse = await fetch(`/conversations/${conversationId}`);
+
+            let currentTagIds = [];
+            @if($activeConversation)
+            currentTagIds = @json($activeConversation->tags->pluck('id')->toArray());
+            @endif
+
+            // Group tags by category
+            const grouped = {};
+            data.tags.forEach(tag => {
+                if (!grouped[tag.category]) grouped[tag.category] = [];
+                grouped[tag.category].push(tag);
+            });
+
+            let html = '';
+            for (const [category, tags] of Object.entries(grouped)) {
+                html += `<div class="mb-4"><h4 class="text-xs font-bold text-on-surface-variant uppercase mb-2">${getCategoryLabel(category)}</h4>`;
+                tags.forEach(tag => {
+                    const isSelected = currentTagIds.includes(tag.id);
+                    html += `
+                        <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-surface-container-low cursor-pointer transition-colors">
+                            <input type="checkbox" value="${tag.id}" ${isSelected ? 'checked' : ''} onchange="updateConversationTags(${conversationId})">
+                            <span class="w-3 h-3 rounded-full" style="background-color: ${tag.color}"></span>
+                            <span class="flex-1 text-sm text-on-surface">${tag.name}</span>
+                        </label>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+            modal.classList.remove('hidden');
+        } catch (error) {
+            alert('Erro ao carregar tags: ' + error.message);
+        }
+    }
+
+    function closeTagsModal() {
+        document.getElementById('tagsModal').classList.add('hidden');
+    }
+
+    async function updateConversationTags(conversationId) {
+        const checked = Array.from(document.querySelectorAll('#tagsContainer input[type="checkbox"]:checked')).map(el => parseInt(el.value));
+
+        try {
+            const response = await fetch(`/conversations/${conversationId}/tags`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({ tag_ids: checked }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao atualizar tags: ' + data.message);
+            }
+        } catch (error) {
+            alert('Erro: ' + error.message);
+        }
+    }
+
+    async function removeTag(conversationId, tagId) {
+        if (!confirm('Remover esta tag?')) return;
+
+        try {
+            const response = await fetch(`/conversations/${conversationId}/tags/${tagId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao remover tag: ' + data.message);
+            }
+        } catch (error) {
+            alert('Erro: ' + error.message);
+        }
+    }
+
+    function getCategoryLabel(category) {
+        const labels = {
+            'priority': 'Prioridade',
+            'status': 'Status',
+            'outcome': 'Resultado',
+            'custom': 'Tipo de Atendimento',
+        };
+        return labels[category] || category;
+    }
+
+    // Close tags modal on outside click
+    document.getElementById('tagsModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeTagsModal();
+    });
 
     // Initialize SSE connections
     document.addEventListener('DOMContentLoaded', function() {

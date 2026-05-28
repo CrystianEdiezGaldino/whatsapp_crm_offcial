@@ -13,6 +13,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\TagController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -92,6 +93,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/conversations/{conversation}/claim-history', [ConversationClaimController::class, 'history'])->name('conversations.claim-history');
 
     Route::get('/conversations/{conversation}/audit/timeline', [AuditController::class, 'timeline'])->name('audit.timeline');
+
+    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
+    Route::post('/tags', [TagController::class, 'store'])->name('tags.store');
+    Route::post('/conversations/{conversation}/tags', [TagController::class, 'attachToConversation'])->name('conversations.tags.attach');
+    Route::delete('/conversations/{conversation}/tags/{tag}', [TagController::class, 'detachFromConversation'])->name('conversations.tags.detach');
     Route::get('/audit/conversations', [AuditController::class, 'conversation'])->name('audit.conversations');
     Route::get('/audit/activity', [AuditController::class, 'agentActivity'])->name('audit.activity');
 
