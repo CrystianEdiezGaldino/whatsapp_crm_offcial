@@ -47,24 +47,6 @@
     <!-- Content -->
     <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div class="grid grid-cols-1 gap-6 max-w-7xl">
-            <!-- Help Card (Dynamic) -->
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4" id="infoCard">
-                <div class="flex gap-3">
-                    <span class="text-2xl flex-shrink-0">ℹ️</span>
-                    <div>
-                        <p class="text-sm font-semibold text-blue-900">Como funciona a distribuição de leads?</p>
-                        <div class="mt-2 space-y-1">
-                            <p class="text-xs text-blue-800" id="modeDescription">
-                                <strong>👤 Manual:</strong> Agentes clamam conversas manualmente (modo padrão, sem automação)
-                            </p>
-                            <p class="text-xs text-blue-800" id="modeDetails" style="display: none;">
-                                <strong>🤖 Automático:</strong> Sistema distribui novos leads automaticamente usando round-robin (alternando entre agentes ativos, respeitando capacidade máxima)
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Modo de Distribuição Card -->
             <div class="bg-white rounded-xl border border-outline-variant shadow-sm p-6">
                 <h2 class="text-lg font-bold text-on-surface mb-4">⚙️ Modo de Distribuição</h2>
@@ -324,12 +306,10 @@
 
 @push('scripts')
 <script>
-    // Update info card when mode changes
+    // Toggle overflow section visibility based on mode
     document.querySelectorAll('.mode-radio').forEach(radio => {
         radio.addEventListener('change', function() {
             const mode = this.value;
-            const modeDesc = document.getElementById('modeDescription');
-            const modeDetails = document.getElementById('modeDetails');
             const overflowSection = document.getElementById('overflowSection');
 
             // Update label styling
@@ -340,15 +320,11 @@
             this.closest('.mode-label').classList.remove('border-outline-variant');
             this.closest('.mode-label').classList.add('border-secondary', 'bg-secondary/10');
 
-            // Update info card text
-            if (mode === 'manual') {
-                modeDesc.style.display = 'block';
-                modeDetails.style.display = 'none';
-                if (overflowSection) overflowSection.style.display = 'none';
-            } else {
-                modeDesc.style.display = 'none';
-                modeDetails.style.display = 'block';
+            // Show/hide overflow section
+            if (mode === 'automatic') {
                 if (overflowSection) overflowSection.style.display = 'block';
+            } else {
+                if (overflowSection) overflowSection.style.display = 'none';
             }
         });
     });
