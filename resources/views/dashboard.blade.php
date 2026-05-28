@@ -441,7 +441,10 @@ async function loadDashboardData() {
         const totalMessages = data.by_direction.reduce((sum, d) => sum + d.count, 0);
         document.getElementById('totalMessages').textContent = totalMessages.toLocaleString('pt-BR');
         document.getElementById('avgResponseTime').textContent = formatSeconds(data.avg_response_time_seconds);
-        document.getElementById('topContact').textContent = (data.top_contacts?.[0]?.name || '--');
+        const topContactEl = document.getElementById('topContact');
+        if (topContactEl) {
+            topContactEl.textContent = data.top_contacts?.[0]?.name || '--';
+        }
 
         // Renderizar charts apenas se tiver dados
         if (data.by_hour && data.by_hour.length > 0) {
