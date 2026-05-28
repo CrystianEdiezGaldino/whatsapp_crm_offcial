@@ -15,9 +15,8 @@ class ProcessDistributionQueue extends Command
     {
         $this->info('Processing distribution queue...');
 
-        // Get conversations that are "new" and don't have an active claim
-        $pendingConversations = Conversation::where('status', 'new')
-            ->whereDoesntHave('activeClaim')
+        // Get conversations without an active claim (regardless of status)
+        $pendingConversations = Conversation::whereDoesntHave('activeClaim')
             ->orderBy('created_at', 'asc')
             ->get();
 

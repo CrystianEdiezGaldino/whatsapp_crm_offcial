@@ -125,9 +125,8 @@ class DistributionController extends Controller
     public function processQueue()
     {
         try {
-            // Get pending conversations without active claims
-            $pendingConversations = \App\Models\Conversation::where('status', 'new')
-                ->whereDoesntHave('activeClaim')
+            // Get conversations without active claims
+            $pendingConversations = \App\Models\Conversation::whereDoesntHave('activeClaim')
                 ->orderBy('created_at', 'asc')
                 ->get();
 
