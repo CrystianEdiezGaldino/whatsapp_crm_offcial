@@ -18,24 +18,25 @@ class ConversationController extends Controller
     {
         $isAdmin = Auth::user()->isAdmin();
         $showAllConversations = $isAdmin && !$request->filled('assigned') && !$request->filled('status');
+        $isMineTab = $request->filled('assigned') && $request->assigned === 'mine';
 
         $query = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'activeClaim.user', 'tags']);
 
-        // Admin can see all conversations in "Todos" tab, agents only see active ones
-        if (!$showAllConversations) {
+        // Admin can see all conversations in "Todos" tab, agents only see active ones (except "Meus" tab shows all)
+        if (!$showAllConversations && !$isMineTab) {
             // Agents or filtered views - only show active conversations
             $query->whereIn('status', ['new', 'in_attendance']);
         }
 
         // Filter by "mine" = conversations with active claim by current user
-        if ($request->filled('assigned') && $request->assigned === 'mine') {
+        if ($isMineTab) {
             $query->whereHas('activeClaim', fn($q) => $q->where('user_id', Auth::id()));
         }
 
         $conversations = $query->orderBy('last_message_at', 'desc')->get();
 
-        // For admin "Todos" tab, show only latest conversation per contact
-        if ($showAllConversations) {
+        // Show only latest conversation per contact in "Todos" tab (admin) or "Meus" tab (all users)
+        if ($showAllConversations || $isMineTab) {
             $conversations = $conversations->unique('contact_id')->values();
         }
 
@@ -94,6 +95,13 @@ class ConversationController extends Controller
         ]);
 
         $conversation = Conversation::with('contact')->findOrFail($validated['conversation_id']);
+
+        if ($conversation->status === 'resolved' || $conversation->status === 'closed') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta conversa foi encerrada e não pode mais receber mensagens.',
+            ], 422);
+        }
 
         if (!Auth::user()->isAdmin() && !$conversation->hasActiveClaim(Auth::id())) {
             return response()->json([

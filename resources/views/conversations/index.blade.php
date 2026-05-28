@@ -395,25 +395,25 @@
                 @csrf
                 <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
                 <div class="relative">
-                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim) disabled @if($isAdmin) title="Clique em 'Transferir para mim' para reivindicar esta conversa" @else title="Este atendimento foi clamado por {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'outro agente' }}" @endif @endif></textarea>
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-surface-container-low border border-outline-variant rounded-xl p-4 pr-48 focus:ring-1 focus:ring-secondary-container focus:border-primary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed" placeholder="Escreva uma mensagem... (digite / para macros)" @if(!$hasMyClaim || $activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') title="Esta conversa foi encerrada e não pode mais receber mensagens" @elseif($isAdmin) title="Clique em 'Transferir para mim' para reivindicar esta conversa" @else title="Este atendimento foi clamado por {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'outro agente' }}" @endif @endif></textarea>
 
                     <!-- Macros Menu -->
                     <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white border border-outline-variant rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
                         <div id="macrosMenuItems" class="space-y-1 p-2"></div>
                     </div>
 
-                    <div class="absolute right-4 bottom-4 flex items-center gap-2 text-on-surface-variant">
-                        <button type="button" id="emojiBtn" class="hover:text-primary transition-colors relative" title="Adicionar emoji">
+                    <div class="absolute right-4 bottom-4 flex items-center gap-2 text-on-surface-variant" id="chatActions">
+                        <button type="button" id="emojiBtn" class="hover:text-primary transition-colors relative {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Adicionar emoji" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="text-xl">😊</span>
                         </button>
-                        <label class="cursor-pointer hover:text-primary transition-colors" title="Enviar arquivo">
+                        <label class="cursor-pointer hover:text-primary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Enviar arquivo">
                             <span class="material-symbols-outlined">attach_file</span>
-                            <input type="file" name="attachment" id="fileInput" class="hidden" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt">
+                            <input type="file" name="attachment" id="fileInput" class="hidden" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                         </label>
-                        <button type="button" id="audioRecordBtn" class="hover:text-primary transition-colors" title="Gravar audio">
+                        <button type="button" id="audioRecordBtn" class="hover:text-primary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Gravar audio" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="material-symbols-outlined">mic</span>
                         </button>
-                        <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform">
+                        <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="material-symbols-outlined">send</span>
                         </button>
                     </div>
