@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blocos de Fluxo - Hybrid Builder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 40px 20px; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #001769; margin-bottom: 10px; text-align: center; font-size: 32px; }
+        .subtitle { color: #666; text-align: center; margin-bottom: 40px; font-size: 16px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+
+        .block {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 5px solid;
+        }
+
+        .block:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .block.message { border-left-color: #46b575; }
+        .block.decision { border-left-color: #ffa500; }
+        .block.action { border-left-color: #2196F3; }
+        .block.delay { border-left-color: #9c27b0; }
+        .block.transfer { border-left-color: #ff5722; }
+
+        .block-icon {
+            font-size: 32px;
+            padding: 16px;
+            text-align: center;
+            background: #f5f5f5;
+        }
+
+        .block-content { padding: 16px; }
+        .block-title { font-size: 16px; font-weight: 600; color: #001769; margin-bottom: 8px; }
+        .block-desc { font-size: 13px; color: #666; line-height: 1.5; margin-bottom: 12px; }
+        .block-example {
+            font-size: 12px;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            color: #555;
+            font-style: italic;
+            border-left: 2px solid #ddd;
+            padding-left: 10px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #001769;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #142c8e;
+        }
+
+        .flow-example {
+            background: #f0f9ff;
+            border: 2px solid #2196F3;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 40px;
+        }
+
+        .flow-example h3 { color: #001769; margin-bottom: 16px; }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .flow-step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .flow-step:nth-child(1) .flow-step-icon { background: #46b575; }
+        .flow-step:nth-child(2) .flow-step-icon { background: #46b575; }
+        .flow-step:nth-child(3) .flow-step-icon { background: #ffa500; }
+        .flow-step:nth-child(4) .flow-step-icon { background: #46b575; }
+        .flow-step:nth-child(5) .flow-step-icon { background: #46b575; }
+
+        .flow-step-content { flex: 1; }
+        .flow-step-title { font-weight: 600; color: #001769; margin-bottom: 4px; }
+        .flow-step-desc { font-size: 13px; color: #666; }
+
+        .selection-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 14px;
+            color: #666;
+            border-left: 4px solid #46b575;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Blocos de Fluxo Conversacional 🧩</h1>
+        <p class="subtitle">Componentes que o admin pode usar para montar o fluxo</p>
+
+        <div class="section-title">Blocos Principais</div>
+
+        <div class="grid">
+            <!-- Message Block -->
+            <div class="block message">
+                <div class="block-icon">💬</div>
+                <div class="block-content">
+                    <div class="block-title">Enviar Mensagem</div>
+                    <div class="block-desc">Envia uma mensagem automática pro cliente. Pode ter texto, emojis, e variáveis.</div>
+                    <div class="block-example">Ex: "Olá {nome}, bem-vindo! 👋"</div>
+                </div>
+            </div>
+
+            <!-- Decision/Menu Block -->
+            <div class="block decision">
+                <div class="block-icon">🎯</div>
+                <div class="block-content">
+                    <div class="block-title">Menu / Decisão</div>
+                    <div class="block-desc">Apresenta opções numeradas para o cliente escolher. Roteia para fluxos diferentes.</div>
+                    <div class="block-example">Ex: "Digite 1 para Suporte, 2 para Admin"</div>
+                </div>
+            </div>
+
+            <!-- Action Block -->
+            <div class="block action">
+                <div class="block-icon">⚙️</div>
+                <div class="block-content">
+                    <div class="block-title">Ação / Sistema</div>
+                    <div class="block-desc">Executa uma ação: transfere para agente, marca tags, registra informação.</div>
+                    <div class="block-example">Ex: "Transferir para Suporte", "Adicionar tag: premium"</div>
+                </div>
+            </div>
+
+            <!-- Delay Block -->
+            <div class="block delay">
+                <div class="block-icon">⏱️</div>
+                <div class="block-content">
+                    <div class="block-title">Aguardar / Delay</div>
+                    <div class="block-desc">Pausa antes da próxima mensagem. Simula conversa natural.</div>
+                    <div class="block-example">Ex: Aguarda 2 segundos</div>
+                </div>
+            </div>
+
+            <!-- Transfer Block -->
+            <div class="block transfer">
+                <div class="block-icon">👤</div>
+                <div class="block-content">
+                    <div class="block-title">Transferir para Agente</div>
+                    <div class="block-desc">Entrega o fluxo para um agente real atender. Pode transferir para pessoa específica ou fila.</div>
+                    <div class="block-example">Ex: "Transferir para Suporte Técnico"</div>
+                </div>
+            </div>
+
+            <!-- Condition Block -->
+            <div class="block" style="border-left-color: #f44336;">
+                <div class="block-icon">❓</div>
+                <div class="block-content">
+                    <div class="block-title">Condicional</div>
+                    <div class="block-desc">Toma decisão baseada em dados (resposta do cliente, hora do dia, etc).</div>
+                    <div class="block-example">Ex: "Se hora > 18h, enviar mensagem diferente"</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flow-example">
+            <h3>Exemplo: Fluxo de Novo Cliente 📊</h3>
+
+            <div class="flow-step">
+                <div class="flow-step-icon">1</div>
+                <div class="flow-step-content">
+                    <div class="flow-step-title">💬 Enviar Mensagem (Boas-vindas)</div>
+                    <div class="flow-step-desc">"Olá! Bem-vindo ao SisChat. Como posso ajudar?"</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-step-icon">2</div>
+                <div class="flow-step-content">
+                    <div class="flow-step-title">⏱️ Aguardar 1 segundo</div>
+                    <div class="flow-step-desc">Pausa natural antes do menu</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-step-icon">3</div>
+                <div class="flow-step-content">
+                    <div class="flow-step-title">🎯 Menu com opções</div>
+                    <div class="flow-step-desc">"Digite: 1=Dúvida, 2=Problema, 3=Outro"</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-step-icon">4</div>
+                <div class="flow-step-content">
+                    <div class="flow-step-title">💬 Mensagem (Confirmação)</div>
+                    <div class="flow-step-desc">Se escolheu opção 1: "Ótimo! Estamos analisando..."</div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="flow-step-icon">5</div>
+                <div class="flow-step-content">
+                    <div class="flow-step-title">👤 Transferir para Agente</div>
+                    <div class="flow-step-desc">Passa para fila de Suporte com contexto</div>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin-top: 40px; padding: 16px; background: #f0fdf4; border-radius: 8px; color: #555; border-left: 4px solid #46b575;">
+            <strong>💡 Nota:</strong> Os blocos acima são os principais. Conforme evolui, pode adicionar mais: WebHook, delay condicional, etc.
+        </p>
+    </div>
+
+    <script>
+        document.querySelectorAll('.block').forEach(block => {
+            block.addEventListener('click', function() {
+                const title = this.querySelector('.block-title').textContent;
+                const indicator = document.querySelector('.selection-indicator') || createIndicator();
+                indicator.textContent = '✓ Você clicou em: ' + title;
+                indicator.classList.add('active');
+            });
+        });
+
+        function createIndicator() {
+            const ind = document.createElement('div');
+            ind.className = 'selection-indicator';
+            document.body.appendChild(ind);
+            return ind;
+        }
+    </script>
+</body>
+</html>

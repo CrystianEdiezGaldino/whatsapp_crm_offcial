@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Portal de Atendimento - Santa Monica Clube de Campo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#354769",
+                    "on-tertiary-fixed-variant": "#00522d",
+                    "secondary-fixed-dim": "#b5c6f0",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#e1e3e4",
+                    "tertiary-fixed": "#8bf9b2",
+                    "on-background": "#191c1d",
+                    "secondary-fixed": "#d8e2ff",
+                    "on-secondary-fixed": "#061b3c",
+                    "on-primary-fixed": "#001159",
+                    "surface-dim": "#d9dadb",
+                    "on-surface-variant": "#454652",
+                    "on-surface": "#191c1d",
+                    "background": "#f8f9fa",
+                    "primary-fixed": "#dee1ff",
+                    "on-primary-fixed-variant": "#283d9d",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#b9c3ff",
+                    "surface-container": "#edeeef",
+                    "primary": "#001769",
+                    "tertiary-fixed-dim": "#6edc98",
+                    "tertiary": "#002913",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#b9c3ff",
+                    "tertiary-container": "#004122",
+                    "surface-tint": "#4256b7",
+                    "inverse-surface": "#2e3132",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#4d5e83",
+                    "outline-variant": "#c5c5d4",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#879aff",
+                    "secondary-container": "#c3d4ff",
+                    "on-secondary-container": "#4a5b80",
+                    "primary-container": "#142c8e",
+                    "on-tertiary-fixed": "#00210f",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e1e3e4",
+                    "surface-container-high": "#e7e8e9",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary-container": "#46b575",
+                    "inverse-on-surface": "#f0f1f2",
+                    "surface-container-low": "#f3f4f5",
+                    "outline": "#757684",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "stack-md": "16px",
+                    "sidebar-width": "260px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "32px",
+                    "header-height": "64px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "label-lg": ["Inter"],
+                    "headline-sm": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "brand-text-dark": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "brand-text-dark": ["14px", {"fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c5c5d4;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-[260px] bg-primary flex flex-col py-gutter z-50">
+<div class="px-6 mb-10">
+<img alt="Santa Monica Clube de Campo Logo" class="w-full h-auto brightness-0 invert opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrxVzLCysZjHMvALcmz6tyWd21BGFEupglBEds6REiw6RuCVzqfQuHzfqEJCp_kptIlopSaQjBVlcYtWEar03w6jYvySmD9_sOQElYD4tRohL84hmUmQQ6l75i2iu94_0r40m0qKHnITOcKm8Vp8-LYed1pHVDSiZ-5PvEZPQuUPDdKZHy4zGx5KSjwgPp6iRCoFQiRlA8AoIhUdcM5yg5BlpXu4TZ1BQ2vykRmt6RB70ng5-ygdxNdstJV4-YAEMCZQESTlSbZHFp"/>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white/10 text-white border-l-4 border-tertiary-fixed font-label-lg text-label-lg Active: opacity-90 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed font-label-lg text-label-lg hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span>Atendimentos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed font-label-lg text-label-lg hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+<span>Canais</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed font-label-lg text-label-lg hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="speed">speed</span>
+<span>Performance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed font-label-lg text-label-lg hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span>Relatórios</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed font-label-lg text-label-lg hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Configurações</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-white/10 pt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed font-label-lg text-label-lg hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Suporte</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary-fixed font-label-lg text-label-lg hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Sair</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[260px] flex-1 flex flex-col min-w-0">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center h-header-height px-margin-desktop border-b border-outline-variant bg-surface sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<h1 class="font-headline-sm text-headline-sm text-primary">Portal de Atendimento</h1>
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md w-64 focus:ring-2 focus:ring-primary/20" placeholder="Buscar atendimentos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:bg-surface-container-low rounded-full p-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:bg-surface-container-low rounded-full p-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="apps">apps</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right hidden sm:block">
+<p class="font-label-lg text-label-lg text-on-surface leading-none">Admin User</p>
+<p class="text-label-md text-on-surface-variant">Santa Monica CC</p>
+</div>
+<img alt="Foto de Perfil do Usuário" class="w-10 h-10 rounded-full border border-outline-variant shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-Qz-rBKeLs8NS0uvBCGm4rQccekdYmrObDLTuWkddfmpwcoHhjNr81slDNlOhbJ5VR4pU2B48oLLhU1j5ZT5jQI4--aDhbwM8xTfmM7XWXrwwj6FTAZUajjkhZ4iOhvz3na1udQLdMurzNYoNst53QUx4uA-GGHqaq9YeVxKR1FKnWFqfd6iY4jDTpfdhMT7Z7TVlJHc2gRbWOQ6NXRvvYlqTM9uq5dquSumBpLnSWcIDfbvNKQEJ0ylwLQL6r66U6uEoGJzGBi8f"/>
+</div>
+</div>
+</header>
+<!-- Canvas Content -->
+<div class="p-margin-desktop space-y-gutter overflow-y-auto h-[calc(100vh-64px)] custom-scrollbar">
+<!-- KPI Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- KPI Card 1 -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/5 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="forum">forum</span>
+</div>
+<span class="text-tertiary-container font-label-md text-label-md bg-tertiary-fixed px-2 py-1 rounded">+12%</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">Total Atendimentos</p>
+<h3 class="font-headline-lg text-headline-lg text-primary mt-1">1,284</h3>
+<p class="text-label-md text-outline mt-2 italic">Consolidado do mês</p>
+</div>
+<!-- KPI Card 2 -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/5 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="timer">timer</span>
+</div>
+<span class="text-error font-label-md text-label-md bg-error-container px-2 py-1 rounded">-2min</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">Tempo Médio (TMR)</p>
+<h3 class="font-headline-lg text-headline-lg text-primary mt-1">04:15</h3>
+<p class="text-label-md text-outline mt-2 italic">Meta: 05:00 min</p>
+</div>
+<!-- KPI Card 3 -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/5 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="bolt">bolt</span>
+</div>
+<span class="text-on-secondary-fixed-variant font-label-md text-label-md bg-secondary-container px-2 py-1 rounded">Ativo</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">Atendimentos Ativos</p>
+<h3 class="font-headline-lg text-headline-lg text-primary mt-1">42</h3>
+<p class="text-label-md text-outline mt-2 italic">Em fila: 08</p>
+</div>
+<!-- KPI Card 4 -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-primary/5 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="sentiment_satisfied">sentiment_satisfied</span>
+</div>
+<span class="text-tertiary-container font-label-md text-label-md bg-tertiary-fixed px-2 py-1 rounded">98%</span>
+</div>
+<p class="text-on-surface-variant font-label-lg text-label-lg">Clientes Satisfeitos</p>
+<h3 class="font-headline-lg text-headline-lg text-primary mt-1">96.4%</h3>
+<p class="text-label-md text-outline mt-2 italic">Base: 420 avaliações</p>
+</div>
+</div>
+<!-- Main Dashboard Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Main Chart (Volume por Hora) -->
+<div class="col-span-12 lg:col-span-8 bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Volume de Mensagens por Hora</h4>
+<p class="text-body-md text-on-surface-variant">Frequência de interações nos canais integrados</p>
+</div>
+<select class="bg-surface-container-low border-none rounded-lg font-label-md text-label-md text-on-surface-variant focus:ring-0">
+<option>Últimas 24 horas</option>
+<option>Hoje</option>
+</select>
+</div>
+<div class="h-[300px] w-full flex items-end gap-2 px-2">
+<!-- Placeholder for visual chart representation -->
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 40%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 60%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 35%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 80%"></div>
+<div class="flex-1 bg-primary-container/20 rounded-t-lg transition-all hover:bg-primary/30" style="height: 95%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 70%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 55%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 45%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 30%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 85%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 65%"></div>
+<div class="flex-1 bg-primary/10 rounded-t-lg transition-all hover:bg-primary/30" style="height: 50%"></div>
+</div>
+<div class="flex justify-between mt-4 text-label-md text-outline px-2">
+<span>08h</span><span>10h</span><span>12h</span><span>14h</span><span>16h</span><span>18h</span><span>20h</span><span>22h</span>
+</div>
+</div>
+<!-- Secondary Chart (Atendimentos por Canal) -->
+<div class="col-span-12 lg:col-span-4 bg-white p-6 rounded-xl border border-outline-variant shadow-sm">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-2">Atendimentos por Canal</h4>
+<p class="text-body-md text-on-surface-variant mb-8">Distribuição omnicanal</p>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between font-label-lg text-label-lg">
+<span class="flex items-center gap-2">
+<img alt="WhatsApp" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBi_OfAxYSNwMFKByNM66agFRDC6xWp7_10JXn0JBUXcOmVOk43RRSnNoGadmGR5tUutB_P2kyBhamlYs48ZpY2TV6Npm466Suob1YGbpumIkJEGC1FWL4sjSaNjBVZLwuSm_Gzue1Yfak4fCuqvYmyMl4E7fzbt5FzDNpfGSZ5_lRGUtP0_Mta8q0-BMNOqnWpTfwd9GC13J7RZK4o_EjYa5bDkuOM3cxCxAxChqphuKy3phGk-yCEAdvDFvxvsKGPkSGCfS9uCah9"/> WhatsApp
+                                </span>
+<span>65%</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-emerald-500 h-2 rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-label-lg text-label-lg">
+<span class="flex items-center gap-2">
+<img alt="Instagram" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx6EnatySsL6J01q9UcaTVfm_GdPg1kVFxSXtoQJjfr6OuLlrwZPwSsl9yrLBE-tZxz_WJFQOZnOjlPW_opmVuRq5s80DN6qFtGQUQJYtWOMTZHSdmehbvja3h9wEEHRWvqN_trrlk5AUXTOfPMj_1J_U-xbQyQYBUEHcbzZY5p70Lu-giBMV6DnszdkDhSVvBk94-sPgmaBXnamoR82PgEAUi2YsPABsc2uW_8CrbXNeQntiy5jPlNpmOCNUMWaZJ-ABzBY2GKkIn"/> Instagram
+                                </span>
+<span>20%</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-pink-500 h-2 rounded-full" style="width: 20%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between font-label-lg text-label-lg">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="language">language</span> Web Chat
+                                </span>
+<span>15%</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+<div class="mt-12 bg-surface-container-low p-4 rounded-lg flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary" data-icon="info">info</span>
+<p class="text-label-md text-on-surface-variant">WhatsApp permanece como o canal preferencial com 12% de crescimento este mês.</p>
+</div>
+</div>
+<!-- Attendants Table -->
+<div class="col-span-12 bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary">Atendentes Online</h4>
+<p class="text-body-md text-on-surface-variant">Carga de trabalho em tempo real</p>
+</div>
+<button class="bg-white border border-primary text-primary px-4 py-2 rounded-lg font-label-lg text-label-lg hover:bg-primary/5 transition-colors">
+                            Gerenciar Escala
+                        </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-primary/5 text-primary font-label-lg text-label-lg">
+<th class="px-6 py-4 uppercase tracking-wider">Atendente</th>
+<th class="px-6 py-4 uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 uppercase tracking-wider text-center">Atendimentos Ativos</th>
+<th class="px-6 py-4 uppercase tracking-wider">Carga Atual</th>
+<th class="px-6 py-4 uppercase tracking-wider text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Atendente" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDd36J89TMw9zD7h1nCq3OjwYQucNOwuFw_14nh1eIxP8m-109jGFaNglMRY5J4aNvUsZksdWO5r-WTkkk52gcXrGbB9dEhhVEs9Xw3_oNdKho71k1hQoq4FjY342xtymEDaiHXnfBHpER8eAd5z9JaPIYWzXXICINh4pdWaEeDkyEhWsHgM9kyj4AMnC3OIiF1mXScA0yXeAMEsgGcVeDtQjC4y1kImEPm3fe6TAcd0i09Z-p9Slr62GKxZtF8N-8FNHDCYGQNGqwX"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Mariana Silva</p>
+<p class="text-label-md text-outline">mariana.s@santamonica.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-2 text-on-tertiary-fixed-variant font-label-md text-label-md bg-tertiary-fixed px-3 py-1 rounded-full w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span> Online
+                                        </span>
+</td>
+<td class="px-6 py-4 text-center font-label-lg text-label-lg text-on-surface">5</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full" style="width: 60%"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">60%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2" data-icon="more_vert">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Atendente" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJieqtWGHQR08-4BTCE6_dcRs5nKD15NhCrZQ-fPuaYBAILIri680PSABv_QxtYrbB7rBIApU0tAxjhhZizCp9YEuTMI42FwhLIx_EABBMpnDKKsgGHqYn1_2s2Dqk7B7_cCx1Um8whBE0HPUsARF9kkrOOuRReFty7lYqDN0x65bOO-NUBzdTUtlgS6eXowPodRe9M7AjbMM2UntGIxX_7or_pN1cPE2qUWafLGVw5FtXvE1fV5KhOJ_xF4KbmqnYp2QIWJ15hJ0B"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Ricardo Oliveira</p>
+<p class="text-label-md text-outline">ricardo.o@santamonica.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-2 text-on-secondary-fixed-variant font-label-md text-label-md bg-secondary-container px-3 py-1 rounded-full w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> Em Pausa
+                                        </span>
+</td>
+<td class="px-6 py-4 text-center font-label-lg text-label-lg text-on-surface">0</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-outline h-full" style="width: 0%"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">0%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2" data-icon="more_vert">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Atendente" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3FDHOZl2wESPNPl-goNPaQZVQTPr5ziuTGfiLlXfJxMtRGm6jKF4De5Dy99A77aXKagqp-tgEG2H8t7KGV3FnRdSUkQ6eXC0ZGMZG9gXYoLoA7rTYkZdryTx6NYDIIBHMX10UF8im0CBn1j48fUClDUt_wk4iSZFNpilMjQU8F6XzNOSzkg8JFiAGBTAoKRwrPzjRp_2Weeg3qQGPMYt8wtiDvuDNHkcQuV3BTNd8BJl1c_v1Xg_9Hoffw0dVts58GeP_gW3980iR"/>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Carla Mendes</p>
+<p class="text-label-md text-outline">carla.m@santamonica.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-2 text-on-tertiary-fixed-variant font-label-md text-label-md bg-tertiary-fixed px-3 py-1 rounded-full w-fit">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span> Online
+                                        </span>
+</td>
+<td class="px-6 py-4 text-center font-label-lg text-label-lg text-on-surface">8</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container rounded-full overflow-hidden">
+<div class="bg-error h-full" style="width: 95%"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">95%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2" data-icon="more_vert">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-surface-container-lowest border-t border-outline-variant flex justify-center">
+<button class="text-primary font-label-lg text-label-lg hover:underline">Ver todos os atendentes (12)</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for New Interaction (Optional but helpful UI element) -->
+<button class="fixed bottom-margin-desktop right-margin-desktop bg-primary text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-primary-container transition-all active:scale-90 z-50">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<script>
+        // Optional: Simple interactive effects for the charts
+        document.querySelectorAll('.flex-1.bg-primary\\/10').forEach(bar => {
+            bar.addEventListener('mouseenter', () => {
+                bar.classList.replace('bg-primary/10', 'bg-primary-container');
+            });
+            bar.addEventListener('mouseleave', () => {
+                if (!bar.classList.contains('bg-primary-container/20')) {
+                    bar.classList.replace('bg-primary-container', 'bg-primary/10');
+                }
+            });
+        });
+
+        // Tooltip emulation or other subtle micro-interactions can go here
+    </script>
+</body></html>

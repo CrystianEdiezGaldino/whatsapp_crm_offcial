@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Fluxo Conversacional - Abordagens</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 40px 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #001769; margin-bottom: 10px; text-align: center; font-size: 32px; }
+        .subtitle { color: #666; text-align: center; margin-bottom: 40px; font-size: 16px; }
+
+        .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; }
+
+        .option {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .option:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .option.selected {
+            border-color: #46b575;
+            background: #f0fdf4;
+        }
+
+        .option-header {
+            background: linear-gradient(135deg, #001769 0%, #142c8e 100%);
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .option-body { padding: 24px; }
+        .option-title { font-size: 18px; font-weight: 600; color: #001769; margin-bottom: 12px; }
+        .option-desc { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+
+        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .pros, .cons { font-size: 13px; }
+        .pros h4 { color: #46b575; margin-bottom: 8px; font-size: 12px; }
+        .cons h4 { color: #d32f2f; margin-bottom: 8px; font-size: 12px; }
+        .pros ul, .cons ul { padding-left: 16px; }
+        .pros li, .cons li { margin-bottom: 4px; }
+
+        .selection-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 14px;
+            color: #666;
+            border-left: 4px solid #46b575;
+        }
+
+        .selection-indicator.active {
+            background: #f0fdf4;
+            color: #46b575;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Fluxo Conversacional 🤖</h1>
+        <p class="subtitle">Qual abordagem o admin prefere para criar fluxos?</p>
+
+        <div class="options" id="options">
+            <!-- Option A: Node-based Visual Builder -->
+            <div class="option" data-choice="node-based" onclick="selectOption(this)">
+                <div class="option-header">🔗 Node-Based Builder</div>
+                <div class="option-body">
+                    <div class="option-title">Visual Canvas com Nodes</div>
+                    <div class="option-desc">
+                        Arrasta nodes (Message, Decision, Action) em um canvas. Conecta com linhas. Tipo Zapier/Make.
+                    </div>
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✓ Vantagens</h4>
+                            <ul>
+                                <li>Visual intuitivo</li>
+                                <li>Fluxos complexos fáceis</li>
+                                <li>Ramificações claras</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>✗ Desvantagens</h4>
+                            <ul>
+                                <li>Mais complexo de dev</li>
+                                <li>Precisa de JS robusto</li>
+                                <li>Parsing de grafo</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option B: Form-based / Step-by-Step -->
+            <div class="option" data-choice="form-based" onclick="selectOption(this)">
+                <div class="option-header">📋 Form-Based (Step by Step)</div>
+                <div class="option-body">
+                    <div class="option-title">Wizard com Formulários</div>
+                    <div class="option-desc">
+                        Campos em abas/steps. "Mensagem inicial → Opção 1 → Ação". Tipo Wix/Webflow.
+                    </div>
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✓ Vantagens</h4>
+                            <ul>
+                                <li>Simples de dev</li>
+                                <li>Mais focado</li>
+                                <li>Menos bugs</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>✗ Desvantagens</h4>
+                            <ul>
+                                <li>Fluxos complexos chatos</li>
+                                <li>Difícil visualizar</li>
+                                <li>Limite de níveis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Option C: Hybrid / Estruturado -->
+            <div class="option" data-choice="hybrid" onclick="selectOption(this)">
+                <div class="option-header">⚡ Hybrid (Recomendado)</div>
+                <div class="option-body">
+                    <div class="option-title">Visual Light + Form Config</div>
+                    <div class="option-desc">
+                        Canvas simples (drag+drop básico) + painel de config. Inicio em node-based, evolui para form.
+                    </div>
+                    <div class="pros-cons">
+                        <div class="pros">
+                            <h4>✓ Vantagens</h4>
+                            <ul>
+                                <li>Bom custo-benefício</li>
+                                <li>Escalável</li>
+                                <li>Intuitivo + robusto</li>
+                            </ul>
+                        </div>
+                        <div class="cons">
+                            <h4>✗ Desvantagens</h4>
+                            <ul>
+                                <li>Meio do caminho</li>
+                                <li>Requer design bom</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="selection-indicator" id="indicator">
+        Nenhuma opção selecionada
+    </div>
+
+    <script>
+        function selectOption(el) {
+            document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            const choice = el.dataset.choice;
+            const text = el.querySelector('.option-title').textContent;
+            document.getElementById('indicator').textContent = '✓ Selecionado: ' + text;
+            document.getElementById('indicator').classList.add('active');
+            // Store selection
+            localStorage.setItem('flowChoice', choice);
+        }
+
+        // Restore selection if exists
+        const saved = localStorage.getItem('flowChoice');
+        if (saved) {
+            document.querySelector(`[data-choice="${saved}"]`)?.click();
+        }
+    </script>
+</body>
+</html>
