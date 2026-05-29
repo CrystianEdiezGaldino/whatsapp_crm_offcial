@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,6 +72,10 @@
         }
     </script>
     <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
         body {
             background-color: #f8f9fa;
             color: #191c1d;
@@ -105,8 +109,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
-<body class="bg-background font-sans text-on-background">
-    <div class="flex h-screen w-full">
+<body class="bg-background font-sans text-on-background h-full overflow-hidden">
+    <div class="flex h-full w-full overflow-hidden">
         @if(!($hideSidebar ?? false))
         @php
             $current = request()->route()?->getName() ?? '';
@@ -136,7 +140,7 @@
                 ['route' => 'admin.whatsapp.numbers.index', 'match' => 'admin.whatsapp.numbers', 'icon' => 'phone', 'label' => 'Números WhatsApp'],
             ];
         @endphp
-        <aside class="w-sidebar h-full sticky top-0 left-0 bg-primary-container flex flex-col shrink-0 z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(0,23,105,0.15)]">
+        <aside class="w-sidebar h-full bg-primary-container flex flex-col shrink-0 z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(0,23,105,0.15)]">
             {{-- Brand --}}
             <div class="px-4 pt-6 pb-5 border-b border-white/10 flex flex-col items-center text-center">
                 <img alt="Santa Monica Logo" class="brightness-0 invert mb-3" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
@@ -201,7 +205,7 @@
         @if($hideSidebar ?? false)
             @yield('content')
         @else
-        <main class="flex-1 flex flex-col min-w-0 bg-surface">
+        <main class="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto bg-surface custom-scrollbar">
             @yield('content')
         </main>
         @endif

@@ -13,102 +13,164 @@ class FlowService
 {
     public function __construct(private WhatsAppService $whatsAppService)
     {}
+
     public function executeFlow(Conversation $conversation, ConversationFlow $flow): void
     {
         $execution = FlowExecution::create([
             'conversation_id' => $conversation->id,
             'flow_id' => $flow->id,
-            'status' => 'started'
+            'status' => 'started',
+            'current_step' => 1
         ]);
 
-        $this->processFlowNodes($conversation, $flow, $execution);
+        $this->processStep($conversation, $flow, $execution, 1);
     }
 
-    private function processFlowNodes(Conversation $conversation, ConversationFlow $flow, FlowExecution $execution): void
+    private function processStep(Conversation $conversation, ConversationFlow $flow, FlowExecution $execution, int $stepNumber): void
     {
-        // Send initial message
-        $this->sendMessage($conversation, $flow->config['initial_message'] ?? 'Olá!');
+        $step = $flow->nodes()
+            ->where('position', $stepNumber)
+            ->first();
 
-        // Get menu nodes
-        $menuNodes = $flow->nodes()
-            ->where('node_type', 'menu')
-            ->orderBy('position')
-            ->get();
-
-        if ($menuNodes->isEmpty()) {
-            // No menu: send final message and complete
-            $this->sendMessage($conversation, $flow->config['final_message'] ?? 'Obrigado!');
+        if (!$step) {
+            Log::warning('[Flow] Step not found', ['flow_id' => $flow->id, 'step' => $stepNumber]);
             $execution->update(['status' => 'completed']);
             return;
         }
 
-        // Update execution to in_progress (waiting for client response)
+        $execution->update(['current_step' => $stepNumber]);
+
+        match ($step->node_type) {
+            'message' => $this->handleMessage($conversation, $flow, $execution, $step, $stepNumber),
+            'menu' => $this->handleMenu($conversation, $flow, $execution, $step),
+            'queue' => $this->handleQueue($conversation, $flow, $execution, $step),
+            default => Log::error('[Flow] Unknown node type', ['type' => $step->node_type])
+        };
+    }
+
+    private function handleMessage(Conversation $conversation, ConversationFlow $flow, FlowExecution $execution, FlowNode $step, int $currentStep): void
+    {
+        $text = $step->config['text'] ?? '';
+        $text = $this->replaceVariables($text, $conversation);
+
+        $this->sendMessage($conversation, $text);
+
+        // Move to next step
+        $nextStep = $currentStep + 1;
+        $nextStepExists = $flow->nodes()->where('position', $nextStep)->exists();
+
+        if ($nextStepExists) {
+            $this->processStep($conversation, $flow, $execution, $nextStep);
+        } else {
+            $execution->update(['status' => 'completed']);
+        }
+    }
+
+    private function handleMenu(Conversation $conversation, ConversationFlow $flow, FlowExecution $execution, FlowNode $step): void
+    {
+        $text = $step->config['text'] ?? 'Escolha uma opção:';
+        $options = $step->config['options'] ?? [];
+
+        // Build menu text
+        $menuText = $text . "\n\n";
+        foreach ($options as $option) {
+            $menuText .= "{$option['number']}. {$option['label']}\n";
+        }
+
+        $this->sendMessage($conversation, $menuText);
+
+        // Wait for response
         $execution->update(['status' => 'in_progress']);
+    }
+
+    private function handleQueue(Conversation $conversation, ConversationFlow $flow, FlowExecution $execution, FlowNode $step): void
+    {
+        // Send confirmation message
+        $text = $step->config['text'] ?? 'Você será atendido em breve. Obrigado!';
+        $text = $this->replaceVariables($text, $conversation);
+        $this->sendMessage($conversation, $text);
+
+        // Assign sector and complete flow
+        $sectorId = $step->target_sector_id;
+        if ($sectorId) {
+            $conversation->update(['sector_id' => $sectorId]);
+
+            // Distribute to agent
+            Log::info('[Flow] Assigning to queue', [
+                'conversation_id' => $conversation->id,
+                'sector_id' => $sectorId
+            ]);
+
+            DistributionService::assign($conversation);
+        }
+
+        $execution->update(['status' => 'completed', 'result_sector_id' => $sectorId]);
     }
 
     public function handleClientResponse(Conversation $conversation, int $clientChoice, FlowExecution $execution): void
     {
-        $menuNode = $execution->flow->nodes()
+        $currentStep = $execution->current_step;
+        $flow = $execution->flow;
+
+        $step = $flow->nodes()
+            ->where('position', $currentStep)
             ->where('node_type', 'menu')
-            ->whereJsonContains('config->option_number', $clientChoice)
             ->first();
 
-        if (!$menuNode) {
+        if (!$step) {
+            return;
+        }
+
+        // Find which option was chosen
+        $options = $step->config['options'] ?? [];
+        $chosenOption = collect($options)->firstWhere('number', $clientChoice);
+
+        if (!$chosenOption) {
             // Invalid option: replay menu
-            $this->replayMenu($conversation, $execution->flow);
+            $this->replayMenu($conversation, $step);
             return;
         }
 
         // Register choice
-        $execution->update([
-            'node_id' => $menuNode->id,
-            'client_choice' => $clientChoice
-        ]);
+        $execution->update(['client_choice' => $clientChoice]);
 
-        // If targets a subflow: execute it
-        if ($menuNode->target_flow_id) {
-            $subflow = ConversationFlow::find($menuNode->target_flow_id);
-            if ($subflow) {
-                $this->executeFlow($conversation, $subflow);
-                return;
-            }
-        }
+        // Find next step (option_number maps to step number)
+        // For simplicity: option 1 → step position after menu
+        // We need to figure out routing logic
 
-        // If targets a sector: complete flow
-        $this->sendMessage($conversation, $execution->flow->config['final_message'] ?? 'Obrigado!');
+        // Option-based routing: each option goes to a different step
+        $optionIndex = array_search($clientChoice, array_column($options, 'number'));
 
-        if ($menuNode->target_sector_id) {
-            $this->completeFlow($conversation, $execution, $menuNode->target_sector_id);
-        }
+        // Logic: after menu at position X, next steps are X+1, X+2, X+3 for options 1, 2, 3
+        $nextStep = $step->position + 1 + $optionIndex;
+
+        $this->processStep($conversation, $flow, $execution, $nextStep);
     }
 
-    private function completeFlow(Conversation $conversation, FlowExecution $execution, ?int $sectorId): void
+    private function replayMenu(Conversation $conversation, FlowNode $step): void
     {
-        $execution->update([
-            'status' => 'completed',
-            'result_sector_id' => $sectorId
-        ]);
+        $text = $step->config['text'] ?? 'Opção inválida. Tente novamente:';
+        $options = $step->config['options'] ?? [];
 
-        if ($sectorId) {
-            $conversation->update(['sector_id' => $sectorId]);
-        }
-    }
-
-    private function replayMenu(Conversation $conversation, ConversationFlow $flow): void
-    {
-        $menuText = "Por favor, escolha uma opção válida:\n";
-        $menuNodes = $flow->nodes()
-            ->where('node_type', 'menu')
-            ->orderBy('position')
-            ->get();
-
-        foreach ($menuNodes as $node) {
-            $number = $node->config['option_number'] ?? '?';
-            $label = $node->config['label'] ?? 'Opção';
-            $menuText .= "$number. $label\n";
+        $menuText = $text . "\n\n";
+        foreach ($options as $option) {
+            $menuText .= "{$option['number']}. {$option['label']}\n";
         }
 
         $this->sendMessage($conversation, $menuText);
+    }
+
+    private function replaceVariables(string $text, Conversation $conversation): string
+    {
+        return str_replace([
+            '{{contact_name}}',
+            '{{contact_phone}}',
+            '{{sector_name}}'
+        ], [
+            $conversation->contact->name ?? 'Cliente',
+            $conversation->contact->phone ?? '',
+            $conversation->sector->name ?? ''
+        ], $text);
     }
 
     private function sendMessage(Conversation $conversation, string $content): void
@@ -143,7 +205,6 @@ class FlowService
                 'error' => $e->getMessage()
             ]);
 
-            // Create failed message record
             Message::create([
                 'conversation_id' => $conversation->id,
                 'direction' => 'outbound',
