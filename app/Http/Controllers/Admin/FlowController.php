@@ -31,19 +31,30 @@ class FlowController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:primary,secondary',
-            'trigger_type' => 'required|in:on_new_conversation,on_command,manual',
-            'config' => 'required|array',
-            'config.initial_message' => 'required|string',
-            'config.final_message' => 'required|string',
-            'nodes' => 'array'
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'type' => 'required|in:primary,secondary',
+                'trigger_type' => 'required|in:on_new_conversation,on_command,manual',
+                'config' => 'required|array',
+                'config.initial_message' => 'required|string',
+                'config.final_message' => 'required|string',
+                'nodes' => 'array'
+            ]);
 
-        $this->service->createFlow($data);
+            $flow = $this->service->createFlow($data);
 
-        return redirect()->route('admin.flows.index')->with('success', 'Fluxo criado com sucesso!');
+            return redirect()->route('admin.flows.index')->with('success', 'Fluxo criado com sucesso!');
+        } catch (\Exception $e) {
+            \Log::error('Flow creation failed', [
+                'error' => $e->getMessage(),
+                'data' => $request->all()
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erro ao criar fluxo: ' . $e->getMessage());
+        }
     }
 
     public function edit(ConversationFlow $flow)
@@ -54,27 +65,48 @@ class FlowController extends Controller
 
     public function update(ConversationFlow $flow, Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:primary,secondary',
-            'trigger_type' => 'required|in:on_new_conversation,on_command,manual',
-            'config' => 'required|array',
-            'config.initial_message' => 'required|string',
-            'config.final_message' => 'required|string',
-            'nodes' => 'array'
-        ]);
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'type' => 'required|in:primary,secondary',
+                'trigger_type' => 'required|in:on_new_conversation,on_command,manual',
+                'config' => 'required|array',
+                'config.initial_message' => 'required|string',
+                'config.final_message' => 'required|string',
+                'nodes' => 'array'
+            ]);
 
-        $this->service->updateFlow($flow, $data);
+            $this->service->updateFlow($flow, $data);
 
-        return redirect()->route('admin.flows.index')->with('success', 'Fluxo atualizado com sucesso!');
+            return redirect()->route('admin.flows.index')->with('success', 'Fluxo atualizado com sucesso!');
+        } catch (\Exception $e) {
+            \Log::error('Flow update failed', [
+                'error' => $e->getMessage(),
+                'flow_id' => $flow->id,
+                'data' => $request->all()
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar fluxo: ' . $e->getMessage());
+        }
     }
 
     public function toggle(ConversationFlow $flow)
     {
-        $this->service->toggleFlow($flow);
+        try {
+            $this->service->toggleFlow($flow);
 
-        $status = $flow->fresh()->is_active ? 'ativado' : 'desativado';
-        return back()->with('success', "Fluxo $status com sucesso!");
+            $status = $flow->fresh()->is_active ? 'ativado' : 'desativado';
+            return back()->with('success', "Fluxo $status com sucesso!");
+        } catch (\Exception $e) {
+            \Log::error('Flow toggle failed', [
+                'error' => $e->getMessage(),
+                'flow_id' => $flow->id
+            ]);
+
+            return back()->with('error', 'Erro ao ativar/desativar fluxo: ' . $e->getMessage());
+        }
     }
 
     public function executions(ConversationFlow $flow)

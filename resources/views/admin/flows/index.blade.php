@@ -15,6 +15,12 @@
         </div>
     @endif
 
+    @if ($message = Session::get('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {{ $message }}
+        </div>
+    @endif
+
     @if ($flows->isEmpty())
         <div class="bg-white rounded-lg shadow p-8 text-center">
             <p class="text-gray-500 mb-4">Nenhum fluxo criado ainda.</p>

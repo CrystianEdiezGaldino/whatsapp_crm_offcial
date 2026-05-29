@@ -94,7 +94,7 @@
     <div class="flex h-screen w-full">
         @if(!($hideSidebar ?? false))
         <!-- Sidebar -->
-        <aside class="w-sidebar h-screen sticky top-0 left-0 bg-primary flex flex-col py-6 px-4 border-r border-outline-variant shrink-0 z-50">
+        <aside class="w-sidebar h-full sticky top-0 left-0 bg-primary flex flex-col py-6 px-4 border-r border-outline-variant shrink-0 z-50">
             <div class="mb-8 flex flex-col items-center text-center">
                 <img alt="Santa Monica Logo" class="brightness-0 invert mb-3" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
                 <h1 class="text-2xl font-black text-on-primary font-headline tracking-tight">SisChat</h1>

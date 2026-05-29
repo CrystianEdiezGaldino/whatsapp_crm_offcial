@@ -4,6 +4,23 @@
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Editar Fluxo: {{ $flow->name }}</h1>
 
+    @if ($errors->any())
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+            <p class="text-red-800 font-semibold mb-2">Erros encontrados:</p>
+            <ul class="text-red-700 text-sm space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>• {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+            <p class="text-red-800 font-semibold">{{ session('error') }}</p>
+        </div>
+    @endif
+
     <form action="{{ route('admin.flows.update', $flow) }}" method="POST" class="bg-white rounded-lg shadow p-8">
         @csrf
         @method('PUT')
