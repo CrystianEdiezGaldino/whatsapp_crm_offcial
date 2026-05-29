@@ -138,16 +138,10 @@
         @endphp
         <aside class="w-sidebar h-full sticky top-0 left-0 bg-primary-container flex flex-col shrink-0 z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(0,23,105,0.15)]">
             {{-- Brand --}}
-            <div class="px-4 pt-6 pb-5 border-b border-white/10">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0 ring-1 ring-white/20">
-                        <img alt="Santa Monica" class="h-7 w-auto brightness-0 invert opacity-95" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
-                    </div>
-                    <div class="min-w-0">
-                        <h1 class="sidebar-brand text-lg font-bold text-on-primary font-headline tracking-tight leading-tight">SisChat</h1>
-                        <p class="text-[11px] uppercase tracking-wider text-on-primary-container/80 font-medium">Santa Mônica CC</p>
-                    </div>
-                </div>
+            <div class="px-4 pt-6 pb-5 border-b border-white/10 flex flex-col items-center text-center">
+                <img alt="Santa Monica Logo" class="brightness-0 invert mb-3" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
+                <h1 class="sidebar-brand text-lg font-bold text-on-primary font-headline tracking-tight leading-tight">SisChat</h1>
+                <p class="text-[11px] uppercase tracking-wider text-on-primary-container/80 font-medium mt-0.5">Santa Mônica CC</p>
             </div>
 
             {{-- Nav --}}

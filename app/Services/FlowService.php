@@ -7,9 +7,12 @@ use App\Models\ConversationFlow;
 use App\Models\FlowExecution;
 use App\Models\FlowNode;
 use App\Models\Message;
+use Illuminate\Support\Facades\Log;
 
 class FlowService
 {
+    public function __construct(private WhatsAppService $whatsAppService)
+    {}
     public function executeFlow(Conversation $conversation, ConversationFlow $flow): void
     {
         $execution = FlowExecution::create([
@@ -110,11 +113,43 @@ class FlowService
 
     private function sendMessage(Conversation $conversation, string $content): void
     {
-        Message::create([
-            'conversation_id' => $conversation->id,
-            'direction' => 'outbound',
-            'content' => $content,
-            'status' => 'pending'
-        ]);
+        try {
+            // Send via WhatsApp
+            $response = $this->whatsAppService->sendText(
+                $conversation->contact->phone,
+                $content
+            );
+
+            // Create message record
+            $message = Message::create([
+                'conversation_id' => $conversation->id,
+                'direction' => 'outbound',
+                'content' => $content,
+                'status' => $response ? 'sent' : 'failed'
+            ]);
+
+            if ($response && isset($response['messages'][0]['id'])) {
+                $message->update(['external_id' => $response['messages'][0]['id']]);
+            }
+
+            Log::info('[Flow] Message sent', [
+                'conversation_id' => $conversation->id,
+                'message_id' => $message->id,
+                'status' => $message->status
+            ]);
+        } catch (\Exception $e) {
+            Log::error('[Flow] Failed to send message', [
+                'conversation_id' => $conversation->id,
+                'error' => $e->getMessage()
+            ]);
+
+            // Create failed message record
+            Message::create([
+                'conversation_id' => $conversation->id,
+                'direction' => 'outbound',
+                'content' => $content,
+                'status' => 'failed'
+            ]);
+        }
     }
 }
