@@ -129,6 +129,10 @@
                         <span class="material-symbols-outlined">people</span>
                         <span class="text-sm">Atendentes</span>
                     </a>
+                    <a href="{{ route('admin.flows.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.flows') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
+                        <span class="material-symbols-outlined">flow_diagram</span>
+                        <span class="text-sm">Fluxos</span>
+                    </a>
                     <a href="{{ route('admin.distribution.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.distribution') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
                         <span class="material-symbols-outlined">settings</span>
                         <span class="text-sm">Distribuição</span>
