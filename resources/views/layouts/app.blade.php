@@ -83,8 +83,23 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #c5c5d4; border-radius: 10px; }
-        aside h1 {
-            text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.4);
+        aside .sidebar-brand {
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+        }
+        aside .nav-link-active {
+            background: linear-gradient(90deg, rgba(139, 249, 178, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
+            box-shadow: inset 3px 0 0 0 #8bf9b2;
+        }
+        aside .nav-icon-wrap {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        aside a:hover .nav-icon-wrap,
+        aside button:hover .nav-icon-wrap {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+        aside .nav-link-active .nav-icon-wrap {
+            background-color: rgba(139, 249, 178, 0.2);
+            color: #8bf9b2;
         }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -93,92 +108,94 @@
 <body class="bg-background font-sans text-on-background">
     <div class="flex h-screen w-full">
         @if(!($hideSidebar ?? false))
-        <!-- Sidebar -->
-        <aside class="w-sidebar h-full sticky top-0 left-0 bg-primary flex flex-col py-6 px-4 border-r border-outline-variant shrink-0 z-50">
-            <div class="mb-8 flex flex-col items-center text-center">
-                <img alt="Santa Monica Logo" class="brightness-0 invert mb-3" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
-                <h1 class="text-2xl font-black text-on-primary font-headline tracking-tight">SisChat</h1>
+        @php
+            $current = request()->route()?->getName() ?? '';
+            $navActive = fn (string|array $match) => is_array($match)
+                ? collect($match)->contains(fn ($m) => $m === $current || str_starts_with($current, $m . '.'))
+                : ($match === $current || str_starts_with($current, $match . '.'));
+            $navItemClass = fn (bool $active) => 'group flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all duration-200 '
+                . ($active
+                    ? 'nav-link-active text-on-primary font-semibold'
+                    : 'text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5');
+            $mainNav = [
+                ['route' => 'dashboard', 'match' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard'],
+                ['route' => 'conversations.index', 'match' => 'conversations', 'icon' => 'chat_bubble', 'label' => 'Atendimentos'],
+                ['route' => 'contacts.index', 'match' => 'contacts', 'icon' => 'person_book', 'label' => 'Contatos'],
+                ['route' => 'macros.index', 'match' => 'macros', 'icon' => 'bolt', 'label' => 'Macros'],
+            ];
+            $adminNav = [
+                ['route' => 'admin.sectors.index', 'match' => 'admin.sectors', 'icon' => 'category', 'label' => 'Setores'],
+                ['route' => 'admin.agents.index', 'match' => 'admin.agents', 'icon' => 'people', 'label' => 'Atendentes'],
+                ['route' => 'admin.flows.index', 'match' => 'admin.flows', 'icon' => 'account_tree', 'label' => 'Fluxos'],
+                ['route' => 'admin.distribution.index', 'match' => 'admin.distribution', 'icon' => 'tune', 'label' => 'Distribuição'],
+                ['route' => 'admin.sla.dashboard', 'match' => 'admin.sla', 'icon' => 'schedule', 'label' => 'SLA'],
+                ['route' => 'admin.tags.index', 'match' => 'admin.tags', 'icon' => 'label', 'label' => 'Tags'],
+                ['route' => 'admin.complaints.dashboard', 'match' => 'admin.complaints', 'icon' => 'warning', 'label' => 'Reclamações'],
+                ['route' => 'admin.transfers.index', 'match' => 'admin.transfers', 'icon' => 'compare_arrows', 'label' => 'Transferências'],
+                ['route' => 'admin.whatsapp.token.index', 'match' => 'admin.whatsapp.token', 'icon' => 'vpn_key', 'label' => 'Tokens WhatsApp'],
+                ['route' => 'admin.whatsapp.numbers.index', 'match' => 'admin.whatsapp.numbers', 'icon' => 'phone', 'label' => 'Números WhatsApp'],
+            ];
+        @endphp
+        <aside class="w-sidebar h-full sticky top-0 left-0 bg-primary-container flex flex-col shrink-0 z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(0,23,105,0.15)]">
+            {{-- Brand --}}
+            <div class="px-4 pt-6 pb-5 border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center shrink-0 ring-1 ring-white/20">
+                        <img alt="Santa Monica" class="h-7 w-auto brightness-0 invert opacity-95" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="sidebar-brand text-lg font-bold text-on-primary font-headline tracking-tight leading-tight">SisChat</h1>
+                        <p class="text-[11px] uppercase tracking-wider text-on-primary-container/80 font-medium">Santa Mônica CC</p>
+                    </div>
+                </div>
             </div>
 
-            <nav class="flex-1 flex flex-col gap-1">
-                @php $current = request()->route()?->getName() ?? ''; @endphp
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ $current === 'dashboard' ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    <span class="text-sm">Dashboard</span>
-                </a>
-                <a href="{{ route('conversations.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'conversations') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                    <span class="material-symbols-outlined">chat_bubble</span>
-                    <span class="text-sm">Atendimentos</span>
-                </a>
-                <a href="{{ route('contacts.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'contacts') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                    <span class="material-symbols-outlined">person_book</span>
-                    <span class="text-sm">Contatos</span>
-                </a>
-                <a href="{{ route('macros.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'macros') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                    <span class="material-symbols-outlined">bolt</span>
-                    <span class="text-sm">Macros</span>
-                </a>
+            {{-- Nav --}}
+            <nav class="flex-1 overflow-y-auto custom-scrollbar px-3 py-4 flex flex-col gap-1">
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-on-primary-container/60">Operação</p>
+                @foreach($mainNav as $item)
+                    @php $active = $navActive($item['match']); @endphp
+                    <a href="{{ route($item['route']) }}" class="{{ $navItemClass($active) }}">
+                        <span class="nav-icon-wrap w-9 h-9 rounded-lg flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">{{ $item['icon'] }}</span>
+                        </span>
+                        <span class="text-sm truncate">{{ $item['label'] }}</span>
+                    </a>
+                @endforeach
 
                 @if(auth()->check() && auth()->user()->isAdmin())
-                <div class="border-t border-white/10 my-2 pt-2">
-                    <a href="{{ route('admin.sectors.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.sectors') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">category</span>
-                        <span class="text-sm">Setores</span>
+                <p class="px-3 mt-4 mb-1 text-[10px] font-semibold uppercase tracking-widest text-on-primary-container/60">Administração</p>
+                @foreach($adminNav as $item)
+                    @php $active = $navActive($item['match']); @endphp
+                    <a href="{{ route($item['route']) }}" class="{{ $navItemClass($active) }}">
+                        <span class="nav-icon-wrap w-9 h-9 rounded-lg flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">{{ $item['icon'] }}</span>
+                        </span>
+                        <span class="text-sm truncate">{{ $item['label'] }}</span>
                     </a>
-                    <a href="{{ route('admin.agents.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.agents') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">people</span>
-                        <span class="text-sm">Atendentes</span>
-                    </a>
-                    <a href="{{ route('admin.flows.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.flows') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">account_tree</span>
-                        <span class="text-sm">Fluxos</span>
-                    </a>
-                    <a href="{{ route('admin.distribution.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.distribution') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">settings</span>
-                        <span class="text-sm">Distribuição</span>
-                    </a>
-                    <a href="{{ route('admin.sla.dashboard') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.sla') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">schedule</span>
-                        <span class="text-sm">SLA</span>
-                    </a>
-                    <a href="{{ route('admin.tags.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.tags') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">label</span>
-                        <span class="text-sm">Tags</span>
-                    </a>
-                    <a href="{{ route('admin.complaints.dashboard') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.complaints') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">warning</span>
-                        <span class="text-sm">Reclamações</span>
-                    </a>
-                    <a href="{{ route('admin.transfers.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.transfers') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">compare_arrows</span>
-                        <span class="text-sm">Transferências</span>
-                    </a>
-                    <a href="{{ route('admin.whatsapp.token.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.whatsapp.token') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">vpn_key</span>
-                        <span class="text-sm">Tokens WhatsApp</span>
-                    </a>
-                    <a href="{{ route('admin.whatsapp.numbers.index') }}" class="flex items-center gap-4 py-3 px-4 rounded transition-colors duration-200 {{ str_starts_with($current, 'admin.whatsapp.numbers') ? 'border-l-4 border-tertiary-fixed bg-white/10 text-on-primary font-semibold' : 'text-secondary-fixed hover:bg-white/5' }}">
-                        <span class="material-symbols-outlined">phone</span>
-                        <span class="text-sm">Números WhatsApp</span>
-                    </a>
-                </div>
+                @endforeach
                 @endif
             </nav>
 
-            <div class="mt-auto flex flex-col gap-1 border-t border-white/10 pt-6">
-                <div class="flex items-center gap-3 px-4 py-3 mb-2">
-                    <div class="w-10 h-10 rounded-full bg-on-primary/20 flex items-center justify-center text-sm font-bold text-on-primary">
+            {{-- User + logout --}}
+            <div class="px-3 pb-5 pt-4 border-t border-white/10 bg-primary/40">
+                <div class="flex items-center gap-3 px-2 py-3 mb-2 rounded-xl bg-white/5 ring-1 ring-white/10">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-tertiary-fixed/30 to-secondary-fixed/20 flex items-center justify-center text-sm font-bold text-on-primary ring-2 ring-tertiary-fixed/40 shrink-0">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
-                    <div class="overflow-hidden">
-                        <p class="text-on-primary text-sm truncate">{{ auth()->user()->name }}</p>
-                        <p class="text-on-primary/50 text-xs">{{ auth()->user()->role === 'admin' ? 'Admin' : 'Agente' }}</p>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-on-primary text-sm font-medium truncate">{{ auth()->user()->name }}</p>
+                        <span class="inline-flex mt-0.5 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded {{ auth()->user()->role === 'admin' ? 'bg-tertiary-fixed/20 text-tertiary-fixed' : 'bg-white/10 text-secondary-fixed-dim' }}">
+                            {{ auth()->user()->role === 'admin' ? 'Administrador' : 'Agente' }}
+                        </span>
                     </div>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="w-full flex items-center gap-4 py-3 px-4 rounded text-secondary-fixed hover:bg-white/5 transition-colors">
-                        <span class="material-symbols-outlined">logout</span>
+                    <button type="submit" class="group w-full flex items-center gap-3 py-2.5 px-3 rounded-lg text-secondary-fixed-dim hover:text-on-primary hover:bg-white/5 transition-all duration-200">
+                        <span class="nav-icon-wrap w-9 h-9 rounded-lg flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">logout</span>
+                        </span>
                         <span class="text-sm">Sair</span>
                     </button>
                 </form>
