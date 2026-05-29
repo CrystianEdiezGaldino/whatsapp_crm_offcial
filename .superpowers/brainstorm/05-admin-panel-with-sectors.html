@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Fluxo com Setores</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1 { color: #001769; margin-bottom: 30px; text-align: center; font-size: 28px; }
+
+        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #001769 0%, #142c8e 100%);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+        }
+
+        .panel-body { padding: 24px; }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #001769;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input, .textarea, .select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .input:focus, .textarea:focus, .select:focus {
+            outline: none;
+            border-color: #142c8e;
+            box-shadow: 0 0 0 3px rgba(20, 44, 142, 0.1);
+        }
+
+        .textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .option-block {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .option-block:hover {
+            border-color: #142c8e;
+            background: #f5f7ff;
+        }
+
+        .option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .option-number {
+            background: #142c8e;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .option-title {
+            flex: 1;
+            margin-left: 12px;
+            font-weight: 600;
+            color: #001769;
+        }
+
+        .remove-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: #c92a2a;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .sector-badge {
+            display: inline-block;
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .agents-list {
+            background: #f0f0f0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .agent-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+        }
+
+        .agent-avatar {
+            width: 24px;
+            height: 24px;
+            background: #46b575;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .button-primary {
+            background: #46b575;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #2e8b57;
+            box-shadow: 0 4px 8px rgba(70, 181, 117, 0.3);
+        }
+
+        .button-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .button-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .button-group .button {
+            flex: 1;
+        }
+
+        .divider { border-top: 1px solid #eee; margin: 20px 0; }
+
+        .info-box {
+            background: #f0fdf4;
+            border-left: 4px solid #46b575;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #555;
+            margin-top: 20px;
+        }
+
+        .preview-header {
+            background: #f0fdf4;
+            border-left: 4px solid #46b575;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .preview-header h3 { color: #2e8b57; margin-bottom: 8px; }
+
+        .preview-message {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .preview-message.user {
+            background: #e3f2fd;
+            border-color: #90caf9;
+            text-align: right;
+            margin-left: 40px;
+        }
+
+        .preview-message.bot {
+            background: #f0fdf4;
+            border-color: #86efac;
+            margin-right: 40px;
+        }
+
+        .option-list {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            font-size: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .option-item:last-child {
+            border-bottom: none;
+        }
+
+        .option-number-small {
+            background: #142c8e;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .option-item-content {
+            flex: 1;
+        }
+
+        .option-item-title {
+            font-weight: 600;
+            color: #001769;
+        }
+
+        .option-item-sector {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .route-box {
+            margin-top: 16px;
+            padding: 12px;
+            background: #fff8e1;
+            border-left: 4px solid #ffa500;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .route-box strong { color: #ff8c00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Criar Fluxo com Roteamento de Setores 🎯</h1>
+
+        <div class="layout">
+            <!-- Left: Form -->
+            <div class="panel">
+                <div class="panel-header">⚙️ Configuração do Fluxo</div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="label">📝 Nome do Fluxo</label>
+                        <input type="text" class="input" placeholder="Ex: Fluxo Boas-vindas" value="Fluxo Boas-vindas">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">🎯 Quando Ativar?</label>
+                        <select class="select">
+                            <option selected>Quando nova conversa chegar</option>
+                            <option>Quando cliente digitar comando (/menu)</option>
+                            <option>Manualmente (só admin dispara)</option>
+                        </select>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label class="label">1️⃣ Mensagem Inicial</label>
+                        <textarea class="textarea">Olá! 👋 Bem-vindo ao SisChat.
+Por favor, escolha o tipo de atendimento:</textarea>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label class="label">2️⃣ Opções e Setores</label>
+
+                        <!-- Opção 1 -->
+                        <div class="option-block">
+                            <div class="option-header">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="option-number">1</div>
+                                    <div class="option-title">Suporte Técnico</div>
+                                </div>
+                                <button class="remove-btn">Remover</button>
+                            </div>
+
+                            <div class="input-group">
+                                <label>🏢 Associar a Setor:</label>
+                                <select class="select" style="background: #e3f2fd; border-color: #90caf9;">
+                                    <option value="">-- Selecione um setor --</option>
+                                    <option value="1" selected>Suporte Técnico (3 agentes)</option>
+                                    <option value="2">Administrativo (2 agentes)</option>
+                                    <option value="3">Comercial (4 agentes)</option>
+                                </select>
+                            </div>
+
+                            <div class="sector-badge">✓ Setor: Suporte Técnico</div>
+                            <div class="agents-list">
+                                <strong>Agentes disponíveis:</strong>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">JM</div>
+                                    <span>João Martins</span>
+                                </div>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">MC</div>
+                                    <span>Maria Clara</span>
+                                </div>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">PL</div>
+                                    <span>Paulo Lima</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opção 2 -->
+                        <div class="option-block">
+                            <div class="option-header">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="option-number">2</div>
+                                    <div class="option-title">Administrativo</div>
+                                </div>
+                                <button class="remove-btn">Remover</button>
+                            </div>
+
+                            <div class="input-group">
+                                <label>🏢 Associar a Setor:</label>
+                                <select class="select" style="background: #e3f2fd; border-color: #90caf9;">
+                                    <option value="">-- Selecione um setor --</option>
+                                    <option value="1">Suporte Técnico (3 agentes)</option>
+                                    <option value="2" selected>Administrativo (2 agentes)</option>
+                                    <option value="3">Comercial (4 agentes)</option>
+                                </select>
+                            </div>
+
+                            <div class="sector-badge">✓ Setor: Administrativo</div>
+                            <div class="agents-list">
+                                <strong>Agentes disponíveis:</strong>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">AC</div>
+                                    <span>Ana Costa</span>
+                                </div>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">RS</div>
+                                    <span>Roberto Silva</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opção 3 -->
+                        <div class="option-block">
+                            <div class="option-header">
+                                <div style="display: flex; align-items: center;">
+                                    <div class="option-number">3</div>
+                                    <div class="option-title">Comercial</div>
+                                </div>
+                                <button class="remove-btn">Remover</button>
+                            </div>
+
+                            <div class="input-group">
+                                <label>🏢 Associar a Setor:</label>
+                                <select class="select" style="background: #e3f2fd; border-color: #90caf9;">
+                                    <option value="">-- Selecione um setor --</option>
+                                    <option value="1">Suporte Técnico (3 agentes)</option>
+                                    <option value="2">Administrativo (2 agentes)</option>
+                                    <option value="3" selected>Comercial (4 agentes)</option>
+                                </select>
+                            </div>
+
+                            <div class="sector-badge">✓ Setor: Comercial</div>
+                            <div class="agents-list">
+                                <strong>Agentes disponíveis:</strong>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">FB</div>
+                                    <span>Fernanda Brás</span>
+                                </div>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">LG</div>
+                                    <span>Lucas Gonçalves</span>
+                                </div>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">VR</div>
+                                    <span>Vanessa Rosa</span>
+                                </div>
+                                <div class="agent-item">
+                                    <div class="agent-avatar">TM</div>
+                                    <span>Tomás Mendes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="button button-secondary" style="width: 100%; margin-top: 12px;">+ Adicionar Opção</button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label class="label">3️⃣ Mensagem Após Escolha</label>
+                        <textarea class="textarea">Ótimo! Um agente do setor escolhido irá ajudá-lo em breve. ⏳</textarea>
+                    </div>
+
+                    <div class="info-box">
+                        ℹ️ Ao selecionar um setor, a conversa entra automaticamente na fila daquele setor. O primeiro agente disponível atenderá.
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button button-secondary">Cancelar</button>
+                        <button class="button button-primary">✓ Salvar e Ativar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="panel">
+                <div class="panel-header">👁️ Visualizar Fluxo</div>
+                <div class="panel-body">
+                    <div class="preview-header">
+                        <h3>Como o cliente verá:</h3>
+                        <p style="font-size: 12px; color: #666;">Simulação de conversa</p>
+                    </div>
+
+                    <div class="preview-message bot">
+                        🤖 Bot: Olá! 👋 Bem-vindo ao SisChat.
+                        Por favor, escolha o tipo de atendimento:
+                    </div>
+
+                    <div class="option-list">
+                        <div class="option-item">
+                            <div class="option-number-small">1</div>
+                            <div class="option-item-content">
+                                <div class="option-item-title">Suporte Técnico</div>
+                                <div class="option-item-sector">📍 Setor: Suporte Técnico</div>
+                            </div>
+                        </div>
+                        <div class="option-item">
+                            <div class="option-number-small">2</div>
+                            <div class="option-item-content">
+                                <div class="option-item-title">Administrativo</div>
+                                <div class="option-item-sector">📍 Setor: Administrativo</div>
+                            </div>
+                        </div>
+                        <div class="option-item">
+                            <div class="option-number-small">3</div>
+                            <div class="option-item-content">
+                                <div class="option-item-title">Comercial</div>
+                                <div class="option-item-sector">📍 Setor: Comercial</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: #f9f9f9; border-radius: 6px; font-size: 12px; color: #666;">
+                        <strong>Exemplo:</strong> Cliente digita "1"
+                    </div>
+
+                    <div class="preview-message user" style="margin-top: 12px;">
+                        Cliente: 1
+                    </div>
+
+                    <div class="preview-message bot" style="margin-top: 12px;">
+                        🤖 Bot: Ótimo! Um agente do setor escolhido irá ajudá-lo em breve. ⏳
+                    </div>
+
+                    <div class="route-box">
+                        <strong>🎯 Roteamento automático:</strong>
+                        <p>Conversa entra na fila do setor <strong>Suporte Técnico</strong></p>
+                        <p style="margin-top: 6px;">Próximo agente disponível: <strong>João Martins, Maria Clara ou Paulo Lima</strong></p>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: #e8f5e9; border-radius: 6px; border-left: 4px solid #46b575; font-size: 12px;">
+                        <strong>✓ Sistema automático</strong>
+                        <p style="margin-top: 4px; color: #666;">Sem intervenção manual. Fila + distribuição por setor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

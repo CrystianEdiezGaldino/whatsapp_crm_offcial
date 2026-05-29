@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integração Bot + Fila de Atendimento</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 40px 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #001769; margin-bottom: 10px; text-align: center; font-size: 32px; }
+        .subtitle { color: #666; text-align: center; margin-bottom: 40px; font-size: 16px; }
+
+        .flow-diagram {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .flow-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #001769;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .flow-steps {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .step-box {
+            background: linear-gradient(135deg, #001769 0%, #142c8e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .step-box.bot { background: linear-gradient(135deg, #46b575 0%, #2e8b57 100%); }
+        .step-box.queue { background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%); }
+        .step-box.agent { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); }
+
+        .step-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .arrow {
+            font-size: 28px;
+            color: #142c8e;
+            margin: 0 10px;
+        }
+
+        .details {
+            font-size: 11px;
+            color: #666;
+            margin-top: 8px;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #001769;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #142c8e;
+        }
+
+        .info-box {
+            background: #f0fdf4;
+            border-left: 4px solid #46b575;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h4 { color: #46b575; margin-bottom: 8px; }
+        .info-box p { color: #555; font-size: 14px; line-height: 1.6; }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffa500;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .warning-box h4 { color: #ff8c00; margin-bottom: 8px; }
+        .warning-box p { color: #666; font-size: 14px; }
+
+        .timeline {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 50px;
+            width: 2px;
+            height: 30px;
+            background: #142c8e;
+        }
+
+        .timeline-dot {
+            width: 40px;
+            height: 40px;
+            background: #142c8e;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .timeline-content h4 { color: #001769; margin-bottom: 4px; }
+        .timeline-content p { color: #666; font-size: 13px; }
+
+        .code-box {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+            margin: 8px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bot Pré-Atendimento + Fila 🤖→📋</h1>
+        <p class="subtitle">Como o fluxo conversacional se integra com a fila de atendimento</p>
+
+        <div class="info-box">
+            <h4>💡 Fluxo Principal</h4>
+            <p>Nova conversa llega → Bot executa fluxo automaticamente → Se nenhuma ação terminal ocorrer, conversa entra na fila para agente</p>
+        </div>
+
+        <!-- Main Flow -->
+        <div class="flow-diagram">
+            <div class="flow-title">Fluxo: Nova Conversa</div>
+            <div class="flow-steps">
+                <div class="step">
+                    <div class="step-box bot">
+                        📱 Cliente envia mensagem
+                    </div>
+                    <div class="details">Webhook chega</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step">
+                    <div class="step-box bot">
+                        🤖 Bot executa fluxo
+                    </div>
+                    <div class="details">Mensagem + Menu</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step">
+                    <div class="step-box queue">
+                        📋 Entra na Fila
+                    </div>
+                    <div class="details">Status: pending</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="step">
+                    <div class="step-box agent">
+                        👤 Agente atende
+                    </div>
+                    <div class="details">Clama conversa</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Cenários Possíveis</div>
+
+        <div class="timeline">
+            <h3 style="color: #001769; margin-bottom: 20px;">Cenário 1: Fluxo Resolve (Cliente vai para Fila)</h3>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">1</div>
+                <div class="timeline-content">
+                    <h4>Cliente envia mensagem</h4>
+                    <p>Ex: "Oi, preciso de ajuda"</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">2</div>
+                <div class="timeline-content">
+                    <h4>Bot envia fluxo: Boas-vindas</h4>
+                    <p>"Olá! Qual o tipo de atendimento?"</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">3</div>
+                <div class="timeline-content">
+                    <h4>Cliente escolhe opção (1, 2 ou 3)</h4>
+                    <p>Seleção registrada na conversa</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">4</div>
+                <div class="timeline-content">
+                    <h4>Bot envia mensagem de confirmação</h4>
+                    <p>"Ótimo! Um agente irá ajudar..."</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">5</div>
+                <div class="timeline-content">
+                    <h4>Conversa entra em FILA com contexto</h4>
+                    <p>Agente vê: "Cliente escolheu opção 1", histórico do bot, etc</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline" style="margin-top: 30px;">
+            <h3 style="color: #001769; margin-bottom: 20px;">Cenário 2: Fluxo Resolve Sozinho (Sem entrar na Fila)</h3>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">1</div>
+                <div class="timeline-content">
+                    <h4>Cliente envia mensagem</h4>
+                    <p>Ex: "Qual seu horário de funcionamento?"</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">2</div>
+                <div class="timeline-content">
+                    <h4>Bot reconhece e responde (com condicional)</h4>
+                    <p>Resposta automática: "Funcionamos de 8h às 18h"</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">3</div>
+                <div class="timeline-content">
+                    <h4>Bot pergunta se resolveu</h4>
+                    <p>"Sua dúvida foi resolvida? (Sim/Não)"</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">4</div>
+                <div class="timeline-content">
+                    <h4>Se responder "Sim": Encerra conversa</h4>
+                    <p>Status: resolved. NÃO entra na fila</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot">5</div>
+                <div class="timeline-content">
+                    <h4>Se responder "Não": Transfere para agente</h4>
+                    <p>Entra na fila com contexto</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Configuração do Sistema</div>
+
+        <div class="info-box">
+            <h4>✅ Banco de Dados</h4>
+            <p>Criar tabela <code>conversation_flows</code>:</p>
+            <div class="code-box">
+id, name, trigger_type (on_new_conversation),
+enabled (true/false), nodes (JSON),
+created_by, created_at, updated_at
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h4>✅ Acionamento Automático</h4>
+            <p>Após criar a conversa no WhatsAppService, verificar:</p>
+            <div class="code-box">
+if (conversation.status === 'new' && flowEnabled) {
+  flowService.executeFlow(conversation, flowId)
+}
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <h4>⚠️ Importante</h4>
+            <p><strong>O fluxo é "automático" mas responde às mensagens do cliente.</strong> Ou seja:</p>
+            <ul style="margin-left: 16px; margin-top: 8px;">
+                <li>Cliente envia msg 1 → Bot responde com bloco 1</li>
+                <li>Cliente envia msg 2 (resposta à escolha) → Bot processa e vai para bloco 2</li>
+                <li>Conversa continua até terminar o fluxo ou transferir</li>
+            </ul>
+        </div>
+
+        <div class="section-title">Fluxo no Código</div>
+
+        <div class="info-box">
+            <h4>📍 Onde integra</h4>
+            <p>No webhook (WhatsAppService.php):</p>
+            <div class="code-box">
+1. Webhook chega → cria/encontra conversation
+2. Verifica: exists(flow_by_trigger='on_new_conversation')?
+3. SIM → FlowService::executeFlow($conversation, $flow)
+4. Fluxo executa (pode enviar N mensagens)
+5. Se flow termina com "transfer" → status fica 'new', entra fila
+6. Se flow termina com "resolve" → status 'resolved', encerra
+            </div>
+        </div>
+    </div>
+</body>
+</html>

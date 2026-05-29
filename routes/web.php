@@ -14,6 +14,7 @@ use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\Admin\FlowController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -38,6 +39,11 @@ Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')-
     Route::patch('/distribution/agents/{user}/capacity', [\App\Http\Controllers\Admin\DistributionController::class, 'updateAgentCapacity'])->name('distribution.agent.capacity');
     Route::post('/distribution/process-queue', [\App\Http\Controllers\Admin\DistributionController::class, 'processQueue'])->name('distribution.process-queue');
     Route::get('/distribution/metrics', [\App\Http\Controllers\Admin\DistributionController::class, 'metrics'])->name('distribution.metrics');
+
+    // Conversation Flows
+    Route::resource('flows', FlowController::class)->except(['show']);
+    Route::post('/flows/{flow}/toggle', [FlowController::class, 'toggle'])->name('flows.toggle');
+    Route::get('/flows/{flow}/executions', [FlowController::class, 'executions'])->name('flows.executions');
 
     // Tags
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class);

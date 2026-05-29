@@ -527,6 +527,19 @@ class WhatsAppService
             $conversation->update(['last_message_at' => now()]);
         }
 
+        // Check if there's an active flow for new conversations
+        if ($conversation->status === 'new') {
+            $flow = \App\Models\ConversationFlow::where('trigger_type', 'on_new_conversation')
+                ->where('is_active', true)
+                ->first();
+
+            if ($flow) {
+                $flowService = app(\App\Services\FlowService::class);
+                $flowService->executeFlow($conversation, $flow);
+                return;
+            }
+        }
+
         // Apply automatic distribution if enabled
         \App\Services\DistributionService::assign($conversation);
 

@@ -108,7 +108,11 @@
       "Bash(php -r 'require '\\\\''vendor/autoload.php'\\\\''; $app = require_once '\\\\''bootstrap/app.php'\\\\''; $app->make\\('\\\\''Illuminate\\\\Contracts\\\\Console\\\\Kernel'\\\\''\\)->bootstrap\\(\\); echo \\\\App\\\\Models\\\\Tag::count\\(\\);')",
       "Bash(php -d memory_limit=512M artisan db:seed --class=TagSeeder)",
       "WebFetch(domain:essenciatech.com.br)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(powershell -Command ' *)",
+      "Bash(mkdir -p .superpowers/brainstorm)",
+      "Bash(python3 -c ' *)",
+      "Bash(cat .superpowers/brainstorm/state/server-info.json)"
     ]
   }
 }

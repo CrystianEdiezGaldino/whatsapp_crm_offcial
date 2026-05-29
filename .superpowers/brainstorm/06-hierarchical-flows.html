@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluxos Hierárquicos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 40px 20px; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #001769; margin-bottom: 10px; text-align: center; font-size: 32px; }
+        .subtitle { color: #666; text-align: center; margin-bottom: 40px; font-size: 16px; }
+
+        .flow-tree {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .tree-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #001769;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .flow-node {
+            margin-bottom: 30px;
+        }
+
+        .node-header {
+            background: linear-gradient(135deg, #001769 0%, #142c8e 100%);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .node-icon {
+            font-size: 24px;
+        }
+
+        .node-content {
+            background: #f9f9f9;
+            border-left: 4px solid #142c8e;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .node-option {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-number {
+            background: #142c8e;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-weight: 600;
+            color: #001769;
+            margin-bottom: 4px;
+        }
+
+        .option-link {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .link-arrow {
+            color: #46b575;
+            font-weight: bold;
+        }
+
+        .subflow-badge {
+            display: inline-block;
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .queue-badge {
+            display: inline-block;
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1565c0;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #001769;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #142c8e;
+        }
+
+        .flow-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .flow-item:hover {
+            background: #f9f9f9;
+            border-color: #142c8e;
+        }
+
+        .flow-info {
+            flex: 1;
+        }
+
+        .flow-name {
+            font-weight: 600;
+            color: #001769;
+            margin-bottom: 4px;
+        }
+
+        .flow-desc {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .flow-type {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .flow-type.secondary {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .flow-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1976d2;
+        }
+
+        .btn-toggle {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-toggle:hover {
+            background: #e0e0e0;
+        }
+
+        .status-active {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .status-inactive {
+            display: inline-block;
+            background: #999;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: #f0fdf4;
+            border-left: 4px solid #46b575;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 40px;
+        }
+
+        .info-box h3 { color: #2e7d32; margin-bottom: 8px; }
+        .info-box p { color: #555; font-size: 14px; line-height: 1.6; }
+        .info-box ul { margin-left: 20px; margin-top: 8px; }
+        .info-box li { margin-bottom: 4px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Fluxos Hierárquicos 🌳</h1>
+        <p class="subtitle">Fluxos em camadas: Principal → Subfluxos por Setor</p>
+
+        <!-- Tree Visualization -->
+        <div class="flow-tree">
+            <div class="tree-title">Exemplo: Estrutura Completa de Fluxos</div>
+
+            <!-- Level 1: Main Flow -->
+            <div class="flow-node">
+                <div class="node-header">
+                    <span class="node-icon">🌳</span>
+                    <span>FLUXO PRINCIPAL: Boas-vindas (Acionado em nova conversa)</span>
+                </div>
+
+                <div class="node-content">
+                    <div class="node-option">
+                        <div class="option-number">1</div>
+                        <div class="option-content">
+                            <div class="option-title">Suporte Técnico</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do setor</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="node-option">
+                        <div class="option-number">2</div>
+                        <div class="option-content">
+                            <div class="option-title">Comercial</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Ativa Fluxo Comercial</span>
+                                <span class="subflow-badge">SUBFLUXO</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="node-option">
+                        <div class="option-number">3</div>
+                        <div class="option-content">
+                            <div class="option-title">Administrativo</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do setor</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size: 13px; color: #666; margin-left: 16px;">
+                    💡 <strong>Nota:</strong> Opções 1 e 3 vão direto para fila. Opção 2 abre um subfluxo.
+                </p>
+            </div>
+
+            <!-- Level 2: Commercial Subflow -->
+            <div class="flow-node">
+                <div class="node-header">
+                    <span class="node-icon">🏢</span>
+                    <span>SUBFLUXO: Comercial (Acionado se cliente escolheu opção 2)</span>
+                </div>
+
+                <div class="node-content">
+                    <div class="node-option">
+                        <div class="option-number">1</div>
+                        <div class="option-content">
+                            <div class="option-title">Alocação de Salão</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do Comercial</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="node-option">
+                        <div class="option-number">2</div>
+                        <div class="option-content">
+                            <div class="option-title">Compra de Título</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do Comercial</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="node-option">
+                        <div class="option-number">3</div>
+                        <div class="option-content">
+                            <div class="option-title">Agendamento</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do Comercial</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size: 13px; color: #666; margin-left: 16px;">
+                    💡 <strong>Contexto mantido:</strong> Sistema sabe que cliente veio do Comercial. Todas as mensagens vão para agentes do Comercial.
+                </p>
+            </div>
+
+            <!-- Optional: Level 2: Support Subflow -->
+            <div class="flow-node">
+                <div class="node-header">
+                    <span class="node-icon">🔧</span>
+                    <span>SUBFLUXO: Suporte Técnico (Opcional - Se você criar)</span>
+                </div>
+
+                <div class="node-content">
+                    <div class="node-option">
+                        <div class="option-number">1</div>
+                        <div class="option-content">
+                            <div class="option-title">Hardware</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do Suporte</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="node-option">
+                        <div class="option-number">2</div>
+                        <div class="option-content">
+                            <div class="option-title">Software</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do Suporte</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="node-option">
+                        <div class="option-number">3</div>
+                        <div class="option-content">
+                            <div class="option-title">Acesso / Permissões</div>
+                            <div class="option-link">
+                                <span class="link-arrow">→</span>
+                                <span>Entra fila do Suporte</span>
+                                <span class="queue-badge">FILA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p style="font-size: 13px; color: #666; margin-left: 16px;">
+                    💡 Você só cria isso se quiser dar mais opções ao setor Suporte. Se não criar, cliente vai direto para fila.
+                </p>
+            </div>
+        </div>
+
+        <!-- Management Panel -->
+        <div class="panel">
+            <div class="panel-title">📋 Gerenciar Fluxos</div>
+
+            <div class="flow-item">
+                <div class="flow-info">
+                    <div class="flow-name">Fluxo Principal: Boas-vindas</div>
+                    <div class="flow-desc">Categorizador inicial - Acionado em nova conversa</div>
+                    <span class="flow-type">Principal</span>
+                    <span class="status-active">Ativo</span>
+                </div>
+                <div class="flow-actions">
+                    <button class="btn-small btn-edit">Editar</button>
+                    <button class="btn-small btn-toggle">Desativar</button>
+                </div>
+            </div>
+
+            <div class="flow-item">
+                <div class="flow-info">
+                    <div class="flow-name">Fluxo Comercial: Opções</div>
+                    <div class="flow-desc">Subfluxo acionado se cliente escolhe Comercial (opção 2)</div>
+                    <span class="flow-type secondary">Secundário</span>
+                    <span class="status-active">Ativo</span>
+                </div>
+                <div class="flow-actions">
+                    <button class="btn-small btn-edit">Editar</button>
+                    <button class="btn-small btn-toggle">Desativar</button>
+                </div>
+            </div>
+
+            <div class="flow-item">
+                <div class="flow-info">
+                    <div class="flow-name">Fluxo Suporte: Categorias</div>
+                    <div class="flow-desc">Subfluxo acionado se cliente escolhe Suporte Técnico (opção 1)</div>
+                    <span class="flow-type secondary">Secundário</span>
+                    <span class="status-inactive">Inativo</span>
+                </div>
+                <div class="flow-actions">
+                    <button class="btn-small btn-edit">Editar</button>
+                    <button class="btn-small btn-toggle">Ativar</button>
+                </div>
+            </div>
+
+            <div class="flow-item">
+                <div class="flow-info">
+                    <div class="flow-name">Fluxo Admin: Solicitações</div>
+                    <div class="flow-desc">Subfluxo acionado se cliente escolhe Administrativo (opção 3)</div>
+                    <span class="flow-type secondary">Secundário</span>
+                    <span class="status-inactive">Inativo</span>
+                </div>
+                <div class="flow-actions">
+                    <button class="btn-small btn-edit">Editar</button>
+                    <button class="btn-small btn-toggle">Ativar</button>
+                </div>
+            </div>
+
+            <button style="margin-top: 20px; padding: 10px 16px; background: #46b575; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">+ Criar Novo Fluxo</button>
+        </div>
+
+        <div class="info-box">
+            <h3>✅ Como Funciona</h3>
+            <ul>
+                <li><strong>Fluxo Principal:</strong> Sempre ativado em nova conversa. Categoriza o cliente.</li>
+                <li><strong>Subfluxos:</strong> Ativados baseado na opção escolhida no fluxo anterior.</li>
+                <li><strong>Múltiplos Fluxos:</strong> Você pode ter vários subfluxos inativos, ativa quando precisar.</li>
+                <li><strong>Contexto:</strong> Sistema mantém histórico de qual fluxo/setor o cliente veio. Agente vê tudo.</li>
+                <li><strong>Simples:</strong> Admin cria, ativa/desativa, edita. Sistema gerencia automaticamente.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

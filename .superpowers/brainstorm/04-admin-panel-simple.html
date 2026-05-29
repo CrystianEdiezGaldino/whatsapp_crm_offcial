@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Criar Fluxo Simples</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #001769; margin-bottom: 30px; text-align: center; font-size: 28px; }
+
+        .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #001769 0%, #142c8e 100%);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+        }
+
+        .panel-body { padding: 24px; }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #001769;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input, .textarea, .select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .input:focus, .textarea:focus, .select:focus {
+            outline: none;
+            border-color: #142c8e;
+            box-shadow: 0 0 0 3px rgba(20, 44, 142, 0.1);
+        }
+
+        .textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .button-primary {
+            background: #46b575;
+            color: white;
+        }
+
+        .button-primary:hover {
+            background: #2e8b57;
+            box-shadow: 0 4px 8px rgba(70, 181, 117, 0.3);
+        }
+
+        .button-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .button-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .option-block {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .option-title {
+            font-weight: 600;
+            color: #001769;
+        }
+
+        .remove-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .preview-header {
+            background: #f0fdf4;
+            border-left: 4px solid #46b575;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .preview-header h3 { color: #2e8b57; margin-bottom: 12px; }
+
+        .preview-message {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .preview-message.user {
+            background: #e3f2fd;
+            border-color: #90caf9;
+            text-align: right;
+            margin-left: 40px;
+        }
+
+        .preview-message.bot {
+            background: #f0fdf4;
+            border-color: #86efac;
+            margin-right: 40px;
+        }
+
+        .option-list {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .option-number {
+            background: #142c8e;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #555;
+            margin-top: 20px;
+        }
+
+        .divider { border-top: 1px solid #eee; margin: 20px 0; }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .button-group .button {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Criar Fluxo de Boas-vindas 🤖</h1>
+
+        <div class="layout">
+            <!-- Left: Form -->
+            <div class="panel">
+                <div class="panel-header">⚙️ Configuração do Fluxo</div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label class="label">📝 Nome do Fluxo</label>
+                        <input type="text" class="input" placeholder="Ex: Fluxo Boas-vindas" value="Fluxo Boas-vindas">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">🎯 Quando Ativar?</label>
+                        <select class="select">
+                            <option selected>Quando nova conversa chegar</option>
+                            <option>Quando cliente digitar comando (/menu)</option>
+                            <option>Manualmente (só admin dispara)</option>
+                        </select>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label class="label">1️⃣ Mensagem Inicial</label>
+                        <textarea class="textarea" placeholder="Digite a mensagem de boas-vindas...">Olá! 👋 Bem-vindo ao SisChat.
+Como posso ajudar você hoje?</textarea>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label class="label">2️⃣ Opções de Menu</label>
+                        <div id="optionsContainer">
+                            <div class="option-block">
+                                <div class="option-header">
+                                    <span class="option-title">Opção 1</span>
+                                    <button class="remove-btn">Remover</button>
+                                </div>
+                                <input type="text" class="input" placeholder="Ex: Suporte Técnico" value="Suporte Técnico" style="margin-bottom: 8px;">
+                                <input type="text" class="input" placeholder="Ação (ex: atribuir tag 'suporte')" value="Tag: suporte_tecnico">
+                            </div>
+
+                            <div class="option-block">
+                                <div class="option-header">
+                                    <span class="option-title">Opção 2</span>
+                                    <button class="remove-btn">Remover</button>
+                                </div>
+                                <input type="text" class="input" placeholder="Ex: Administrativo" value="Administrativo" style="margin-bottom: 8px;">
+                                <input type="text" class="input" placeholder="Ação (ex: atribuir tag 'admin')" value="Tag: administrativo">
+                            </div>
+
+                            <div class="option-block">
+                                <div class="option-header">
+                                    <span class="option-title">Opção 3</span>
+                                    <button class="remove-btn">Remover</button>
+                                </div>
+                                <input type="text" class="input" placeholder="Ex: Outro" value="Outro" style="margin-bottom: 8px;">
+                                <input type="text" class="input" placeholder="Ação (ex: atribuir tag 'outro')" value="Tag: outro">
+                            </div>
+                        </div>
+
+                        <button class="button button-secondary" style="width: 100%; margin-top: 12px;">+ Adicionar Opção</button>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="form-group">
+                        <label class="label">3️⃣ Mensagem Após Escolha</label>
+                        <textarea class="textarea" placeholder="Mensagem de confirmação...">Ótimo! Um agente irá ajudá-lo em breve. ⏳</textarea>
+                    </div>
+
+                    <div class="info-box">
+                        ℹ️ Após a escolha, a conversa entra automaticamente na fila para um agente atender.
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button button-secondary">Cancelar</button>
+                        <button class="button button-primary">✓ Salvar e Ativar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Preview -->
+            <div class="panel">
+                <div class="panel-header">👁️ Visualizar Fluxo</div>
+                <div class="panel-body">
+                    <div class="preview-header">
+                        <h3>Como o cliente verá:</h3>
+                        <p style="font-size: 12px; color: #666;">Simulação de conversa</p>
+                    </div>
+
+                    <div class="preview-message bot">
+                        🤖 Bot: Olá! 👋 Bem-vindo ao SisChat.
+                        Como posso ajudar você hoje?
+                    </div>
+
+                    <div class="option-list">
+                        <div class="option-item">
+                            <div class="option-number">1</div>
+                            <span>Suporte Técnico</span>
+                        </div>
+                        <div class="option-item">
+                            <div class="option-number">2</div>
+                            <span>Administrativo</span>
+                        </div>
+                        <div class="option-item">
+                            <div class="option-number">3</div>
+                            <span>Outro</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: #f9f9f9; border-radius: 6px; font-size: 12px; color: #666;">
+                        <strong>Exemplo:</strong> Cliente digita "1"
+                    </div>
+
+                    <div class="preview-message user" style="margin-top: 12px;">
+                        Cliente: 1
+                    </div>
+
+                    <div class="preview-message bot" style="margin-top: 12px;">
+                        🤖 Bot: Ótimo! Um agente irá ajudá-lo em breve. ⏳
+                    </div>
+
+                    <div style="margin-top: 16px; padding: 12px; background: #e8f5e9; border-radius: 6px; border-left: 4px solid #46b575; font-size: 12px;">
+                        <strong>✓ Conversa entra na fila</strong>
+                        <p style="margin-top: 4px; color: #666;">Agente verá: "Cliente escolheu: Suporte Técnico"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
