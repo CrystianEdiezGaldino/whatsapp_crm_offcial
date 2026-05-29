@@ -1,18 +1,45 @@
 # Flow Builder - Code Quality & Refactoring Recommendations
 
-## Status: CRITICAL BUG FIXED ✅
+## Status: CRITICAL BUGS FIXED ✅
 
-**What was reported:** Conversation 25 was assigned to an agent without passing through the flow filter.
+### Bug 1: Conversation 25 (Earlier Report)
+**Root cause:** Conversation 25 was created on 2026-05-28 17:16:02, but flows were created on 2026-05-29. Since the conversation existed before flows were set up, it never passed through the filter.
 
-**Root cause identified:** Conversation 25 was created on 2026-05-28 17:16:02, but flows were created on 2026-05-29. Since the conversation existed before flows were set up, it never passed through the flow filter.
+### Bug 2: Conversation 24 (Current Issue) 🔧 FIXED
+**What was reported:** Conversation 24 was assigned to agent Cheila without passing through flow. Customer sent 3 messages but bot never responded.
+
+**Root cause identified:** 
+- Conversation 24 created: 2026-05-28 17:15:50
+- Fluxo criado: 2026-05-29 17:20:53
+- When first message arrived, conversation was created but **fluxo didn't exist yet**
+- DistributionService assigned immediately to Cheila, status changed to `in_attendance`
+- When messages arrived on 2026-05-29 (after flow was created), flow logic only checked `status === 'new'`
+- Since status was already `in_attendance`, flow was never executed
+
+**Fix implemented:**
+Modified WhatsAppService to execute flow if **either**:
+1. Conversation status is `new`, **OR**
+2. Conversation never had a flow execution (even if `in_attendance`)
+
+This allows retroactive application of flows to existing conversations.
+
+**Code change:**
+```php
+// Before: only checks status === 'new'
+if ($conversation->status === 'new') { ... }
+
+// After: also checks if never had flow execution
+$hasFlowExecution = FlowExecution::where('conversation_id', $conversation->id)->exists();
+if ($conversation->status === 'new' || !$hasFlowExecution) { ... }
+```
 
 **Verification:** Database checks confirm:
 - ✅ 2 flows successfully created and stored in database
 - ✅ Active on_new_conversation flow found with 2 menu nodes
-- ✅ Flow integration working in WhatsAppService (lines 531-541)
-- ✅ New conversations will be properly filtered through active flows
+- ✅ Flow integration fixed to handle existing conversations
+- ✅ New messages on existing conversations will now trigger flow if never executed
 
-**Error handling added:** Controllers now have try-catch blocks with comprehensive logging to catch future issues.
+**Error handling added:** Controllers have try-catch blocks with comprehensive logging.
 
 ---
 
