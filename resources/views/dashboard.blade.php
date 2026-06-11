@@ -3,22 +3,11 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(225, 227, 232, 0.6);
-    }
-    .glass-card:hover {
-        transform: translateY(-4px);
-        transition: all 0.3s ease-out;
-    }
-</style>
 
 <!-- Top Bar -->
 <header class="flex justify-between items-center h-16 px-8 w-full sticky top-0 z-40 bg-surface border-b border-surface-container-highest">
     <div class="flex items-center gap-8">
-        <h2 class="text-xl font-bold text-primary font-headline">SisChat Dashboard</h2>
+        <h2 class="text-xl font-bold text-primary font-headline">SisZap Dashboard</h2>
         <div class="relative">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
             <input class="pl-10 pr-4 py-2 bg-surface-container border-none rounded-xl focus:ring-2 focus:ring-primary-container transition-all text-sm w-80" placeholder="Buscar chats ou agentes..." type="text">
@@ -47,7 +36,7 @@
 <!-- Dashboard Body -->
 <div class="p-8 overflow-y-auto custom-scrollbar flex-1 space-y-8 max-w-[1600px]">
     <!-- Filtros -->
-    <div class="glass-card rounded-xl p-6 shadow-sm">
+    <div class="card-nm rounded-xl p-6">
         <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <input type="date" id="startDate" name="start_date" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Data inicial">
             <input type="date" id="endDate" name="end_date" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Data final">
@@ -66,7 +55,7 @@
     <!-- Metrics KPIs Bento Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Card 1: Total Mensagens -->
-        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-primary-fixed text-primary rounded-xl">
                     <span class="material-symbols-outlined">forum</span>
@@ -81,7 +70,7 @@
         </div>
 
         <!-- Card 2: Tempo Médio Resposta -->
-        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-secondary-fixed text-secondary rounded-xl">
                     <span class="material-symbols-outlined">schedule</span>
@@ -100,7 +89,7 @@
         </div>
 
         <!-- Card 3: Chats Abertos -->
-        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-tertiary-fixed-dim text-on-tertiary-fixed-variant rounded-xl">
                     <span class="material-symbols-outlined">chat</span>
@@ -118,7 +107,7 @@
         </div>
 
         <!-- Card 4: Taxa de Satisfação -->
-        <div class="glass-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-surface-container-highest text-on-surface-variant rounded-xl">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -140,7 +129,7 @@
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Message Volume Chart -->
-        <div class="lg:col-span-2 glass-card rounded-xl p-8 shadow-sm">
+        <div class="lg:col-span-2 card-nm rounded-xl p-8 shadow-sm">
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h3 class="font-headline-md text-headline-md">Volume de Mensagens</h3>
@@ -158,7 +147,7 @@
         </div>
 
         <!-- Channel Distribution -->
-        <div class="glass-card rounded-xl p-8 shadow-sm">
+        <div class="card-nm rounded-xl p-8 shadow-sm">
             <h3 class="font-headline-md text-headline-md mb-8">Distribuição por Canal</h3>
             <div class="space-y-6">
                 <div class="space-y-2">
@@ -197,7 +186,7 @@
     <!-- Bottom Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Chart 3: Inbound vs Outbound -->
-        <div class="glass-card rounded-xl p-8 shadow-sm">
+        <div class="card-nm rounded-xl p-8 shadow-sm">
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h3 class="font-headline-md text-headline-md">Fluxo de Mensagens</h3>
@@ -210,7 +199,7 @@
         </div>
 
         <!-- Chart 4: Atividade por Agente -->
-        <div class="glass-card rounded-xl p-8 shadow-sm">
+        <div class="card-nm rounded-xl p-8 shadow-sm">
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h3 class="font-headline-md text-headline-md">Atividade por Agente</h3>
@@ -224,7 +213,7 @@
     </div>
 
     <!-- Top Contatos -->
-    <div class="glass-card rounded-xl shadow-sm overflow-hidden">
+    <div class="card-nm rounded-xl shadow-sm overflow-hidden">
         <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
             <div>
                 <h3 class="font-headline-md text-headline-md">Top 10 Contatos</h3>
@@ -254,7 +243,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <!-- My Chats -->
-        <div class="lg:col-span-2 glass-card rounded-xl shadow-sm flex flex-col overflow-hidden">
+        <div class="lg:col-span-2 card-nm rounded-xl shadow-sm flex flex-col overflow-hidden">
             <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
                 <div>
                     <h3 class="font-headline-md text-headline-md">Meus Atendimentos</h3>
@@ -314,7 +303,7 @@
         </div>
 
         <!-- Online Agents -->
-        <div class="glass-card rounded-xl shadow-sm flex flex-col overflow-hidden">
+        <div class="card-nm rounded-xl shadow-sm flex flex-col overflow-hidden">
             <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
                 <div>
                     <h3 class="font-headline-md text-headline-md">Agentes Online</h3>
@@ -344,7 +333,7 @@
         </div>
 
         <!-- Pending Chats -->
-        <div class="lg:col-span-3 glass-card rounded-xl shadow-sm flex flex-col overflow-hidden">
+        <div class="lg:col-span-3 card-nm rounded-xl shadow-sm flex flex-col overflow-hidden">
             <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
                 <div>
                     <h3 class="font-headline-md text-headline-md">Atendimentos Pendentes</h3>

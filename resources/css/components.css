@@ -121,3 +121,270 @@ select:disabled {
   visibility: visible;
   opacity: 1;
 }
+
+/* ===== NEUMORPHISM DESIGN SYSTEM ===== */
+
+/* Neumorphic Cards */
+.card-neumorphic {
+  background: rgb(255, 255, 255);
+  border-radius: 20px;
+  padding: 20px;
+  border: none;
+  box-shadow: rgb(196, 200, 212) 6px 6px 16px, rgb(255, 255, 255) -2px -2px 8px;
+  transition: all 0.3s ease-in-out;
+}
+
+.card-neumorphic:hover {
+  box-shadow: rgb(196, 200, 212) 8px 8px 20px, rgb(255, 255, 255) -3px -3px 10px;
+  transform: translateY(-2px);
+}
+
+/* Neumorphic Buttons - Primary (Green) */
+.btn-neumorphic-primary {
+  height: 42px;
+  padding: 0px 20px;
+  border-radius: 14px;
+  background: rgb(29, 168, 90);
+  color: rgb(255, 255, 255);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+  border: none;
+  box-shadow: rgba(29, 168, 90, 0.35) 4px 4px 10px, rgb(255, 255, 255) -3px -3px 8px;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-neumorphic-primary:hover {
+  background: rgb(24, 148, 76);
+  box-shadow: rgba(24, 148, 76, 0.35) 6px 6px 12px, rgb(255, 255, 255) -3px -3px 8px;
+  transform: translateY(-2px);
+}
+
+.btn-neumorphic-primary:active {
+  box-shadow: rgba(29, 168, 90, 0.25) 2px 2px 6px inset, rgb(255, 255, 255) -1px -1px 3px inset;
+  transform: translateY(0);
+}
+
+.btn-neumorphic-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Neumorphic Buttons - Secondary */
+.btn-neumorphic-secondary {
+  height: 42px;
+  padding: 0px 20px;
+  border-radius: 14px;
+  background: rgb(240, 242, 247);
+  color: rgb(80, 90, 110);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+  border: none;
+  box-shadow: rgb(196, 200, 212) 3px 3px 8px, rgb(255, 255, 255) -2px -2px 6px;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-neumorphic-secondary:hover {
+  background: rgb(245, 247, 252);
+  box-shadow: rgb(196, 200, 212) 4px 4px 10px, rgb(255, 255, 255) -2px -2px 6px;
+  transform: translateY(-2px);
+}
+
+.btn-neumorphic-secondary:active {
+  box-shadow: rgb(196, 200, 212) 1px 1px 4px inset, rgb(255, 255, 255) -1px -1px 3px inset;
+  transform: translateY(0);
+}
+
+/* Neumorphic Input Fields */
+.input-neumorphic {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 14px;
+  background: rgb(255, 255, 255);
+  color: rgb(50, 55, 70);
+  font-size: 14px;
+  font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  transition: all 0.2s ease-in-out;
+}
+
+.input-neumorphic:focus {
+  outline: none;
+  box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+}
+
+/* Neumorphic Textarea */
+.textarea-neumorphic {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 14px;
+  background: rgb(255, 255, 255);
+  color: rgb(50, 55, 70);
+  font-size: 14px;
+  font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  transition: all 0.2s ease-in-out;
+  resize: vertical;
+}
+
+.textarea-neumorphic:focus {
+  outline: none;
+  box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+}
+
+/* Neumorphic Select */
+.select-neumorphic {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 14px;
+  background: rgb(255, 255, 255);
+  color: rgb(50, 55, 70);
+  font-size: 14px;
+  font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(80,90,110)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+.select-neumorphic:focus {
+  outline: none;
+  box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+}
+
+/* Neumorphic Option Block (for grouped options) */
+.option-block-neumorphic {
+  background: rgb(245, 247, 252);
+  border-radius: 16px;
+  padding: 16px;
+  border: none;
+  box-shadow: rgb(196, 200, 212) 4px 4px 12px, rgb(255, 255, 255) -2px -2px 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.option-block-neumorphic:hover {
+  box-shadow: rgb(196, 200, 212) 5px 5px 14px, rgb(255, 255, 255) -2px -2px 6px;
+  transform: translateY(-1px);
+}
+
+/* Neumorphic Alert Box */
+.alert-neumorphic {
+  border-radius: 16px;
+  padding: 16px;
+  border: none;
+  box-shadow: rgb(196, 200, 212) 4px 4px 12px, rgb(255, 255, 255) -2px -2px 6px;
+}
+
+.alert-neumorphic.success {
+  background: rgb(220, 245, 235);
+  color: rgb(15, 110, 70);
+}
+
+.alert-neumorphic.error {
+  background: rgb(255, 235, 238);
+  color: rgb(160, 20, 30);
+}
+
+/* Tailwind Utility Overrides */
+@layer components {
+  .btn-nm-primary {
+    @apply h-[42px] px-5 rounded-[14px] bg-[#1DA85A] text-white text-sm font-bold cursor-pointer font-sans;
+    box-shadow: rgba(29, 168, 90, 0.35) 4px 4px 10px, rgb(255, 255, 255) -3px -3px 8px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-nm-primary:hover {
+    background: rgb(24, 148, 76);
+    box-shadow: rgba(24, 148, 76, 0.35) 6px 6px 12px, rgb(255, 255, 255) -3px -3px 8px;
+    transform: translateY(-2px);
+  }
+
+  .btn-nm-primary:active {
+    box-shadow: rgba(29, 168, 90, 0.25) 2px 2px 6px inset, rgb(255, 255, 255) -1px -1px 3px inset;
+    transform: translateY(0);
+  }
+
+  .btn-nm-secondary {
+    @apply h-[42px] px-5 rounded-[14px] bg-[#F0F2F7] text-[#505A6E] text-sm font-bold cursor-pointer font-sans;
+    box-shadow: rgb(196, 200, 212) 3px 3px 8px, rgb(255, 255, 255) -2px -2px 6px;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-nm-secondary:hover {
+    background: rgb(245, 247, 252);
+    box-shadow: rgb(196, 200, 212) 4px 4px 10px, rgb(255, 255, 255) -2px -2px 6px;
+    transform: translateY(-2px);
+  }
+
+  .card-nm {
+    @apply bg-white rounded-[20px] p-5;
+    box-shadow: rgb(196, 200, 212) 6px 6px 16px, rgb(255, 255, 255) -2px -2px 8px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .card-nm:hover {
+    box-shadow: rgb(196, 200, 212) 8px 8px 20px, rgb(255, 255, 255) -3px -3px 10px;
+    transform: translateY(-2px);
+  }
+
+  .input-nm {
+    @apply w-full px-4 py-3 rounded-[14px] bg-white text-[#323746] text-sm font-sans;
+    box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    transition: all 0.2s ease-in-out;
+    border: none;
+  }
+
+  .input-nm:focus {
+    outline: none;
+    box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  }
+
+  .textarea-nm {
+    @apply w-full px-4 py-3 rounded-[14px] bg-white text-[#323746] text-sm font-sans;
+    box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    resize: vertical;
+  }
+
+  .textarea-nm:focus {
+    outline: none;
+    box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  }
+
+  .select-nm {
+    @apply w-full px-4 py-3 rounded-[14px] bg-white text-[#323746] text-sm font-sans cursor-pointer;
+    box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(80,90,110)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+  }
+
+  .select-nm:focus {
+    outline: none;
+    box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  }
+}
