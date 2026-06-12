@@ -13,12 +13,12 @@
 
 @php
     $value = $value ?? old($name);
-    $borderClass = $error ? 'border-error' : 'border-outline-variant';
+    $borderClass = $error ? 'border-error' : 'border-gray-200';
 @endphp
 
 <div class="space-y-2">
     @if($label)
-        <label class="block text-xs font-semibold text-on-surface-variant uppercase">
+        <label class="block text-xs font-semibold text-gray-600 uppercase">
             {{ $label }}
             @if($required)
                 <span class="text-error">*</span>
@@ -43,7 +43,7 @@
         @endif
 
         @if($maxlength)
-            <span class="text-xs text-on-surface-variant" id="char-count-{{ $name }}">
+            <span class="text-xs text-gray-600" id="char-count-{{ $name }}">
                 <span id="current-{{ $name }}">{{ strlen($value) }}</span> / {{ $maxlength }}
             </span>
         @endif

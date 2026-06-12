@@ -23,9 +23,9 @@
     @endif
 
     @if($numbers->isEmpty())
-    <div class="bg-surface-container p-8 rounded-lg text-center">
-        <span class="material-symbols-outlined text-5xl text-on-surface-variant mb-4 block">phone</span>
-        <p class="text-on-surface-variant text-lg">Nenhum número cadastrado ainda</p>
+    <div class="bg-gray-100 p-8 rounded-lg text-center">
+        <span class="material-symbols-outlined text-5xl text-gray-600 mb-4 block">phone</span>
+        <p class="text-gray-600 text-lg">Nenhum número cadastrado ainda</p>
         <a href="{{ route('admin.whatsapp.numbers.create') }}" class="mt-4 inline-block bg-primary text-on-primary px-4 py-2 rounded-lg font-semibold">
             Adicionar Primeiro Número
         </a>
@@ -33,7 +33,7 @@
     @else
     <div class="space-y-4">
         @foreach($numbers as $number)
-        <div class="bg-white border border-outline-variant rounded-lg p-6 flex items-center justify-between">
+        <div class="bg-white border border-gray-200 rounded-lg p-6 flex items-center justify-between">
             <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
                     <h3 class="text-lg font-bold text-on-surface">{{ $number->display_name }}</h3>
@@ -52,11 +52,11 @@
                     </span>
                     @endif
                 </div>
-                <p class="text-sm text-on-surface-variant mb-2">
+                <p class="text-sm text-gray-600 mb-2">
                     <span class="font-semibold">Número:</span> {{ $number->phone_number }}
                 </p>
                 @if($number->business_account_id)
-                <p class="text-xs text-on-surface-variant">
+                <p class="text-xs text-gray-600">
                     <span class="font-semibold">ID Conta:</span> {{ $number->business_account_id }}
                 </p>
                 @endif
@@ -91,17 +91,17 @@
     <div id="syncMetaModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
             <h3 class="text-lg font-bold text-on-surface mb-4">Importar Números da Meta</h3>
-            <p class="text-sm text-on-surface-variant mb-6">Cole seu access token da Meta e nós buscaremos automaticamente todos os números cadastrados</p>
+            <p class="text-sm text-gray-600 mb-6">Cole seu access token da Meta e nós buscaremos automaticamente todos os números cadastrados</p>
 
             <form id="syncMetaForm" class="space-y-4">
                 @csrf
                 <div>
                     <label class="text-sm font-semibold text-on-surface block mb-2">Access Token *</label>
-                    <textarea name="access_token" required class="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info font-mono text-xs" rows="3" placeholder="Cole seu access token da Meta"></textarea>
+                    <textarea name="access_token" required class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info font-mono text-xs" rows="3" placeholder="Cole seu access token da Meta"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4">
-                    <button type="button" onclick="closeSyncModal()" class="px-4 py-2 border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors">
+                    <button type="button" onclick="closeSyncModal()" class="px-4 py-2 border border-gray-200 rounded-lg text-on-surface hover:bg-gray-100 transition-colors">
                         Cancelar
                     </button>
                     <button type="submit" class="px-4 py-2 bg-info text-on-info rounded-lg font-semibold hover:opacity-90 transition-all flex items-center gap-2">

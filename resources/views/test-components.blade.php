@@ -10,7 +10,7 @@
         <!-- Button Component Tests -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Button Component</h2>
-            <div class="space-y-4 p-6 bg-surface-container rounded-lg">
+            <div class="space-y-4 p-6 bg-gray-100 rounded-lg">
                 <div class="flex gap-3 flex-wrap">
                     <x-button variant="primary">Primary Button</x-button>
                     <x-button variant="secondary">Secondary Button</x-button>
@@ -27,7 +27,7 @@
         <!-- Input Component Tests -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Input Component</h2>
-            <div class="space-y-4 p-6 bg-surface-container rounded-lg">
+            <div class="space-y-4 p-6 bg-gray-100 rounded-lg">
                 <x-input
                     name="test_input"
                     type="text"
@@ -54,7 +54,7 @@
         <!-- Select Component Tests -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Select Component</h2>
-            <div class="space-y-4 p-6 bg-surface-container rounded-lg">
+            <div class="space-y-4 p-6 bg-gray-100 rounded-lg">
                 <x-select
                     name="category"
                     label="Choose Category"
@@ -73,7 +73,7 @@
         <!-- Textarea Component Tests -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Textarea Component</h2>
-            <div class="space-y-4 p-6 bg-surface-container rounded-lg">
+            <div class="space-y-4 p-6 bg-gray-100 rounded-lg">
                 <x-textarea
                     name="message"
                     label="Message"
@@ -99,7 +99,7 @@
         <!-- Checkbox Component Tests -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Checkbox Component</h2>
-            <div class="space-y-4 p-6 bg-surface-container rounded-lg">
+            <div class="space-y-4 p-6 bg-gray-100 rounded-lg">
                 <x-checkbox
                     name="terms"
                     value="1"
@@ -123,7 +123,7 @@
         <!-- Form Test -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Complete Form Test</h2>
-            <form method="POST" class="p-6 bg-surface-container rounded-lg space-y-4">
+            <form method="POST" class="p-6 bg-gray-100 rounded-lg space-y-4">
                 @csrf
 
                 <x-input
@@ -175,26 +175,26 @@
         <!-- Component Props Reference -->
         <div class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-4">Props Reference</h2>
-            <div class="space-y-4 p-6 bg-surface-container rounded-lg">
+            <div class="space-y-4 p-6 bg-gray-100 rounded-lg">
                 <div>
                     <h3 class="font-bold text-on-surface mb-2">Button Props:</h3>
-                    <p class="text-sm text-on-surface-variant">type, variant (primary|secondary|danger|text), disabled, href, class</p>
+                    <p class="text-sm text-gray-600">type, variant (primary|secondary|danger|text), disabled, href, class</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-on-surface mb-2">Input Props:</h3>
-                    <p class="text-sm text-on-surface-variant">name, type, label, placeholder, value, error, required, class</p>
+                    <p class="text-sm text-gray-600">name, type, label, placeholder, value, error, required, class</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-on-surface mb-2">Select Props:</h3>
-                    <p class="text-sm text-on-surface-variant">name, label, options (array), value, error, required, class</p>
+                    <p class="text-sm text-gray-600">name, label, options (array), value, error, required, class</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-on-surface mb-2">Textarea Props:</h3>
-                    <p class="text-sm text-on-surface-variant">name, label, placeholder, value, rows, error, maxlength, required, class</p>
+                    <p class="text-sm text-gray-600">name, label, placeholder, value, rows, error, maxlength, required, class</p>
                 </div>
                 <div>
                     <h3 class="font-bold text-on-surface mb-2">Checkbox Props:</h3>
-                    <p class="text-sm text-on-surface-variant">name, type (checkbox|radio), value, label, checked, class</p>
+                    <p class="text-sm text-gray-600">name, type (checkbox|radio), value, label, checked, class</p>
                 </div>
             </div>
         </div>

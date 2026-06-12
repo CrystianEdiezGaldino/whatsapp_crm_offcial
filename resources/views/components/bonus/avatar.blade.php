@@ -26,9 +26,9 @@
 
 <div class="relative inline-flex {{ $class }}">
     @if($src)
-        <img src="{{ $src }}" alt="{{ $name ?? 'Avatar' }}" class="{{ $sizeClasses }} rounded-full object-cover border-2 border-outline-variant" @if($name) title="{{ $name }}" @endif>
+        <img src="{{ $src }}" alt="{{ $name ?? 'Avatar' }}" class="{{ $sizeClasses }} rounded-full object-cover border-2 border-gray-200" @if($name) title="{{ $name }}" @endif>
     @else
-        <div class="{{ $sizeClasses }} rounded-full bg-secondary text-on-secondary flex items-center justify-center font-semibold border-2 border-outline-variant">
+        <div class="{{ $sizeClasses }} rounded-full bg-secondary text-on-secondary flex items-center justify-center font-semibold border-2 border-gray-200">
             {{ substr($name ?? 'U', 0, 1) }}
         </div>
     @endif

@@ -24,7 +24,7 @@
             </button>
             <x-layout.modal id="testModal" title="Modal Title">
                 <p class="text-on-surface mb-4">This is the modal content. Click the close button or the dark background to dismiss.</p>
-                <p class="text-on-surface-variant text-sm">Modals are great for capturing user attention for important tasks or confirmations.</p>
+                <p class="text-gray-600 text-sm">Modals are great for capturing user attention for important tasks or confirmations.</p>
             </x-layout.modal>
         </div>
 
@@ -141,27 +141,27 @@
             <h3 class="text-xl font-semibold text-on-surface mb-4">10. Spinner Component (x-spinner)</h3>
             <div class="flex gap-8 items-start">
                 <div>
-                    <p class="text-on-surface-variant text-sm mb-2">Small</p>
+                    <p class="text-gray-600 text-sm mb-2">Small</p>
                     <x-feedback.spinner size="sm" />
                 </div>
                 <div>
-                    <p class="text-on-surface-variant text-sm mb-2">Medium</p>
+                    <p class="text-gray-600 text-sm mb-2">Medium</p>
                     <x-feedback.spinner size="md" text="Loading..." />
                 </div>
                 <div>
-                    <p class="text-on-surface-variant text-sm mb-2">Large</p>
+                    <p class="text-gray-600 text-sm mb-2">Large</p>
                     <x-feedback.spinner size="lg" color="success" />
                 </div>
                 <div>
-                    <p class="text-on-surface-variant text-sm mb-2">Extra Large</p>
+                    <p class="text-gray-600 text-sm mb-2">Extra Large</p>
                     <x-feedback.spinner size="xl" color="warning" />
                 </div>
             </div>
         </div>
     </section>
 
-    <div class="mt-12 p-4 bg-surface-container rounded-lg">
-        <p class="text-on-surface-variant">All 10 Phase 3 components are displayed above. Test interactive features like modals, tabs, accordions, and dismissible alerts.</p>
+    <div class="mt-12 p-4 bg-gray-100 rounded-lg">
+        <p class="text-gray-600">All 10 Phase 3 components are displayed above. Test interactive features like modals, tabs, accordions, and dismissible alerts.</p>
     </div>
 </div>
 @endsection

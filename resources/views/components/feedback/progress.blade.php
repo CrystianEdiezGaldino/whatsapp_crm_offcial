@@ -22,11 +22,11 @@
         <div class="flex justify-between items-center mb-2">
             <label class="text-sm font-semibold text-on-surface">{{ $label }}</label>
             @if($showPercent)
-                <span class="text-xs text-on-surface-variant">{{ $value }}%</span>
+                <span class="text-xs text-gray-600">{{ $value }}%</span>
             @endif
         </div>
     @endif
-    <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+    <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
         <div class="{{ $bgColor }} h-full transition-all duration-300 rounded-full" style="width: {{ $value }}%"></div>
     </div>
 </div>

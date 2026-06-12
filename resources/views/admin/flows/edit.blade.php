@@ -204,10 +204,13 @@ function removeOption(btn) {
             'setor': 'Setor de atendimento'
         };
 
+        const varOpen = '{' + '{';
+        const varClose = '}' + '}';
+
         Object.entries(variables).forEach(([key, description]) => {
             const item = document.createElement('div');
             item.className = 'variable-item px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm';
-            item.innerHTML = `<strong>{{${key}}}</strong> - ${description}`;
+            item.innerHTML = '<strong>' + varOpen + key + varClose + '</strong> - ' + description;
             item.addEventListener('click', () => insertVariableAtButton(key, button));
             dropdown.appendChild(item);
         });
@@ -228,6 +231,9 @@ function removeOption(btn) {
     }
 
     function insertVariableAtButton(varName, button) {
+        const varOpen = '{' + '{';
+        const varClose = '}' + '}';
+
         // Find the closest textarea
         const textarea = button.closest('.relative').querySelector('textarea');
         if (!textarea) return;
@@ -238,7 +244,7 @@ function removeOption(btn) {
 
         const before = text.substring(0, start);
         const after = text.substring(end);
-        const newText = before + `{{${varName}}}` + after;
+        const newText = before + varOpen + varName + varClose + after;
 
         textarea.value = newText;
         textarea.selectionStart = textarea.selectionEnd = start + varName.length + 4;

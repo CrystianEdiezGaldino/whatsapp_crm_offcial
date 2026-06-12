@@ -9,14 +9,14 @@
                 <span>Back to Components</span>
             </a>
             <h1 class="text-4xl font-bold text-on-surface mb-4">spinner.Value.ToUpper()pinner Component</h1>
-            <p class="text-lg text-on-surface-variant">Loading spinner</p>
+            <p class="text-lg text-gray-600">Loading spinner</p>
         </div>
 
         <section class="mb-12">
             <h2 class="text-2xl font-bold text-on-surface mb-6">Documentation</h2>
             <x-card>
-                <p class="text-on-surface-variant">Detailed documentation for the spinner component coming soon.</p>
-                <div class="mt-6 pt-6 border-t border-outline-variant">
+                <p class="text-gray-600">Detailed documentation for the spinner component coming soon.</p>
+                <div class="mt-6 pt-6 border-t border-gray-200">
                     <x-button href="{{ route('documentation.index') }}" variant="secondary">
                         Back to All Components
                     </x-button>

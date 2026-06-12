@@ -9,7 +9,7 @@
                 <span>Back to Components</span>
             </a>
             <h1 class="text-4xl font-bold text-on-surface mb-4">Button Component</h1>
-            <p class="text-lg text-on-surface-variant">A versatile button component with multiple variants and states.</p>
+            <p class="text-lg text-gray-600">A versatile button component with multiple variants and states.</p>
         </div>
 
         <section class="mb-12">
@@ -36,7 +36,7 @@
             <x-card>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="border-b border-outline-variant bg-surface-container-low">
+                        <thead class="border-b border-gray-200 bg-gray-100-low">
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Prop</th>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Type</th>
@@ -47,33 +47,33 @@
                         <tbody class="divide-y divide-outline-variant">
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">type</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">'button'</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Button type: button, submit, reset</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">'button'</td>
+                                <td class="px-4 py-3 text-gray-600">Button type: button, submit, reset</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">variant</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">'primary'</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Style variant: primary, secondary, danger, text</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">'primary'</td>
+                                <td class="px-4 py-3 text-gray-600">Style variant: primary, secondary, danger, text</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">disabled</td>
-                                <td class="px-4 py-3 text-on-surface-variant">boolean</td>
-                                <td class="px-4 py-3 text-on-surface-variant">false</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Disable the button</td>
+                                <td class="px-4 py-3 text-gray-600">boolean</td>
+                                <td class="px-4 py-3 text-gray-600">false</td>
+                                <td class="px-4 py-3 text-gray-600">Disable the button</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">href</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">null</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Convert to link element with href</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">null</td>
+                                <td class="px-4 py-3 text-gray-600">Convert to link element with href</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">class</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">''</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Additional CSS classes</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">''</td>
+                                <td class="px-4 py-3 text-gray-600">Additional CSS classes</td>
                             </tr>
                         </tbody>
                     </table>

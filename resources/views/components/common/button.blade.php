@@ -11,7 +11,7 @@
     $baseClasses = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all';
     $variantClasses = match($variant) {
         'primary' => 'bg-secondary text-on-secondary hover:bg-secondary/90 active:scale-95',
-        'secondary' => 'bg-surface-container text-on-surface hover:bg-surface-container/80',
+        'secondary' => 'bg-gray-100 text-on-surface hover:bg-gray-100/80',
         'danger' => 'bg-error text-on-error hover:bg-error/90',
         'text' => 'text-secondary hover:bg-secondary/10',
         default => 'bg-secondary text-on-secondary hover:bg-secondary/90',

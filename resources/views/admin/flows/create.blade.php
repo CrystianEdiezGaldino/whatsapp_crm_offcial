@@ -52,7 +52,7 @@
         <div class="mb-6">
             <label for="initial_message" class="block text-sm font-semibold text-gray-900 mb-2">Mensagem Inicial</label>
             <div class="relative">
-                <textarea id="initial_message" name="config[initial_message]" required class="textarea-nm message-textarea" rows="4" placeholder="Use {{nome}}, {{telefone}}, {{setor}} para variáveis dinâmicas...">{{ old('config.initial_message') }}</textarea>
+                <textarea id="initial_message" name="config[initial_message]" required class="textarea-nm message-textarea" rows="4" placeholder="Use @{{nome}}, @{{telefone}}, @{{setor}} para variáveis dinâmicas...">{{ old('config.initial_message') }}</textarea>
                 <button type="button" class="btn-insert-variable absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm font-medium transition-colors">
                     + Inserir Variável
                 </button>
@@ -92,7 +92,7 @@
         <div class="mb-8">
             <label for="final_message" class="block text-sm font-semibold text-gray-900 mb-2">Mensagem Final</label>
             <div class="relative">
-                <textarea id="final_message" name="config[final_message]" required class="textarea-nm message-textarea" rows="3" placeholder="Use {{nome}}, {{telefone}}, {{setor}} para variáveis dinâmicas...">{{ old('config.final_message') }}</textarea>
+                <textarea id="final_message" name="config[final_message]" required class="textarea-nm message-textarea" rows="3" placeholder="Use @{{nome}}, @{{telefone}}, @{{setor}} para variáveis dinâmicas...">{{ old('config.final_message') }}</textarea>
                 <button type="button" class="btn-insert-variable absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm font-medium transition-colors">
                     + Inserir Variável
                 </button>
@@ -201,10 +201,13 @@ function removeOption(btn) {
             'setor': 'Setor de atendimento'
         };
 
+        const varOpen = '{' + '{';
+        const varClose = '}' + '}';
+
         Object.entries(variables).forEach(([key, description]) => {
             const item = document.createElement('div');
             item.className = 'variable-item px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm';
-            item.innerHTML = `<strong>{{${key}}}</strong> - ${description}`;
+            item.innerHTML = '<strong>' + varOpen + key + varClose + '</strong> - ' + description;
             item.addEventListener('click', () => insertVariableAtButton(key, button));
             dropdown.appendChild(item);
         });
@@ -225,6 +228,9 @@ function removeOption(btn) {
     }
 
     function insertVariableAtButton(varName, button) {
+        const varOpen = '{' + '{';
+        const varClose = '}' + '}';
+
         // Find the closest textarea
         const textarea = button.closest('.relative').querySelector('textarea');
         if (!textarea) return;
@@ -235,7 +241,7 @@ function removeOption(btn) {
 
         const before = text.substring(0, start);
         const after = text.substring(end);
-        const newText = before + `{{${varName}}}` + after;
+        const newText = before + varOpen + varName + varClose + after;
 
         textarea.value = newText;
         textarea.selectionStart = textarea.selectionEnd = start + varName.length + 4;

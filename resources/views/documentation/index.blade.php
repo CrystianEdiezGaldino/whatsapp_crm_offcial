@@ -6,7 +6,7 @@
         <!-- Header -->
         <div class="mb-12">
             <h1 class="text-4xl font-bold text-on-surface mb-4">Component Library</h1>
-            <p class="text-lg text-on-surface-variant">Explore all available components in the WhatsApp ERP System design system.</p>
+            <p class="text-lg text-gray-600">Explore all available components in the WhatsApp ERP System design system.</p>
             <div class="mt-6 flex gap-4">
                 <x-button href="#common" variant="primary">
                     Common Components
@@ -25,7 +25,7 @@
 
         <!-- Common Components -->
         <section id="common" class="mb-16">
-            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-outline-variant">
+            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-gray-200">
                 Common Components
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -41,11 +41,11 @@
                                     arrow_forward
                                 </span>
                             </div>
-                            <p class="text-sm text-on-surface-variant">
+                            <p class="text-sm text-gray-600">
                                 {{ $component['description'] }}
                             </p>
-                            <div class="mt-4 pt-4 border-t border-outline-variant">
-                                <span class="inline-block px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-medium">
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-on-surface text-xs font-medium">
                                     {{ $component['category'] }}
                                 </span>
                             </div>
@@ -58,7 +58,7 @@
 
         <!-- Layout Components -->
         <section id="layout" class="mb-16">
-            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-outline-variant">
+            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-gray-200">
                 Layout Components
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -74,11 +74,11 @@
                                     arrow_forward
                                 </span>
                             </div>
-                            <p class="text-sm text-on-surface-variant">
+                            <p class="text-sm text-gray-600">
                                 {{ $component['description'] }}
                             </p>
-                            <div class="mt-4 pt-4 border-t border-outline-variant">
-                                <span class="inline-block px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-medium">
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-on-surface text-xs font-medium">
                                     {{ $component['category'] }}
                                 </span>
                             </div>
@@ -91,7 +91,7 @@
 
         <!-- Feedback Components -->
         <section id="feedback" class="mb-16">
-            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-outline-variant">
+            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-gray-200">
                 Feedback Components
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,11 +107,11 @@
                                     arrow_forward
                                 </span>
                             </div>
-                            <p class="text-sm text-on-surface-variant">
+                            <p class="text-sm text-gray-600">
                                 {{ $component['description'] }}
                             </p>
-                            <div class="mt-4 pt-4 border-t border-outline-variant">
-                                <span class="inline-block px-3 py-1 rounded-full bg-surface-container text-on-surface text-xs font-medium">
+                            <div class="mt-4 pt-4 border-t border-gray-200">
+                                <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-on-surface text-xs font-medium">
                                     {{ $component['category'] }}
                                 </span>
                             </div>
@@ -124,7 +124,7 @@
 
         <!-- Bonus Components -->
         <section id="bonus" class="mb-16">
-            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-outline-variant">
+            <h2 class="text-3xl font-bold text-on-surface mb-8 pb-4 border-b border-gray-200">
                 Bonus Components
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -145,10 +145,10 @@
                                     arrow_forward
                                 </span>
                             </div>
-                            <p class="text-sm text-on-surface-variant">
+                            <p class="text-sm text-gray-600">
                                 {{ $component['description'] }}
                             </p>
-                            <div class="mt-4 pt-4 border-t border-outline-variant">
+                            <div class="mt-4 pt-4 border-t border-gray-200">
                                 <span class="inline-block px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-medium">
                                     {{ $component['category'] }}
                                 </span>
@@ -161,24 +161,24 @@
         </section>
 
         <!-- Info Section -->
-        <section class="mt-16 bg-surface-container rounded-xl p-8">
+        <section class="mt-16 bg-gray-100 rounded-xl p-8">
             <h3 class="text-2xl font-bold text-on-surface mb-4">About This Component Library</h3>
-            <p class="text-on-surface-variant mb-4">
+            <p class="text-gray-600 mb-4">
                 This component library contains 17 reusable Laravel Blade components designed for the WhatsApp ERP System.
                 All components follow Material Design 3 principles and are optimized for performance and accessibility.
             </p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <div>
                     <h4 class="font-bold text-on-surface mb-2">17 Components</h4>
-                    <p class="text-sm text-on-surface-variant">5 common, 6 layout, 5 feedback, and 3 bonus components</p>
+                    <p class="text-sm text-gray-600">5 common, 6 layout, 5 feedback, and 3 bonus components</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-on-surface mb-2">Material Design 3</h4>
-                    <p class="text-sm text-on-surface-variant">Following modern design system principles</p>
+                    <p class="text-sm text-gray-600">Following modern design system principles</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-on-surface mb-2">Production Ready</h4>
-                    <p class="text-sm text-on-surface-variant">Tested and documented for real-world usage</p>
+                    <p class="text-sm text-gray-600">Tested and documented for real-world usage</p>
                 </div>
             </div>
         </section>

@@ -15,14 +15,14 @@
 @endpush
 
 @section('content')
-<header class="flex flex-wrap justify-between items-center gap-4 h-auto min-h-16 py-3 px-6 w-full sticky top-0 z-40 bg-surface/90 backdrop-blur-md border-b border-outline-variant">
+<header class="flex flex-wrap justify-between items-center gap-4 h-auto min-h-16 py-3 px-6 w-full sticky top-0 z-40 bg-surface/90 backdrop-blur-md border-b border-gray-200">
     <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center">
             <span class="material-symbols-outlined text-secondary">bolt</span>
         </div>
         <div>
             <h2 class="text-xl font-bold text-primary leading-tight">Macros</h2>
-            <p class="text-xs text-on-surface-variant">Respostas rápidas para agilizar o atendimento</p>
+            <p class="text-xs text-gray-600">Respostas rápidas para agilizar o atendimento</p>
         </div>
     </div>
     <button type="button" onclick="document.getElementById('newMacroModal').classList.remove('hidden')"
@@ -42,24 +42,24 @@
 
     {{-- KPIs --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <div class="bg-white rounded-xl border border-outline-variant p-4 shadow-sm">
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
             <span class="material-symbols-outlined text-primary text-xl">library_books</span>
-            <p class="text-[10px] font-semibold text-on-surface-variant uppercase mt-2 tracking-wide">Total</p>
+            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Total</p>
             <p class="text-2xl font-bold text-on-surface">{{ $stats['total'] }}</p>
         </div>
-        <div class="bg-white rounded-xl border border-outline-variant p-4 shadow-sm">
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
             <span class="material-symbols-outlined text-blue-600 text-xl">attach_file</span>
-            <p class="text-[10px] font-semibold text-on-surface-variant uppercase mt-2 tracking-wide">Com mídia</p>
+            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Com mídia</p>
             <p class="text-2xl font-bold text-on-surface">{{ $stats['with_files'] }}</p>
         </div>
-        <div class="bg-white rounded-xl border border-outline-variant p-4 shadow-sm">
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
             <span class="material-symbols-outlined text-secondary text-xl">category</span>
-            <p class="text-[10px] font-semibold text-on-surface-variant uppercase mt-2 tracking-wide">Categorias</p>
+            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Categorias</p>
             <p class="text-2xl font-bold text-on-surface">{{ $stats['categories'] }}</p>
         </div>
-        <div class="bg-white rounded-xl border border-outline-variant p-4 shadow-sm">
+        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
             <span class="material-symbols-outlined text-amber-600 text-xl">keyboard</span>
-            <p class="text-[10px] font-semibold text-on-surface-variant uppercase mt-2 tracking-wide">Com atalho</p>
+            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Com atalho</p>
             <p class="text-2xl font-bold text-on-surface">{{ $stats['with_shortcut'] }}</p>
         </div>
     </div>
@@ -79,15 +79,15 @@
     @if($stats['total'] > 0)
     <div class="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
         <div class="relative flex-1 max-w-md">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-lg">search</span>
             <input type="search" id="macroSearch" placeholder="Buscar por nome, atalho ou conteúdo..."
-                class="w-full pl-10 pr-4 py-2.5 bg-white border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary">
+                class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary">
         </div>
         <div class="flex flex-wrap gap-2" id="categoryFilters">
             <button type="button" data-category="all" class="category-pill px-3 py-1.5 text-xs font-semibold rounded-full border border-secondary bg-secondary text-on-secondary transition-colors" data-active="true">Todas</button>
             @foreach($macros->keys() as $cat)
             @php $meta = $categoryMeta[$cat] ?? ['label' => ucfirst($cat), 'icon' => 'label']; @endphp
-            <button type="button" data-category="{{ $cat }}" class="category-pill px-3 py-1.5 text-xs font-semibold rounded-full border border-outline-variant bg-white text-on-surface-variant hover:border-secondary transition-colors">
+            <button type="button" data-category="{{ $cat }}" class="category-pill px-3 py-1.5 text-xs font-semibold rounded-full border border-gray-200 bg-white text-gray-600 hover:border-secondary transition-colors">
                 {{ $meta['label'] }}
             </button>
             @endforeach
@@ -102,19 +102,19 @@
     @endphp
     <section class="macro-category-section mb-8" data-category="{{ $category }}">
         <div class="flex items-center gap-3 mb-4 px-1">
-            <div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center shrink-0">
+            <div class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
                 <span class="material-symbols-outlined text-secondary text-xl">{{ $meta['icon'] }}</span>
             </div>
             <div class="flex-1 min-w-0">
                 <h3 class="text-sm font-bold text-on-surface">{{ $meta['label'] }}</h3>
-                <p class="text-xs text-on-surface-variant">{{ $items->count() }} {{ $items->count() === 1 ? 'macro' : 'macros' }}</p>
+                <p class="text-xs text-gray-600">{{ $items->count() }} {{ $items->count() === 1 ? 'macro' : 'macros' }}</p>
             </div>
-            <span class="text-xs font-mono text-on-surface-variant/60 hidden sm:inline">{{ $category }}</span>
+            <span class="text-xs font-mono text-gray-600/60 hidden sm:inline">{{ $category }}</span>
         </div>
 
         <div class="macro-grid">
             @foreach($items as $macro)
-            <article class="macro-card macro-item bg-white border border-outline-variant rounded-2xl overflow-hidden flex flex-col border-l-4 {{ $meta['accent'] }}"
+            <article class="macro-card macro-item bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col border-l-4 {{ $meta['accent'] }}"
                 data-name="{{ strtolower($macro->name) }}"
                 data-shortcut="{{ strtolower($macro->shortcut ?? '') }}"
                 data-content="{{ strtolower(Str::limit($macro->content, 200)) }}"
@@ -124,12 +124,12 @@
                         <div class="min-w-0 flex-1">
                             <h4 class="text-sm font-bold text-on-surface truncate" title="{{ $macro->name }}">{{ $macro->name }}</h4>
                             @if($macro->shortcut)
-                            <code class="inline-block mt-1.5 text-[11px] bg-surface-container px-2 py-0.5 rounded-md text-secondary font-mono">{{ $macro->shortcut }}</code>
+                            <code class="inline-block mt-1.5 text-[11px] bg-gray-100 px-2 py-0.5 rounded-md text-secondary font-mono">{{ $macro->shortcut }}</code>
                             @endif
                         </div>
                         <div class="flex gap-0.5 shrink-0">
                             <button type="button" onclick="editMacro({{ $macro->id }}, @json($macro->name), @json($macro->content), @json($macro->shortcut), @json($macro->category))"
-                                class="p-1.5 hover:bg-surface-container-high text-on-surface-variant rounded-lg transition-colors" title="Editar">
+                                class="p-1.5 hover:bg-gray-100-high text-gray-600 rounded-lg transition-colors" title="Editar">
                                 <span class="material-symbols-outlined text-lg">edit</span>
                             </button>
                             <form method="POST" action="{{ route('macros.destroy', $macro) }}" class="inline" onsubmit="return confirm('Remover macro?')">
@@ -141,9 +141,9 @@
                         </div>
                     </div>
 
-                    <p class="text-sm text-on-surface-variant leading-relaxed line-clamp-4 flex-1">{{ $macro->content }}</p>
+                    <p class="text-sm text-gray-600 leading-relaxed line-clamp-4 flex-1">{{ $macro->content }}</p>
 
-                    <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-outline-variant/60">
+                    <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-gray-200/60">
                         @if($macro->files_count > 0)
                         <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-blue-50 text-blue-700 px-2 py-1 rounded-md">
                             <span class="material-symbols-outlined text-[14px]">attach_file</span>
@@ -167,12 +167,12 @@
         </div>
     </section>
     @empty
-    <div class="col-span-full flex flex-col items-center justify-center py-20 px-6 bg-white rounded-2xl border border-dashed border-outline-variant">
+    <div class="col-span-full flex flex-col items-center justify-center py-20 px-6 bg-white rounded-2xl border border-dashed border-gray-200">
         <div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-4">
             <span class="material-symbols-outlined text-4xl text-secondary">bolt</span>
         </div>
         <h3 class="text-lg font-bold text-on-surface">Nenhuma macro ainda</h3>
-        <p class="text-sm text-on-surface-variant mt-1 text-center max-w-sm">Crie respostas prontas com atalhos para usar nos chats.</p>
+        <p class="text-sm text-gray-600 mt-1 text-center max-w-sm">Crie respostas prontas com atalhos para usar nos chats.</p>
         <button type="button" onclick="document.getElementById('newMacroModal').classList.remove('hidden')"
             class="mt-6 bg-secondary text-on-secondary px-5 py-2.5 rounded-xl text-sm font-semibold active:scale-95 transition-transform shadow-sm">
             Criar primeira macro
@@ -181,7 +181,7 @@
     @endforelse
     </div>
 
-    <p id="noResults" class="hidden text-center py-12 text-on-surface-variant text-sm">
+    <p id="noResults" class="hidden text-center py-12 text-gray-600 text-sm">
         <span class="material-symbols-outlined text-3xl block mb-2 opacity-50">search_off</span>
         Nenhuma macro encontrada para esta busca.
     </p>
@@ -192,7 +192,7 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-5">
             <h3 class="text-lg font-bold text-on-surface">Nova Macro</h3>
-            <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="p-1 text-on-surface-variant hover:text-on-surface rounded-lg">
+            <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="p-1 text-gray-600 hover:text-on-surface rounded-lg">
                 <span class="material-symbols-outlined">close</span>
             </button>
         </div>
@@ -200,16 +200,16 @@
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Nome</label>
-                    <input name="name" required class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30 focus:border-secondary" placeholder="Ex: Saudação inicial">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Nome</label>
+                    <input name="name" required class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30 focus:border-secondary" placeholder="Ex: Saudação inicial">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Atalho</label>
-                    <input name="shortcut" class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-secondary/30" placeholder="/oi">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Atalho</label>
+                    <input name="shortcut" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-secondary/30" placeholder="/oi">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Categoria</label>
-                    <select name="category" class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Categoria</label>
+                    <select name="category" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
                         <option value="saudacao">Saudação</option>
                         <option value="util">Útil</option>
                         <option value="encerramento">Encerramento</option>
@@ -219,21 +219,21 @@
                     </select>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Conteúdo</label>
-                    <textarea name="content" required rows="5" class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30" placeholder="Mensagem da macro... Use {nome} para variáveis."></textarea>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Conteúdo</label>
+                    <textarea name="content" required rows="5" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30" placeholder="Mensagem da macro... Use {nome} para variáveis."></textarea>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-2 uppercase">Arquivos (Imagem, Vídeo, PDF)</label>
+                    <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase">Arquivos (Imagem, Vídeo, PDF)</label>
                     <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-secondary/40 rounded-xl cursor-pointer hover:bg-secondary/5 transition-colors">
                         <span class="material-symbols-outlined text-secondary">cloud_upload</span>
                         <span class="text-sm text-on-surface">Selecionar arquivo</span>
                         <input type="file" id="new_macro_file_input" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx">
                     </label>
-                    <div id="new_macro_files_list" class="mt-3 text-xs text-on-surface-variant">Nenhum arquivo selecionado</div>
+                    <div id="new_macro_files_list" class="mt-3 text-xs text-gray-600">Nenhum arquivo selecionado</div>
                 </div>
             </div>
             <div class="flex gap-2 mt-6">
-                <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="flex-1 py-2.5 border border-outline-variant rounded-xl text-sm hover:bg-surface-container">Cancelar</button>
+                <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm hover:bg-gray-100">Cancelar</button>
                 <button type="submit" class="flex-1 bg-secondary text-on-secondary py-2.5 rounded-xl text-sm font-semibold active:scale-95">Criar Macro</button>
             </div>
         </form>
@@ -245,7 +245,7 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-5">
             <h3 class="text-lg font-bold text-on-surface">Editar Macro</h3>
-            <button type="button" onclick="document.getElementById('editMacroModal').classList.add('hidden')" class="p-1 text-on-surface-variant hover:text-on-surface rounded-lg">
+            <button type="button" onclick="document.getElementById('editMacroModal').classList.add('hidden')" class="p-1 text-gray-600 hover:text-on-surface rounded-lg">
                 <span class="material-symbols-outlined">close</span>
             </button>
         </div>
@@ -254,16 +254,16 @@
             <input type="hidden" id="edit_macro_id">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Nome</label>
-                    <input id="edit_macro_name" name="name" required class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Nome</label>
+                    <input id="edit_macro_name" name="name" required class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Atalho</label>
-                    <input id="edit_macro_shortcut" name="shortcut" class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-secondary/30">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Atalho</label>
+                    <input id="edit_macro_shortcut" name="shortcut" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-secondary/30">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Categoria</label>
-                    <select id="edit_macro_category" name="category" class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Categoria</label>
+                    <select id="edit_macro_category" name="category" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
                         <option value="saudacao">Saudação</option>
                         <option value="util">Útil</option>
                         <option value="encerramento">Encerramento</option>
@@ -273,11 +273,11 @@
                     </select>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase">Conteúdo</label>
-                    <textarea id="edit_macro_content" name="content" required rows="5" class="w-full border border-outline-variant rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30"></textarea>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Conteúdo</label>
+                    <textarea id="edit_macro_content" name="content" required rows="5" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30"></textarea>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-2 uppercase">Arquivos</label>
+                    <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase">Arquivos</label>
                     <div id="macro_files_list" class="grid grid-cols-1 gap-2 mb-3 max-h-40 overflow-y-auto"></div>
                     <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-secondary/40 rounded-xl cursor-pointer hover:bg-secondary/5 transition-colors">
                         <span class="material-symbols-outlined text-secondary">cloud_upload</span>
@@ -287,7 +287,7 @@
                 </div>
             </div>
             <div class="flex gap-2 mt-6">
-                <button type="button" onclick="document.getElementById('editMacroModal').classList.add('hidden')" class="flex-1 py-2.5 border border-outline-variant rounded-xl text-sm hover:bg-surface-container">Cancelar</button>
+                <button type="button" onclick="document.getElementById('editMacroModal').classList.add('hidden')" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm hover:bg-gray-100">Cancelar</button>
                 <button type="submit" class="flex-1 bg-secondary text-on-secondary py-2.5 rounded-xl text-sm font-semibold active:scale-95">Salvar</button>
             </div>
         </form>
@@ -377,18 +377,18 @@ function renderMacroFiles() {
     const files = Object.values(macroFiles);
 
     if (files.length === 0) {
-        filesList.innerHTML = '<p class="text-xs text-on-surface-variant text-center py-3 col-span-full">Nenhum arquivo</p>';
+        filesList.innerHTML = '<p class="text-xs text-gray-600 text-center py-3 col-span-full">Nenhum arquivo</p>';
         return;
     }
 
     filesList.innerHTML = files.map(f => `
-        <div class="flex items-center gap-2 p-2.5 bg-surface-container-low rounded-xl group">
+        <div class="flex items-center gap-2 p-2.5 bg-gray-100-low rounded-xl group">
             <span class="material-symbols-outlined text-secondary text-lg">${f.icon}</span>
             <div class="flex-1 min-w-0">
                 <p class="text-xs font-semibold text-on-surface truncate">${f.name}</p>
-                <p class="text-[10px] text-on-surface-variant">${f.size}</p>
+                <p class="text-[10px] text-gray-600">${f.size}</p>
             </div>
-            <button type="button" onclick="deleteFile(${f.id})" class="p-1 text-on-surface-variant hover:text-error rounded-lg">
+            <button type="button" onclick="deleteFile(${f.id})" class="p-1 text-gray-600 hover:text-error rounded-lg">
                 <span class="material-symbols-outlined text-base">delete</span>
             </button>
         </div>

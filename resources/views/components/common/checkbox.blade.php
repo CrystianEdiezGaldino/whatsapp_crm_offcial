@@ -18,7 +18,7 @@
         type="{{ $type }}"
         name="{{ $name }}"
         value="{{ $value }}"
-        class="w-4 h-4 rounded border-outline-variant cursor-pointer accent-secondary {{ $class }}"
+        class="w-4 h-4 rounded border-gray-200 cursor-pointer accent-secondary {{ $class }}"
         @if($checked) checked @endif
         @if($disabled) disabled @endif
     >

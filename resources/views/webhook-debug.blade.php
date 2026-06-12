@@ -15,7 +15,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Form -->
-        <div class="bg-white rounded-lg border border-outline-variant p-6">
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
             <h2 class="text-lg font-semibold mb-4">Enviar Webhook de Teste</h2>
 
             <form id="webhookForm" method="POST" action="{{ route('webhook.debug') }}">
@@ -26,14 +26,14 @@
                         <label class="block text-sm font-semibold mb-2">Número do Remetente</label>
                         <input type="text" name="from_phone" id="fromPhone"
                             placeholder="+1 555 646 6644"
-                            class="w-full px-3 py-2 border border-outline-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary"
                             value="15556466644">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold mb-2">Tipo de Mensagem</label>
                         <select id="messageType" name="message_type"
-                            class="w-full px-3 py-2 border border-outline-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary">
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary">
                             <option value="text">Texto</option>
                             <option value="image">Imagem</option>
                             <option value="audio">Áudio</option>
@@ -47,14 +47,14 @@
                         <textarea name="message_content" id="messageContent"
                             placeholder="Olá, tudo bem?"
                             rows="3"
-                            class="w-full px-3 py-2 border border-outline-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary">Olá, tudo bem?</textarea>
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary">Olá, tudo bem?</textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold mb-2">Nome do Contato</label>
                         <input type="text" name="contact_name" id="contactName"
                             placeholder="João Silva"
-                            class="w-full px-3 py-2 border border-outline-variant rounded-lg text-sm focus:ring-1 focus:ring-secondary"
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-secondary"
                             value="Test User">
                     </div>
 
@@ -67,7 +67,7 @@
         </div>
 
         <!-- JSON Preview -->
-        <div class="bg-white rounded-lg border border-outline-variant p-6">
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
             <h2 class="text-lg font-semibold mb-4">Preview do JSON</h2>
             <pre id="jsonPreview" class="bg-slate-50 p-4 rounded text-xs overflow-auto max-h-96 text-gray-700">{}</pre>
         </div>
@@ -75,7 +75,7 @@
 
     <!-- Response -->
     <div id="responseSection" class="mt-6 hidden">
-        <div class="bg-white rounded-lg border border-outline-variant p-6">
+        <div class="bg-white rounded-lg border border-gray-200 p-6">
             <h2 class="text-lg font-semibold mb-4">Resposta</h2>
             <pre id="responseContent" class="bg-slate-50 p-4 rounded text-xs overflow-auto max-h-64 text-gray-700"></pre>
         </div>

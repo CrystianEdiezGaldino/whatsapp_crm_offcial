@@ -5,10 +5,10 @@
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Topbar -->
-    <div class="h-16 px-6 sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant flex items-center justify-between">
+    <div class="h-16 px-6 sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between">
         <div>
             <h1 class="text-2xl font-bold text-on-surface">Setores</h1>
-            <p class="text-xs text-on-surface-variant mt-1">Gerencie os setores do pré-atendimento</p>
+            <p class="text-xs text-gray-600 mt-1">Gerencie os setores do pré-atendimento</p>
         </div>
         <a href="{{ route('admin.sectors.create') }}" class="px-4 py-2 bg-secondary text-on-secondary rounded-lg font-semibold hover:bg-secondary/90 transition-all">
             <span class="material-symbols-outlined inline text-sm mr-1">add</span> Novo Setor
@@ -17,7 +17,7 @@
 
     <!-- Alerts -->
     @if(session('success'))
-    <div class="mx-6 mt-4 p-4 bg-secondary-container/20 border border-secondary text-on-surface rounded-lg flex items-start gap-3">
+    <div class="mx-6 mt-4 p-4 bg-secondary-100/20 border border-secondary text-on-surface rounded-lg flex items-start gap-3">
         <span class="material-symbols-outlined text-secondary mt-1">check_circle</span>
         <span>{{ session('success') }}</span>
     </div>
@@ -34,11 +34,11 @@
     <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
         <div class="max-w-7xl">
             <!-- Sectors Table -->
-            <div class="bg-white rounded-xl border border-outline-variant shadow-sm p-6">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
                 @if($sectors->count() > 0)
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="bg-surface-container-low border-b border-outline-variant">
+                        <thead class="bg-gray-100-low border-b border-gray-200">
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Opção</th>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Setor</th>
@@ -50,7 +50,7 @@
                         </thead>
                         <tbody class="divide-y divide-outline-variant">
                             @foreach($sectors as $sector)
-                            <tr class="hover:bg-surface-container-low">
+                            <tr class="hover:bg-gray-100-low">
                                 <td class="px-4 py-3">
                                     <div class="w-10 h-10 bg-primary-fixed rounded flex items-center justify-center font-bold text-on-primary-fixed text-lg">
                                         {{ $sector->keyboard_option }}
@@ -59,17 +59,17 @@
                                 <td class="px-4 py-3">
                                     <span class="font-medium text-on-surface">{{ $sector->name }}</span>
                                 </td>
-                                <td class="px-4 py-3 text-on-surface-variant text-xs max-w-xs truncate">
+                                <td class="px-4 py-3 text-gray-600 text-xs max-w-xs truncate">
                                     {{ $sector->description ?? '—' }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium bg-surface-container-low text-on-surface-variant">
+                                    <span class="inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium bg-gray-100-low text-gray-600">
                                         <span class="material-symbols-outlined text-sm">people</span>
                                         {{ $sector->getActiveAgentCountAttribute() }}/{{ $sector->getAgentCountAttribute() }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="px-2 py-1 rounded text-xs font-medium {{ $sector->is_active ? 'bg-secondary-container/20 text-secondary' : 'bg-outline-variant/20 text-on-surface-variant' }}">
+                                    <span class="px-2 py-1 rounded text-xs font-medium {{ $sector->is_active ? 'bg-secondary-100/20 text-secondary' : 'bg-outline-variant/20 text-gray-600' }}">
                                         {{ $sector->is_active ? 'Ativo' : 'Inativo' }}
                                     </span>
                                 </td>
@@ -104,8 +104,8 @@
                 </div>
                 @else
                 <div class="text-center py-12">
-                    <span class="material-symbols-outlined text-6xl text-on-surface-variant mb-4">category</span>
-                    <p class="text-on-surface-variant text-lg mb-4">Nenhum setor cadastrado</p>
+                    <span class="material-symbols-outlined text-6xl text-gray-600 mb-4">category</span>
+                    <p class="text-gray-600 text-lg mb-4">Nenhum setor cadastrado</p>
                     <a href="{{ route('admin.sectors.create') }}" class="inline-block px-4 py-2 bg-secondary text-on-secondary rounded-lg font-semibold hover:bg-secondary/90 transition-all">
                         <span class="material-symbols-outlined inline text-sm mr-1">add</span> Criar Primeiro Setor
                     </a>

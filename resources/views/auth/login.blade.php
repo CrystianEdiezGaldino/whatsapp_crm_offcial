@@ -25,10 +25,10 @@
         }
     </script>
 </head>
-<body class="bg-primary-container min-h-screen flex items-center justify-center font-sans">
+<body class="bg-primary min-h-screen flex items-center justify-center font-sans">
     <div class="w-full max-w-md">
         <div class="text-center mb-8">
-            <div class="w-16 h-16 bg-secondary-container rounded-xl flex items-center justify-center mx-auto mb-4">
+            <div class="w-16 h-16 bg-secondary-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span class="text-3xl font-bold text-on-secondary-container">W</span>
             </div>
             <h1 class="text-2xl font-bold text-on-primary">OmniChannel ERP</h1>
@@ -47,16 +47,16 @@
                 @endif
 
                 <div class="mb-4">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase tracking-wider">Email</label>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wider">Email</label>
                     <input type="email" name="email" value="{{ old('email') }}" required autofocus
-                        class="w-full border border-outline-variant rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none transition-all"
+                        class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none transition-all"
                         placeholder="seu@email.com">
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-xs font-semibold text-on-surface-variant mb-1 uppercase tracking-wider">Senha</label>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase tracking-wider">Senha</label>
                     <input type="password" name="password" required
-                        class="w-full border border-outline-variant rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none transition-all"
+                        class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none transition-all"
                         placeholder="Sua senha">
                 </div>
 
@@ -66,8 +66,8 @@
                 </button>
             </form>
 
-            <div class="mt-6 pt-4 border-t border-outline-variant">
-                <p class="text-xs text-on-surface-variant text-center">
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <p class="text-xs text-gray-600 text-center">
                     Admin: admin@erp.com / password<br>
                     Agente: ana@erp.com / password
                 </p>

@@ -8,10 +8,10 @@
 @php
     $bgClasses = match($type) {
         'primary' => 'bg-secondary text-on-secondary',
-        'secondary' => 'bg-surface-container text-on-surface',
+        'secondary' => 'bg-gray-100 text-on-surface',
         'error' => 'bg-error text-on-error',
-        'default' => 'bg-surface-container-low text-on-surface',
-        default => 'bg-surface-container-low text-on-surface',
+        'default' => 'bg-gray-100-low text-on-surface',
+        default => 'bg-gray-100-low text-on-surface',
     };
 @endphp
 

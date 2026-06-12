@@ -10,7 +10,7 @@
                 <span>Back to Components</span>
             </a>
             <h1 class="text-4xl font-bold text-on-surface mb-4">Dropdown Component</h1>
-            <p class="text-lg text-on-surface-variant">A reusable dropdown menu component for actions, navigation, and selections with customizable alignment.</p>
+            <p class="text-lg text-gray-600">A reusable dropdown menu component for actions, navigation, and selections with customizable alignment.</p>
         </div>
 
         <!-- Preview Section -->
@@ -19,7 +19,7 @@
             <x-card title="Basic Dropdowns">
                 <div class="flex gap-12 flex-wrap">
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-4">Left Aligned</p>
+                        <p class="text-sm text-gray-600 mb-4">Left Aligned</p>
                         <x-dropdown
                             id="demo-left"
                             label="Actions"
@@ -33,7 +33,7 @@
                         />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-4">Right Aligned</p>
+                        <p class="text-sm text-gray-600 mb-4">Right Aligned</p>
                         <x-dropdown
                             id="demo-right"
                             label="Settings"
@@ -71,7 +71,7 @@
             <x-card>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="border-b border-outline-variant bg-surface-container-low">
+                        <thead class="border-b border-gray-200 bg-gray-100-low">
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Prop</th>
                                 <th class="px-4 py-3 text-left font-semibold text-on-surface">Type</th>
@@ -82,33 +82,33 @@
                         <tbody class="divide-y divide-outline-variant">
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">id</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">required</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Unique dropdown identifier</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">required</td>
+                                <td class="px-4 py-3 text-gray-600">Unique dropdown identifier</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">label</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">'Menu'</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Button label/trigger text</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">'Menu'</td>
+                                <td class="px-4 py-3 text-gray-600">Button label/trigger text</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">items</td>
-                                <td class="px-4 py-3 text-on-surface-variant">array</td>
-                                <td class="px-4 py-3 text-on-surface-variant">[]</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Array of menu items (label, href/onclick, divider)</td>
+                                <td class="px-4 py-3 text-gray-600">array</td>
+                                <td class="px-4 py-3 text-gray-600">[]</td>
+                                <td class="px-4 py-3 text-gray-600">Array of menu items (label, href/onclick, divider)</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">align</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">'left'</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Menu alignment: left, right</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">'left'</td>
+                                <td class="px-4 py-3 text-gray-600">Menu alignment: left, right</td>
                             </tr>
                             <tr>
                                 <td class="px-4 py-3 font-mono text-secondary">class</td>
-                                <td class="px-4 py-3 text-on-surface-variant">string</td>
-                                <td class="px-4 py-3 text-on-surface-variant">''</td>
-                                <td class="px-4 py-3 text-on-surface-variant">Additional CSS classes</td>
+                                <td class="px-4 py-3 text-gray-600">string</td>
+                                <td class="px-4 py-3 text-gray-600">''</td>
+                                <td class="px-4 py-3 text-gray-600">Additional CSS classes</td>
                             </tr>
                         </tbody>
                     </table>
@@ -116,7 +116,7 @@
             </x-card>
 
             <x-card title="Item Object Structure" class="mt-6">
-                <div class="bg-surface-container p-4 rounded-lg">
+                <div class="bg-gray-100 p-4 rounded-lg">
                     <pre class="text-sm overflow-x-auto"><code>// Link item
 ['label' => 'Edit', 'href' => '/path/to/edit']
 
@@ -134,7 +134,7 @@
             <h2 class="text-2xl font-bold text-on-surface mb-6">Usage Examples</h2>
 
             <x-card title="Basic Dropdown" subtitle="Simple menu with actions" class="mb-6">
-                <pre class="bg-surface-container p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-dropdown
+                <pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-dropdown
     id="user-menu"
     label="Account"
     :items="[
@@ -147,7 +147,7 @@
             </x-card>
 
             <x-card title="Right-Aligned Dropdown" subtitle="For top-right corner placement" class="mb-6">
-                <pre class="bg-surface-container p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-dropdown
+                <pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-dropdown
     id="admin-menu"
     label="Admin"
     align="right"
@@ -160,7 +160,7 @@
             </x-card>
 
             <x-card title="Dropdown with Custom Handlers" subtitle="Using onclick for custom actions">
-                <pre class="bg-surface-container p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-dropdown
+                <pre class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm"><code>&lt;x-dropdown
     id="row-actions"
     label="Actions"
     :items="[
@@ -179,10 +179,10 @@
 
             <x-card title="Table Row Actions">
                 <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-surface-container rounded">
+                    <div class="flex items-center justify-between p-3 bg-gray-100 rounded">
                         <div>
                             <p class="font-semibold text-on-surface">John Doe</p>
-                            <p class="text-sm text-on-surface-variant">john@example.com</p>
+                            <p class="text-sm text-gray-600">john@example.com</p>
                         </div>
                         <x-dropdown
                             id="row-menu-1"
@@ -198,10 +198,10 @@
                             <span class="material-symbols-outlined">more_vert</span>
                         </x-dropdown>
                     </div>
-                    <div class="flex items-center justify-between p-3 bg-surface-container rounded">
+                    <div class="flex items-center justify-between p-3 bg-gray-100 rounded">
                         <div>
                             <p class="font-semibold text-on-surface">Jane Smith</p>
-                            <p class="text-sm text-on-surface-variant">jane@example.com</p>
+                            <p class="text-sm text-gray-600">jane@example.com</p>
                         </div>
                         <x-dropdown
                             id="row-menu-2"
@@ -226,7 +226,7 @@
                         <x-avatar name="Sarah C" size="md" status="online" />
                         <div>
                             <p class="font-semibold text-on-surface">Sarah Connor</p>
-                            <p class="text-xs text-on-surface-variant">Active now</p>
+                            <p class="text-xs text-gray-600">Active now</p>
                         </div>
                     </div>
                     <x-dropdown

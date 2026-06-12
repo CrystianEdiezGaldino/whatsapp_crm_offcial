@@ -27,6 +27,6 @@
 <div class="flex flex-col items-center gap-3 {{ $class }}">
     <div class="{{ $sizeClasses }} border-4 {{ $colorClasses }} border-transparent rounded-full animate-spin" style="border-top-color: currentColor;"></div>
     @if($text)
-        <p class="text-sm text-on-surface-variant">{{ $text }}</p>
+        <p class="text-sm text-gray-600">{{ $text }}</p>
     @endif
 </div>

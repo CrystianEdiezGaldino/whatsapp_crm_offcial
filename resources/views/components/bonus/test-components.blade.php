@@ -9,19 +9,19 @@
             <x-card title="Avatar Sizes" subtitle="sm, md, lg, xl variants">
                 <div class="flex gap-8 items-center flex-wrap">
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Small (sm)</p>
+                        <p class="text-sm text-gray-600 mb-2">Small (sm)</p>
                         <x-avatar size="sm" name="John Doe" />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Medium (md)</p>
+                        <p class="text-sm text-gray-600 mb-2">Medium (md)</p>
                         <x-avatar size="md" name="Jane Smith" />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Large (lg)</p>
+                        <p class="text-sm text-gray-600 mb-2">Large (lg)</p>
                         <x-avatar size="lg" name="Bob Johnson" />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Extra Large (xl)</p>
+                        <p class="text-sm text-gray-600 mb-2">Extra Large (xl)</p>
                         <x-avatar size="xl" name="Alice Brown" />
                     </div>
                 </div>
@@ -30,19 +30,19 @@
             <x-card title="Avatar with Status" subtitle="online, offline, away, busy" class="mt-6">
                 <div class="flex gap-8 items-center flex-wrap">
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Online</p>
+                        <p class="text-sm text-gray-600 mb-2">Online</p>
                         <x-avatar name="John" status="online" />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Offline</p>
+                        <p class="text-sm text-gray-600 mb-2">Offline</p>
                         <x-avatar name="Jane" status="offline" />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Away</p>
+                        <p class="text-sm text-gray-600 mb-2">Away</p>
                         <x-avatar name="Bob" status="away" />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Busy</p>
+                        <p class="text-sm text-gray-600 mb-2">Busy</p>
                         <x-avatar name="Alice" status="busy" />
                     </div>
                 </div>
@@ -73,7 +73,7 @@
             <x-card title="Chip Use Cases" subtitle="Practical examples" class="mt-6">
                 <div class="space-y-4">
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Tags:</p>
+                        <p class="text-sm text-gray-600 mb-2">Tags:</p>
                         <div class="flex gap-2 flex-wrap">
                             <x-chip type="primary">Laravel</x-chip>
                             <x-chip type="primary">Blade</x-chip>
@@ -81,7 +81,7 @@
                         </div>
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-2">Selected Items:</p>
+                        <p class="text-sm text-gray-600 mb-2">Selected Items:</p>
                         <div class="flex gap-2 flex-wrap">
                             <x-chip type="secondary" deletable>Option 1</x-chip>
                             <x-chip type="secondary" deletable>Option 2</x-chip>
@@ -98,7 +98,7 @@
             <x-card title="Basic Dropdown" subtitle="Left and right aligned">
                 <div class="flex gap-8 flex-wrap">
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-4">Left Aligned (default)</p>
+                        <p class="text-sm text-gray-600 mb-4">Left Aligned (default)</p>
                         <x-dropdown
                             id="dropdown-left"
                             label="Actions"
@@ -112,7 +112,7 @@
                         />
                     </div>
                     <div>
-                        <p class="text-sm text-on-surface-variant mb-4">Right Aligned</p>
+                        <p class="text-sm text-gray-600 mb-4">Right Aligned</p>
                         <x-dropdown
                             id="dropdown-right"
                             label="Settings"
@@ -153,7 +153,7 @@
                         <x-avatar name="Sarah Connor" size="lg" status="online" />
                         <div>
                             <h3 class="font-bold text-on-surface">Sarah Connor</h3>
-                            <p class="text-sm text-on-surface-variant">Active now</p>
+                            <p class="text-sm text-gray-600">Active now</p>
                         </div>
                     </div>
                     <x-dropdown
@@ -170,7 +170,7 @@
                         <span class="material-symbols-outlined">more_vert</span>
                     </x-dropdown>
                 </div>
-                <p class="text-sm text-on-surface-variant mb-4">Skills:</p>
+                <p class="text-sm text-gray-600 mb-4">Skills:</p>
                 <div class="flex gap-2 flex-wrap">
                     <x-chip type="primary">Customer Support</x-chip>
                     <x-chip type="primary">Sales</x-chip>

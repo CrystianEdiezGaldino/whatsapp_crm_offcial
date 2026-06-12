@@ -20,7 +20,7 @@
         @if($title)
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-on-surface">{{ $title }}</h3>
-                <button onclick="document.getElementById('{{ $id }}').classList.add('hidden')" class="text-on-surface-variant hover:text-on-surface">
+                <button onclick="document.getElementById('{{ $id }}').classList.add('hidden')" class="text-gray-600 hover:text-on-surface">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
