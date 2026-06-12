@@ -13,7 +13,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'email', 'password', 'role', 'status', 'avatar',
-        'sector_id', 'is_active', 'notes',
+        'sector_id', 'is_active', 'image_credits', 'notes',
     ];
 
     protected $hidden = [
@@ -24,7 +24,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'is_active' => 'boolean',
+        'image_credits' => 'integer',
     ];
+
+    public function imageCreditTransactions()
+    {
+        return $this->hasMany(ImageCreditTransaction::class);
+    }
 
     public function sector()
     {

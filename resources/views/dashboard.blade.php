@@ -5,28 +5,28 @@
 @section('content')
 
 <!-- Top Bar -->
-<header class="flex justify-between items-center h-16 px-8 w-full sticky top-0 z-40 bg-surface border-b border-surface-container-highest">
+<header class="flex justify-between items-center h-16 px-8 w-full sticky top-0 z-40 bg-white border-b border-gray-200">
     <div class="flex items-center gap-8">
-        <h2 class="text-xl font-bold text-primary font-headline">SisZap Dashboard</h2>
+        <h2 class="text-xl font-bold text-[#1DA85A]">SisZap Dashboard</h2>
         <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
-            <input class="pl-10 pr-4 py-2 bg-surface-container border-none rounded-xl focus:ring-2 focus:ring-primary-container transition-all text-sm w-80" placeholder="Buscar chats ou agentes..." type="text">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
+            <input class="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-xl focus:ring-2 focus:ring-green-500 transition-all text-sm w-80" placeholder="Buscar chats ou agentes..." type="text">
         </div>
     </div>
     <div class="flex items-center gap-6">
-        <div class="hidden md:flex items-center gap-6 text-on-surface-variant font-label-lg">
-            <a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">Visão Geral</a>
-            <a class="hover:text-primary transition-colors" href="#">Relatórios</a>
+        <div class="hidden md:flex items-center gap-6 text-gray-600">
+            <a class="text-[#1DA85A] font-bold border-b-2 border-[#1DA85A] pb-1" href="#">Visão Geral</a>
+            <a class="hover:text-[#1DA85A] transition-colors" href="#">Relatórios</a>
         </div>
-        <div class="h-6 w-px bg-surface-container-highest"></div>
+        <div class="h-6 w-px bg-gray-200"></div>
         <div class="flex items-center gap-4">
-            <button class="p-2 hover:bg-surface-container-low rounded-full transition-all text-on-surface-variant">
+            <button class="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-600">
                 <span class="material-symbols-outlined">notifications</span>
             </button>
             <div class="flex items-center gap-2 pl-4">
                 <div class="text-right">
-                    <p class="font-label-lg text-sm">{{ auth()->user()->name }}</p>
-                    <p class="text-[10px] text-outline uppercase tracking-wider">{{ auth()->user()->role === 'admin' ? 'Admin' : 'Agente' }}</p>
+                    <p class="text-sm font-medium">{{ auth()->user()->name }}</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">{{ auth()->user()->role === 'admin' ? 'Admin' : 'Agente' }}</p>
                 </div>
             </div>
         </div>
@@ -36,92 +36,92 @@
 <!-- Dashboard Body -->
 <div class="p-8 overflow-y-auto custom-scrollbar flex-1 space-y-8 max-w-[1600px]">
     <!-- Filtros -->
-    <div class="card-nm rounded-xl p-6">
+    <div class="card-nm">
         <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="date" id="startDate" name="start_date" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Data inicial">
-            <input type="date" id="endDate" name="end_date" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container" placeholder="Data final">
-            <select id="agentSelect" name="agent_id" class="px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-container">
+            <input type="date" id="startDate" name="start_date" class="input-nm h-[42px]" placeholder="Data inicial">
+            <input type="date" id="endDate" name="end_date" class="input-nm h-[42px]" placeholder="Data final">
+            <select id="agentSelect" name="agent_id" class="select-nm h-[42px]">
                 <option value="">Todos os agentes</option>
                 @foreach ($agents as $agent)
                     <option value="{{ $agent->id }}">{{ $agent->name }}</option>
                 @endforeach
             </select>
             <div class="flex gap-2">
-                <button type="submit" class="flex-1 px-4 py-2 bg-primary text-on-primary rounded-xl font-semibold text-sm active:scale-95 transition-transform">Filtrar</button>
-                <button type="reset" class="px-4 py-2 bg-surface-container border border-outline-variant rounded-xl text-sm active:scale-95 transition-transform">Limpar</button>
+                <button type="submit" class="btn-nm-primary flex-1">Filtrar</button>
+                <button type="reset" class="btn-nm-secondary">Limpar</button>
             </div>
         </form>
     </div>
     <!-- Metrics KPIs Bento Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Card 1: Total Mensagens -->
-        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-primary-fixed text-primary rounded-xl">
+                <div class="p-3 bg-green-100 text-[#1DA85A] rounded-xl">
                     <span class="material-symbols-outlined">forum</span>
                 </div>
-                <span class="text-on-tertiary-container bg-tertiary-fixed-dim/30 px-2 py-1 rounded-full text-[10px] font-bold" id="msgBadge">+12%</span>
+                <span class="text-green-700 bg-green-50 px-2 py-1 rounded-full text-[10px] font-bold" id="msgBadge">+12%</span>
             </div>
-            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Total Mensagens</p>
-            <p id="totalMessages" class="font-headline-lg text-headline-lg mt-2">--</p>
-            <div class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden">
-                <div class="h-full bg-primary w-3/4"></div>
+            <p class="text-gray-500 uppercase tracking-widest text-[10px]">Total Mensagens</p>
+            <p id="totalMessages" class="text-2xl font-bold mt-2">--</p>
+            <div class="mt-4 h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-[#1DA85A] w-3/4"></div>
             </div>
         </div>
 
         <!-- Card 2: Tempo Médio Resposta -->
-        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-secondary-fixed text-secondary rounded-xl">
+                <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
                     <span class="material-symbols-outlined">schedule</span>
                 </div>
-                <span class="text-error bg-error-container px-2 py-1 rounded-full text-[10px] font-bold" id="timeBadge">-5%</span>
+                <span class="text-red-700 bg-red-50 px-2 py-1 rounded-full text-[10px] font-bold" id="timeBadge">-5%</span>
             </div>
-            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Tempo Médio Resposta</p>
-            <p id="avgResponseTime" class="font-headline-lg text-headline-lg mt-2">--</p>
+            <p class="text-gray-500 uppercase tracking-widest text-[10px]">Tempo Médio Resposta</p>
+            <p id="avgResponseTime" class="text-2xl font-bold mt-2">--</p>
             <div class="mt-4 flex items-center space-x-1">
-                <div class="h-4 w-1 bg-secondary rounded-full opacity-30"></div>
-                <div class="h-6 w-1 bg-secondary rounded-full opacity-50"></div>
-                <div class="h-8 w-1 bg-secondary rounded-full"></div>
-                <div class="h-5 w-1 bg-secondary rounded-full opacity-60"></div>
-                <div class="h-3 w-1 bg-secondary rounded-full opacity-20"></div>
+                <div class="h-4 w-1 bg-blue-400 rounded-full opacity-30"></div>
+                <div class="h-6 w-1 bg-blue-400 rounded-full opacity-50"></div>
+                <div class="h-8 w-1 bg-blue-400 rounded-full"></div>
+                <div class="h-5 w-1 bg-blue-400 rounded-full opacity-60"></div>
+                <div class="h-3 w-1 bg-blue-400 rounded-full opacity-20"></div>
             </div>
         </div>
 
         <!-- Card 3: Chats Abertos -->
-        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-tertiary-fixed-dim text-on-tertiary-fixed-variant rounded-xl">
+                <div class="p-3 bg-purple-100 text-purple-600 rounded-xl">
                     <span class="material-symbols-outlined">chat</span>
                 </div>
-                <span class="text-on-tertiary-container bg-tertiary-fixed-dim/30 px-2 py-1 rounded-full text-[10px] font-bold">LIVE</span>
+                <span class="text-purple-700 bg-purple-50 px-2 py-1 rounded-full text-[10px] font-bold">LIVE</span>
             </div>
-            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Chats Abertos</p>
-            <p id="openConversations" class="font-headline-lg text-headline-lg mt-2">{{ $stats['open_conversations'] }}</p>
+            <p class="text-gray-500 uppercase tracking-widest text-[10px]">Chats Abertos</p>
+            <p id="openConversations" class="text-2xl font-bold mt-2">{{ $stats['open_conversations'] }}</p>
             <div class="mt-4 flex -space-x-2">
-                <div class="w-6 h-6 rounded-full border-2 border-white bg-primary-fixed"></div>
-                <div class="w-6 h-6 rounded-full border-2 border-white bg-secondary-fixed"></div>
-                <div class="w-6 h-6 rounded-full border-2 border-white bg-tertiary-fixed"></div>
+                <div class="w-6 h-6 rounded-full border-2 border-white bg-green-200"></div>
+                <div class="w-6 h-6 rounded-full border-2 border-white bg-blue-200"></div>
+                <div class="w-6 h-6 rounded-full border-2 border-white bg-purple-200"></div>
                 <div class="w-6 h-6 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center text-[8px] font-bold">+8</div>
             </div>
         </div>
 
         <!-- Card 4: Taxa de Satisfação -->
-        <div class="card-nm rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-nm">
             <div class="flex justify-between items-start mb-4">
-                <div class="p-3 bg-surface-container-highest text-on-surface-variant rounded-xl">
+                <div class="p-3 bg-yellow-100 text-yellow-600 rounded-xl">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
                 </div>
-                <span class="text-on-tertiary-container bg-tertiary-fixed-dim/30 px-2 py-1 rounded-full text-[10px] font-bold">98%</span>
+                <span class="text-green-700 bg-green-50 px-2 py-1 rounded-full text-[10px] font-bold">98%</span>
             </div>
-            <p class="text-outline font-label-md uppercase tracking-widest text-[10px]">Satisfação</p>
-            <p class="font-headline-lg text-headline-lg mt-2">4.9/5.0</p>
+            <p class="text-gray-500 uppercase tracking-widest text-[10px]">Satisfação</p>
+            <p class="text-2xl font-bold mt-2">4.9/5.0</p>
             <div class="mt-4 flex space-x-1">
-                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-                <span class="material-symbols-outlined text-tertiary-container text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                <span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
             </div>
         </div>
     </div>
@@ -129,14 +129,14 @@
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Message Volume Chart -->
-        <div class="lg:col-span-2 card-nm rounded-xl p-8 shadow-sm">
+        <div class="lg:col-span-2 card-nm">
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h3 class="font-headline-md text-headline-md">Volume de Mensagens</h3>
-                    <p class="text-outline text-sm">Distribuição horária de mensagens recebidas</p>
+                    <h3 class="text-lg font-bold">Volume de Mensagens</h3>
+                    <p class="text-gray-500 text-sm">Distribuição horária de mensagens recebidas</p>
                 </div>
-                <div class="flex bg-surface-container rounded-lg p-1">
-                    <button class="px-3 py-1 bg-white shadow-sm rounded-md text-xs font-bold">24h</button>
+                <div class="flex bg-gray-100 rounded-lg p-1">
+                    <button class="px-3 py-1 bg-white rounded-md text-xs font-bold">24h</button>
                     <button class="px-3 py-1 text-xs hover:bg-white/50 rounded-md transition-all">7d</button>
                     <button class="px-3 py-1 text-xs hover:bg-white/50 rounded-md transition-all">30d</button>
                 </div>
@@ -147,31 +147,31 @@
         </div>
 
         <!-- Channel Distribution -->
-        <div class="card-nm rounded-xl p-8 shadow-sm">
-            <h3 class="font-headline-md text-headline-md mb-8">Distribuição por Canal</h3>
+        <div class="card-nm">
+            <h3 class="text-lg font-bold mb-8">Distribuição por Canal</h3>
             <div class="space-y-6">
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-primary-container"></div>
-                            <span class="font-label-lg">WhatsApp</span>
+                            <div class="w-3 h-3 rounded-full bg-[#1DA85A]"></div>
+                            <span class="font-medium">WhatsApp</span>
                         </div>
                         <span class="font-bold">64%</span>
                     </div>
-                    <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
-                        <div class="h-full bg-primary-container w-[64%]"></div>
+                    <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-[#1DA85A] w-[64%]"></div>
                     </div>
                 </div>
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-on-tertiary-container"></div>
-                            <span class="font-label-lg">Outros</span>
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span class="font-medium">Outros</span>
                         </div>
                         <span class="font-bold">36%</span>
                     </div>
-                    <div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
-                        <div class="h-full bg-on-tertiary-container w-[36%]"></div>
+                    <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500 w-[36%]"></div>
                     </div>
                 </div>
                 <div class="mt-12 flex justify-center">
@@ -186,11 +186,11 @@
     <!-- Bottom Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Chart 3: Inbound vs Outbound -->
-        <div class="card-nm rounded-xl p-8 shadow-sm">
+        <div class="card-nm">
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h3 class="font-headline-md text-headline-md">Fluxo de Mensagens</h3>
-                    <p class="text-outline text-sm">Comparativo inbound vs outbound</p>
+                    <h3 class="text-lg font-bold">Fluxo de Mensagens</h3>
+                    <p class="text-gray-500 text-sm">Comparativo inbound vs outbound</p>
                 </div>
             </div>
             <div style="height: 300px; position: relative;">
@@ -199,11 +199,11 @@
         </div>
 
         <!-- Chart 4: Atividade por Agente -->
-        <div class="card-nm rounded-xl p-8 shadow-sm">
+        <div class="card-nm">
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h3 class="font-headline-md text-headline-md">Atividade por Agente</h3>
-                    <p class="text-outline text-sm">Ranking de conversas</p>
+                    <h3 class="text-lg font-bold">Atividade por Agente</h3>
+                    <p class="text-gray-500 text-sm">Ranking de conversas</p>
                 </div>
             </div>
             <div style="height: 300px; position: relative;">
@@ -213,20 +213,20 @@
     </div>
 
     <!-- Top Contatos -->
-    <div class="card-nm rounded-xl shadow-sm overflow-hidden">
-        <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
+    <div class="card-nm overflow-hidden">
+        <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
             <div>
-                <h3 class="font-headline-md text-headline-md">Top 10 Contatos</h3>
-                <p class="text-outline text-sm">Contatos com mais interações</p>
+                <h3 class="text-lg font-bold">Top 10 Contatos</h3>
+                <p class="text-gray-500 text-sm">Contatos com mais interações</p>
             </div>
-            <a href="{{ route('conversations.index') }}?view=reports" class="text-primary font-bold hover:underline flex items-center space-x-1">
+            <a href="{{ route('conversations.index') }}?view=reports" class="text-[#1DA85A] font-bold hover:underline flex items-center space-x-1">
                 <span>Ver Todos</span>
                 <span class="material-symbols-outlined text-sm">chevron_right</span>
             </a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
-                <thead class="bg-surface-container-low text-on-surface-variant font-label-lg">
+                <thead class="bg-gray-50 text-gray-600 font-medium">
                     <tr>
                         <th class="px-8 py-4">Nome</th>
                         <th class="px-8 py-4">Telefone</th>
@@ -234,8 +234,8 @@
                         <th class="px-8 py-4 text-right">Conversas</th>
                     </tr>
                 </thead>
-                <tbody id="topContactsTable" class="divide-y divide-surface-container-highest">
-                    <tr><td colspan="4" class="text-center p-4 text-on-surface-variant">Carregando...</td></tr>
+                <tbody id="topContactsTable" class="divide-y divide-gray-200">
+                    <tr><td colspan="4" class="text-center p-4 text-gray-500">Carregando...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -243,13 +243,13 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <!-- My Chats -->
-        <div class="lg:col-span-2 card-nm rounded-xl shadow-sm flex flex-col overflow-hidden">
-            <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
+        <div class="lg:col-span-2 card-nm flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
                 <div>
-                    <h3 class="font-headline-md text-headline-md">Meus Atendimentos</h3>
-                    <p class="text-outline text-sm">{{ $myChats->count() }} chats ativos</p>
+                    <h3 class="text-lg font-bold">Meus Atendimentos</h3>
+                    <p class="text-gray-500 text-sm">{{ $myChats->count() }} chats ativos</p>
                 </div>
-                <a href="{{ route('conversations.index') }}" class="text-primary font-bold hover:underline flex items-center space-x-1">
+                <a href="{{ route('conversations.index') }}" class="text-[#1DA85A] font-bold hover:underline flex items-center space-x-1">
                     <span>Ver Todos</span>
                     <span class="material-symbols-outlined text-sm">chevron_right</span>
                 </a>
@@ -257,7 +257,7 @@
             <div class="overflow-x-auto">
                 @if($myChats->count() > 0)
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-surface-container-low text-on-surface-variant font-label-lg">
+                    <thead class="bg-gray-50 text-gray-600 font-medium">
                         <tr>
                             <th class="px-8 py-4">Cliente</th>
                             <th class="px-8 py-4">Última Mensagem</th>
@@ -265,29 +265,29 @@
                             <th class="px-8 py-4 text-right">Ação</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-surface-container-highest">
+                    <tbody class="divide-y divide-gray-200">
                         @foreach($myChats->take(5) as $chat)
                         @if($chat->contact)
-                        <tr class="hover:bg-surface-container-lowest transition-all group">
+                        <tr class="hover:bg-gray-50 transition-all group">
                             <td class="px-8 py-4">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-[#1DA85A] font-bold">
                                         {{ $chat->contact->initials }}
                                     </div>
                                     <div>
                                         <p class="font-bold">{{ $chat->contact->name }}</p>
-                                        <p class="text-[10px] text-outline">{{ $chat->contact->phone }}</p>
+                                        <p class="text-[10px] text-gray-500">{{ $chat->contact->phone }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-8 py-4">
-                                <p class="text-sm text-on-surface-variant truncate max-w-[250px]">
+                                <p class="text-sm text-gray-600 truncate max-w-[250px]">
                                     {{ $chat->lastMessage?->content ?? 'Sem mensagens' }}
                                 </p>
                             </td>
                             <td class="px-8 py-4 text-sm">{{ $chat->last_message_at?->diffForHumans() }}</td>
                             <td class="px-8 py-4 text-right">
-                                <a href="{{ route('conversations.index', ['conversation' => $chat->id]) }}" class="bg-primary text-on-primary text-xs font-semibold px-4 py-1.5 rounded-xl active:scale-95 transition-transform">Abrir</a>
+                                <a href="{{ route('conversations.index', ['conversation' => $chat->id]) }}" class="btn-nm-primary text-xs">Abrir</a>
                             </td>
                         </tr>
                         @endif
@@ -295,7 +295,7 @@
                     </tbody>
                 </table>
                 @else
-                <div class="p-8 text-center text-on-surface-variant text-sm">
+                <div class="p-8 text-center text-gray-500 text-sm">
                     Nenhum atendimento ativo no momento.
                 </div>
                 @endif
@@ -303,47 +303,47 @@
         </div>
 
         <!-- Online Agents -->
-        <div class="card-nm rounded-xl shadow-sm flex flex-col overflow-hidden">
-            <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
+        <div class="card-nm flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
                 <div>
-                    <h3 class="font-headline-md text-headline-md">Agentes Online</h3>
-                    <p class="text-outline text-sm">{{ $onlineAgents->count() }} agentes conectados</p>
+                    <h3 class="text-lg font-bold">Agentes Online</h3>
+                    <p class="text-gray-500 text-sm">{{ $onlineAgents->count() }} agentes conectados</p>
                 </div>
             </div>
             <div class="p-4 flex flex-col gap-2 max-h-[400px] overflow-y-auto custom-scrollbar">
                 @foreach($onlineAgents as $agent)
-                <div class="flex items-center gap-4 p-3 hover:bg-surface-container-low rounded-lg transition-colors">
+                <div class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors">
                     <div class="relative">
-                        <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm text-primary">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center font-bold text-sm text-[#1DA85A]">
                             {{ strtoupper(substr($agent->name, 0, 1)) }}
                         </div>
-                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-tertiary-container rounded-full border-2 border-white"></span>
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-bold text-sm truncate">{{ $agent->name }}</p>
-                        <p class="text-[10px] text-tertiary">Online</p>
+                        <p class="text-[10px] text-green-600">Online</p>
                     </div>
-                    <span class="text-xs font-semibold text-on-surface-variant bg-surface-container px-2 py-1 rounded">{{ $agent->conversations_count }} chats</span>
+                    <span class="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">{{ $agent->conversations_count }} chats</span>
                 </div>
                 @endforeach
                 @if($onlineAgents->isEmpty())
-                <p class="text-sm text-on-surface-variant text-center py-4">Nenhum agente online</p>
+                <p class="text-sm text-gray-500 text-center py-4">Nenhum agente online</p>
                 @endif
             </div>
         </div>
 
         <!-- Pending Chats -->
-        <div class="lg:col-span-3 card-nm rounded-xl shadow-sm flex flex-col overflow-hidden">
-            <div class="px-8 py-6 border-b border-surface-container-highest flex justify-between items-center">
+        <div class="lg:col-span-3 card-nm flex flex-col overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
                 <div>
-                    <h3 class="font-headline-md text-headline-md">Atendimentos Pendentes</h3>
-                    <p class="text-outline text-sm">Chats aguardando distribuição</p>
+                    <h3 class="text-lg font-bold">Atendimentos Pendentes</h3>
+                    <p class="text-gray-500 text-sm">Chats aguardando distribuição</p>
                 </div>
             </div>
             <div class="overflow-x-auto">
                 @if($pendingChats->count() > 0)
                 <table class="w-full text-left border-collapse">
-                    <thead class="bg-surface-container-low text-on-surface-variant font-label-lg">
+                    <thead class="bg-gray-50 text-gray-600 font-medium">
                         <tr>
                             <th class="px-8 py-4">Cliente</th>
                             <th class="px-8 py-4">Última Mensagem</th>
@@ -351,33 +351,33 @@
                             <th class="px-8 py-4 text-right">Ação</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-surface-container-highest">
+                    <tbody class="divide-y divide-gray-200">
                         @foreach($pendingChats as $chat)
                         @if($chat->contact)
-                        <tr class="hover:bg-surface-container-lowest transition-all group">
+                        <tr class="hover:bg-gray-50 transition-all group">
                             <td class="px-8 py-4">
                                 <div class="flex items-center space-x-3">
-                                    <div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center font-bold text-sm text-secondary">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-sm text-blue-600">
                                         {{ $chat->contact->initials }}
                                     </div>
                                     <div>
                                         <p class="font-bold">{{ $chat->contact->name }}</p>
-                                        <p class="text-[10px] text-outline">{{ $chat->contact->phone }}</p>
+                                        <p class="text-[10px] text-gray-500">{{ $chat->contact->phone }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-8 py-4">
-                                <p class="text-sm text-on-surface-variant truncate max-w-[300px]">
+                                <p class="text-sm text-gray-600 truncate max-w-[300px]">
                                     "{{ $chat->lastMessage?->content ?? 'Aguardando...' }}"
                                 </p>
                             </td>
-                            <td class="px-8 py-4 text-sm @if($chat->last_message_at?->diffInMinutes() > 10) text-error font-bold @else text-on-surface-variant @endif">
+                            <td class="px-8 py-4 text-sm @if($chat->last_message_at?->diffInMinutes() > 10) text-red-600 font-bold @else text-gray-600 @endif">
                                 {{ $chat->last_message_at?->diffForHumans() }}
                             </td>
                             <td class="px-8 py-4 text-right">
                                 <form method="POST" action="{{ route('conversations.assign', $chat) }}" class="inline">
                                     @csrf @method('PATCH')
-                                    <button type="submit" class="bg-primary text-on-primary text-xs font-semibold px-4 py-1.5 rounded-xl active:scale-95 transition-transform">Assumir</button>
+                                    <button type="submit" class="btn-nm-primary text-xs">Assumir</button>
                                 </form>
                             </td>
                         </tr>
@@ -386,7 +386,7 @@
                     </tbody>
                 </table>
                 @else
-                <div class="p-8 text-center text-on-surface-variant text-sm">
+                <div class="p-8 text-center text-gray-500 text-sm">
                     Nenhum atendimento pendente.
                 </div>
                 @endif

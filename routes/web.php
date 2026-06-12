@@ -44,6 +44,9 @@ Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')-
     Route::resource('flows', FlowController::class)->except(['show']);
     Route::post('/flows/{flow}/toggle', [FlowController::class, 'toggle'])->name('flows.toggle');
     Route::get('/flows/{flow}/executions', [FlowController::class, 'executions'])->name('flows.executions');
+    Route::get('/flows/validate-variables', [FlowController::class, 'validateVariables'])->name('flows.validate-variables');
+    Route::get('/flows/preview-variables', [FlowController::class, 'previewVariables'])->name('flows.preview-variables');
+    Route::get('/flows/available-variables', [FlowController::class, 'availableVariables'])->name('flows.available-variables');
 
     // Tags
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class);

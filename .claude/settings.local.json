@@ -113,7 +113,11 @@
       "Bash(mkdir -p .superpowers/brainstorm)",
       "Bash(python3 -c ' *)",
       "Bash(cat .superpowers/brainstorm/state/server-info.json)",
-      "Bash(xargs grep -l \"Conversation\\\\|Message\")"
+      "Bash(xargs grep -l \"Conversation\\\\|Message\")",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(node --version)",
+      "PowerShell(claude *)",
+      "Bash(sqlite3 database.sqlite \"SELECT id, name, config FROM conversation_flows LIMIT 5;\")"
     ]
   }
 }

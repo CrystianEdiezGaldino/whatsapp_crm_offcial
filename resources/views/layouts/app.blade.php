@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'SisChat') - Santa Monica</title>
+    <title>@yield('title', 'SisZap') - Santa Monica</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -143,9 +143,7 @@
         <aside class="w-sidebar h-full bg-primary-container flex flex-col shrink-0 z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(0,23,105,0.15)]">
             {{-- Brand --}}
             <div class="px-4 pt-6 pb-5 border-b border-white/10 flex flex-col items-center text-center">
-                <img alt="Santa Monica Logo" class="brightness-0 invert mb-3" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
-                <h1 class="sidebar-brand text-lg font-bold text-on-primary font-headline tracking-tight leading-tight">SisChat</h1>
-                <p class="text-[11px] uppercase tracking-wider text-on-primary-container/80 font-medium mt-0.5">Santa Mônica CC</p>
+                <h1 class="sidebar-brand text-3xl font-black text-on-primary font-headline tracking-tight leading-tight">SisZap</h1>
             </div>
 
             {{-- Nav --}}
@@ -197,6 +195,9 @@
                         <span class="text-sm">Sair</span>
                     </button>
                 </form>
+                <div class="mt-4 pt-3 border-t border-white/10 flex justify-center">
+                    <img alt="Santa Monica Logo" class="brightness-0 invert opacity-80 w-20 h-auto" src="https://santamonica.rec.br/wp-content/uploads/2023/02/logo-santa-monica.png" />
+                </div>
             </div>
         </aside>
         @endif

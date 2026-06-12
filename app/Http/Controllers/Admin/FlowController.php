@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Conversation;
 use App\Models\ConversationFlow;
 use App\Models\Sector;
 use App\Services\FlowManagementService;
+use App\Services\VariableResolver;
+use App\Services\VariableValidator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -124,5 +128,38 @@ class FlowController extends Controller
         $this->service->deleteFlow($flow);
 
         return redirect()->route('admin.flows.index')->with('success', 'Fluxo deletado com sucesso!');
+    }
+
+    public function validateVariables(Request $request, VariableValidator $validator): JsonResponse
+    {
+        $text = $request->query('text', '');
+        $result = $validator->validate($text);
+
+        return response()->json($result);
+    }
+
+    public function previewVariables(Request $request, VariableResolver $resolver): JsonResponse
+    {
+        $text = $request->query('text', '');
+        $conversationId = $request->query('conversation_id');
+
+        if ($conversationId) {
+            $conversation = Conversation::find($conversationId);
+            if ($conversation) {
+                $variables = $resolver->resolve($conversation);
+                foreach ($variables as $key => $value) {
+                    $text = str_replace("{{$key}}", $value, $text);
+                }
+            }
+        }
+
+        return response()->json(['preview' => $text]);
+    }
+
+    public function availableVariables(VariableResolver $resolver): JsonResponse
+    {
+        return response()->json([
+            'variables' => $resolver->getAvailableVariables()
+        ]);
     }
 }

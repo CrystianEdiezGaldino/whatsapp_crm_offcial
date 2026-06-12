@@ -162,15 +162,13 @@ class FlowService
 
     private function replaceVariables(string $text, Conversation $conversation): string
     {
-        return str_replace([
-            '{{contact_name}}',
-            '{{contact_phone}}',
-            '{{sector_name}}'
-        ], [
-            $conversation->contact->name ?? 'Cliente',
-            $conversation->contact->phone ?? '',
-            $conversation->sector->name ?? ''
-        ], $text);
+        $variables = app(VariableResolver::class)->resolve($conversation);
+
+        foreach ($variables as $key => $value) {
+            $text = str_replace("{{$key}}", $value, $text);
+        }
+
+        return $text;
     }
 
     private function sendMessage(Conversation $conversation, string $content): void

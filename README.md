@@ -1,66 +1,283 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SisZap — CRM WhatsApp (Santa Mônica CC)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de atendimento omnichannel integrado à **WhatsApp Cloud API (Meta)**. Centraliza conversas, distribui atendimentos por setor, automatiza fluxos iniciais (bot) e oferece painel para agentes e administradores.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## O que o sistema faz
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Área | Função |
+|------|--------|
+| **Atendimentos** | Chat em tempo real com clientes via WhatsApp (texto, áudio, imagem, documento) |
+| **Contatos** | Cadastro e histórico de clientes |
+| **Macros** | Respostas rápidas reutilizáveis (`/oi`, `/aguarde`, etc.) |
+| **Fluxos (bot)** | Menu automático na nova conversa — direciona para setores |
+| **Distribuição** | Fila e roteamento de conversas para agentes |
+| **Admin** | Setores, atendentes, SLA, tags, reclamações, transferências, tokens WhatsApp |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Requisitos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP **8.1+**
+- Composer
+- MySQL **5.7+** ou MariaDB
+- Node.js **18+** (assets front-end)
+- **ffmpeg** (opcional — gravação de áudio no navegador)
+- Conta **Meta Developer** com WhatsApp Business configurado
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalação rápida
 
-## Laravel Sponsors
+```bash
+# 1. Clonar e entrar na pasta
+git clone https://github.com/CrystianEdiezGaldino/whatsapp_crm_offcial.git
+cd whatsapp_crm_offcial
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 2. Dependências
+composer install
+npm install
 
-### Premium Partners
+# 3. Ambiente
+cp .env.example .env
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# 4. Banco — edite DB_* no .env antes
+php artisan migrate
+php artisan db:seed
 
-## Contributing
+# 5. Storage e assets
+php artisan storage:link
+npm run build
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# 6. Subir servidor
+php artisan serve
+```
 
-## Code of Conduct
+Acesse: **http://127.0.0.1:8000**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Configuração
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Banco de dados (`.env`)
 
-## License
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=SisZap
+DB_USERNAME=root
+DB_PASSWORD=sua_senha
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+APP_URL=http://127.0.0.1:8000
+```
+
+### WhatsApp Cloud API (`.env`)
+
+```env
+WA_PHONE_NUMBER_ID=          # ID do número na Meta
+WA_ACCESS_TOKEN=             # Token de acesso (Graph API)
+WA_VERIFY_TOKEN=             # Token secreto do webhook (você define)
+WA_API_VERSION=v23.0
+WA_BASE_URL=https://graph.facebook.com
+
+# Opcional — áudio gravado no navegador (WebM → OGG)
+# WA_FFMPEG_PATH=ffmpeg
+# Windows: WA_FFMPEG_PATH=C:\ffmpeg\bin\ffmpeg.exe
+```
+
+| Variável | Para que serve |
+|----------|----------------|
+| `WA_PHONE_NUMBER_ID` | Identifica o número WhatsApp Business |
+| `WA_ACCESS_TOKEN` | Autentica envio/recebimento na Meta |
+| `WA_VERIFY_TOKEN` | Valida o webhook (mesmo valor no painel Meta) |
+| `WA_FFMPEG_PATH` | Converte áudio gravado no ERP |
+
+**Tokens no painel:** em produção você também pode gerenciar tokens em **Admin → Tokens WhatsApp** (com renovação automática).
+
+### Webhook na Meta
+
+1. Acesse [developers.facebook.com](https://developers.facebook.com) → seu app → **WhatsApp → Configuration**.
+2. **Callback URL:** `https://SEU-DOMINIO/api/webhook/whatsapp`
+3. **Verify token:** igual ao `WA_VERIFY_TOKEN` do `.env`.
+4. Assine o campo **`messages`**.
+
+**Desenvolvimento local** — use [ngrok](https://ngrok.com):
+
+```bash
+ngrok http 8000
+# Use a URL HTTPS gerada: https://xxxx.ngrok-free.app/api/webhook/whatsapp
+```
+
+### Modo teste (Meta)
+
+No painel **WhatsApp → API Setup → To**, cadastre os celulares que podem **receber** mensagens do número de teste. Sem isso o envio retorna erro **#131030**. Receber mensagens via webhook **não** depende dessa lista.
+
+---
+
+## Primeiro acesso
+
+Após `php artisan db:seed`:
+
+| Perfil | E-mail | Senha |
+|--------|--------|-------|
+| Admin | `admin@erp.com` | `password` |
+| Agente | `ana@erp.com` | `password` |
+
+> Altere as senhas em produção.
+
+---
+
+## Como funciona
+
+```
+Cliente WhatsApp
+      │
+      ▼
+ Meta Cloud API ──POST──▶ /api/webhook/whatsapp  (mensagem salva no banco)
+      ▲
+      │
+ Agente no SisZap ──POST──▶ /conversations/send  (envia via API)
+      │
+      ▼
+ Tela de chat atualiza via poll (a cada ~5s)
+```
+
+1. Cliente manda mensagem → Meta envia webhook → sistema cria/atualiza conversa.
+2. Se houver **fluxo ativo**, o bot envia menu e direciona para um setor.
+3. Conversa entra na **fila** e é atribuída a um agente (manual ou automática).
+4. Agente responde pelo painel **Atendimentos** → mensagem vai para o WhatsApp do cliente.
+
+---
+
+## Uso do dia a dia
+
+### Agente
+
+1. Faça login e abra **Atendimentos**.
+2. Clique em uma conversa na lista (ou use **Assumir** para pegar da fila).
+3. Digite a resposta ou use **Macros** (`/atalho`).
+4. Envie texto, anexo ou grave áudio.
+5. Ao finalizar, use **Resolver** com motivo de encerramento.
+
+### Administrador
+
+Além do que o agente faz, o admin configura:
+
+| Menu | O que configurar |
+|------|------------------|
+| **Setores** | Áreas de atendimento (Suporte, Vendas, etc.) |
+| **Atendentes** | Usuários, setor, capacidade |
+| **Fluxos** | Bot de boas-vindas e menu de opções |
+| **Distribuição** | Regras da fila e capacidade por agente |
+| **SLA** | Prazos e alertas |
+| **Tags** | Etiquetas nas conversas |
+| **Tokens / Números WhatsApp** | Integração com a Meta |
+
+### Fluxos (bot)
+
+Em **Admin → Fluxos** você cria o atendimento automático:
+
+- **Mensagem inicial** — saudação ao cliente
+- **Opções de menu** — número + texto + setor destino
+- **Mensagem final** — confirmação após a escolha
+
+Gatilhos: nova conversa, comando ou manual.
+
+---
+
+## Comandos úteis
+
+```bash
+# Servidor local
+php artisan serve
+
+# Assets em desenvolvimento
+npm run dev
+
+# Limpar cache
+php artisan config:clear
+php artisan cache:clear
+
+# Reprocessar fila de mensagens com falha
+php artisan messages:retry
+
+# Renovar token WhatsApp
+php artisan whatsapp:refresh-token
+```
+
+### Produção — agendador
+
+O sistema precisa do scheduler rodando para retry de mensagens e renovação de token:
+
+```bash
+# Crontab (Linux)
+* * * * * cd /caminho/do/projeto && php artisan schedule:run >> /dev/null 2>&1
+```
+
+---
+
+## Estrutura do projeto
+
+```
+app/
+  Http/Controllers/     # Rotas web e webhook
+  Services/             # WhatsApp, distribuição, fluxos
+  Models/               # User, Conversation, Message, Sector...
+resources/views/        # Telas Blade (chat, admin, dashboard)
+routes/web.php          # Rotas principais
+config/services.php     # Config WhatsApp
+```
+
+---
+
+## Rotas importantes
+
+| URL | Função |
+|-----|--------|
+| `/login` | Entrada no sistema |
+| `/dashboard` | Painel geral |
+| `/conversations` | Chat de atendimento |
+| `/admin/flows` | Gestão de fluxos (bot) |
+| `GET/POST /api/webhook/whatsapp` | Webhook Meta |
+| `/health` | Status do sistema |
+
+---
+
+## Documentação detalhada
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| [AJUDA_WHATSAPP.md](AJUDA_WHATSAPP.md) | Webhook, envio, mídia, erros comuns |
+| [PROJECT_FLOW.md](PROJECT_FLOW.md) | Regras de negócio e arquitetura |
+| [docs/FLOW_BUILDER_DESIGN.md](docs/FLOW_BUILDER_DESIGN.md) | Design do construtor de fluxos |
+| [WEBHOOK_TROUBLESHOOTING.md](WEBHOOK_TROUBLESHOOTING.md) | Problemas no webhook |
+
+---
+
+## Problemas comuns
+
+| Problema | Solução |
+|----------|---------|
+| Webhook não verifica | `WA_VERIFY_TOKEN` deve ser idêntico no `.env` e na Meta |
+| Mensagem não envia (#131030) | Número não está na lista de teste da Meta |
+| Chat não atualiza | Verifique se o servidor está rodando e o poll retorna 200 |
+| Áudio não envia | Instale ffmpeg e configure `WA_FFMPEG_PATH` |
+| Token expirado | Use **Admin → Tokens WhatsApp** ou `whatsapp:refresh-token` |
+
+---
+
+## Stack
+
+- **Laravel 10** — back-end
+- **Tailwind CSS** — interface
+- **MySQL** — banco de dados
+- **WhatsApp Cloud API** — mensageria
+
+---
+
+## Licença
+
+MIT — uso interno Santa Mônica Clube de Campo.
