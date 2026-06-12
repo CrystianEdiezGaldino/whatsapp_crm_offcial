@@ -14,53 +14,78 @@
             theme: {
                 extend: {
                     colors: {
-                        'on-secondary-fixed-variant': '#354769',
-                        'on-tertiary-fixed-variant': '#00522d',
-                        'secondary-fixed-dim': '#b5c6f0',
-                        'on-primary': '#ffffff',
-                        'surface-container-highest': '#e1e3e4',
-                        'tertiary-fixed': '#8bf9b2',
-                        'on-background': '#191c1d',
-                        'secondary-fixed': '#d8e2ff',
-                        'on-secondary-fixed': '#061b3c',
-                        'on-primary-fixed': '#001159',
-                        'surface-dim': '#d9dadb',
-                        'on-surface-variant': '#454652',
-                        'on-surface': '#191c1d',
-                        'background': '#f8f9fa',
-                        'primary-fixed': '#dee1ff',
-                        'on-primary-fixed-variant': '#283d9d',
-                        'error-container': '#ffdad6',
-                        'primary-fixed-dim': '#b9c3ff',
-                        'surface-container': '#edeeef',
-                        'primary': '#001769',
-                        'tertiary-fixed-dim': '#6edc98',
-                        'tertiary': '#002913',
-                        'on-tertiary': '#ffffff',
-                        'inverse-primary': '#b9c3ff',
-                        'tertiary-container': '#004122',
-                        'surface-tint': '#4256b7',
-                        'inverse-surface': '#2e3132',
-                        'surface-container-lowest': '#ffffff',
-                        'surface': '#f8f9fa',
-                        'on-secondary': '#ffffff',
-                        'secondary': '#4d5e83',
-                        'outline-variant': '#c5c5d4',
-                        'on-error-container': '#93000a',
-                        'on-primary-container': '#879aff',
-                        'secondary-container': '#c3d4ff',
-                        'on-secondary-container': '#4a5b80',
-                        'primary-container': '#142c8e',
-                        'on-tertiary-fixed': '#00210f',
-                        'on-error': '#ffffff',
-                        'surface-variant': '#e1e3e4',
-                        'surface-container-high': '#e7e8e9',
-                        'surface-bright': '#f8f9fa',
-                        'on-tertiary-container': '#46b575',
-                        'inverse-on-surface': '#f0f1f2',
-                        'surface-container-low': '#f3f4f5',
-                        'outline': '#757684',
-                        'error': '#ba1a1a'
+                        /* SisZap Design System Colors */
+                        'primary': '#1DA85A',
+                        'primary-dark': '#15884d',
+                        'secondary': '#4353E8',
+                        'success': '#22C55E',
+                        'warning': '#F59E0B',
+                        'error': '#D1383E',
+
+                        /* Grayscale */
+                        'gray-50': '#F7F8FB',
+                        'gray-100': '#F0F2F7',
+                        'gray-200': '#E8EAF0',
+                        'gray-400': '#9CA3AF',
+                        'gray-600': '#6B7280',
+                        'gray-700': '#3A4154',
+                        'gray-900': '#14171F',
+
+                        /* Background & Surface */
+                        'background': '#FFFFFF',
+                        'surface': '#F7F8FB',
+                        'surface-card': '#FFFFFF',
+                        'on-background': '#14171F',
+                        'on-surface': '#14171F',
+
+                        /* Legacy Colors (for backward compatibility) */
+                        'primary-container': '#1DA85A',
+                        'on-primary': '#FFFFFF',
+                        'on-primary-container': '#FFFFFF',
+                        'on-primary-fixed': '#FFFFFF',
+                        'on-primary-fixed-variant': '#FFFFFF',
+                        'primary-fixed': '#E8F8EF',
+                        'primary-fixed-dim': '#1DA85A',
+
+                        'secondary-container': '#EEF0FE',
+                        'on-secondary': '#FFFFFF',
+                        'on-secondary-container': '#4353E8',
+                        'secondary-fixed': '#EEF0FE',
+                        'secondary-fixed-dim': '#4353E8',
+                        'on-secondary-fixed': '#4353E8',
+                        'on-secondary-fixed-variant': '#4353E8',
+
+                        'tertiary-fixed': '#E8F8EF',
+                        'tertiary-fixed-dim': '#22C55E',
+                        'on-tertiary-fixed': '#22C55E',
+                        'on-tertiary-fixed-variant': '#22C55E',
+                        'tertiary': '#22C55E',
+                        'on-tertiary': '#FFFFFF',
+                        'tertiary-container': '#E8F8EF',
+                        'on-tertiary-container': '#22C55E',
+
+                        'error-container': '#F8D2D4',
+                        'on-error': '#FFFFFF',
+                        'on-error-container': '#D1383E',
+
+                        'surface-dim': '#E8EAF0',
+                        'surface-bright': '#FFFFFF',
+                        'surface-container-lowest': '#FFFFFF',
+                        'surface-container-low': '#F7F8FB',
+                        'surface-container': '#F0F2F7',
+                        'surface-container-high': '#E8EAF0',
+                        'surface-container-highest': '#E8EAF0',
+                        'surface-variant': '#E8EAF0',
+
+                        'on-surface-variant': '#6B7280',
+                        'outline': '#9CA3AF',
+                        'outline-variant': '#E8EAF0',
+
+                        'inverse-surface': '#14171F',
+                        'inverse-on-surface': '#F7F8FB',
+                        'inverse-primary': '#1DA85A',
+
+                        'surface-tint': '#1DA85A',
                     },
                     fontFamily: {
                         'sans': ['Inter', 'sans-serif'],
@@ -77,8 +102,8 @@
             overflow: hidden;
         }
         body {
-            background-color: #f8f9fa;
-            color: #191c1d;
+            background-color: #FFFFFF;
+            color: #14171F;
         }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
@@ -86,13 +111,13 @@
         }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c5c5d4; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E8EAF0; border-radius: 10px; }
         aside .sidebar-brand {
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         aside .nav-link-active {
-            background: linear-gradient(90deg, rgba(139, 249, 178, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
-            box-shadow: inset 3px 0 0 0 #8bf9b2;
+            background: linear-gradient(90deg, rgba(29, 168, 90, 0.12) 0%, rgba(255, 255, 255, 0.08) 100%);
+            box-shadow: inset 3px 0 0 0 #1DA85A;
         }
         aside .nav-icon-wrap {
             transition: background-color 0.2s, color 0.2s;
@@ -102,8 +127,8 @@
             background-color: rgba(255, 255, 255, 0.12);
         }
         aside .nav-link-active .nav-icon-wrap {
-            background-color: rgba(139, 249, 178, 0.2);
-            color: #8bf9b2;
+            background-color: rgba(29, 168, 90, 0.2);
+            color: #1DA85A;
         }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -140,7 +165,7 @@
                 ['route' => 'admin.whatsapp.numbers.index', 'match' => 'admin.whatsapp.numbers', 'icon' => 'phone', 'label' => 'Números WhatsApp'],
             ];
         @endphp
-        <aside class="w-sidebar h-full bg-primary-container flex flex-col shrink-0 z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(0,23,105,0.15)]">
+        <aside class="w-sidebar h-full bg-gray-900 flex flex-col shrink-0 z-50 border-r border-white/10 shadow-[4px_0_24px_rgba(29,168,90,0.1)]">
             {{-- Brand --}}
             <div class="px-4 pt-6 pb-5 border-b border-white/10 flex flex-col items-center text-center">
                 <h1 class="sidebar-brand text-3xl font-black text-on-primary font-headline tracking-tight leading-tight">SisZap</h1>
@@ -148,7 +173,7 @@
 
             {{-- Nav --}}
             <nav class="flex-1 overflow-y-auto custom-scrollbar px-3 py-4 flex flex-col gap-1">
-                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-on-primary-container/60">Operação</p>
+                <p class="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-white/40">Operação</p>
                 @foreach($mainNav as $item)
                     @php $active = $navActive($item['match']); @endphp
                     <a href="{{ route($item['route']) }}" class="{{ $navItemClass($active) }}">
@@ -160,7 +185,7 @@
                 @endforeach
 
                 @if(auth()->check() && auth()->user()->isAdmin())
-                <p class="px-3 mt-4 mb-1 text-[10px] font-semibold uppercase tracking-widest text-on-primary-container/60">Administração</p>
+                <p class="px-3 mt-4 mb-1 text-[10px] font-semibold uppercase tracking-widest text-white/40">Administração</p>
                 @foreach($adminNav as $item)
                     @php $active = $navActive($item['match']); @endphp
                     <a href="{{ route($item['route']) }}" class="{{ $navItemClass($active) }}">
