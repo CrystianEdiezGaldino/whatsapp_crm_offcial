@@ -122,152 +122,187 @@ select:disabled {
   opacity: 1;
 }
 
-/* ===== NEUMORPHISM DESIGN SYSTEM ===== */
+/* ===== DESIGN SYSTEM (SisZap) ===== */
 
-/* Neumorphic Cards */
+/* Card Primary */
+.card-primary {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #E8EAF0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.card-primary:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Neumorphic Cards (Legacy) */
 .card-neumorphic {
-  background: rgb(255, 255, 255);
-  border-radius: 20px;
-  padding: 20px;
-  border: none;
-  box-shadow: rgb(196, 200, 212) 6px 6px 16px, rgb(255, 255, 255) -2px -2px 8px;
-  transition: all 0.3s ease-in-out;
+  @extend .card-primary;
 }
 
 .card-neumorphic:hover {
-  box-shadow: rgb(196, 200, 212) 8px 8px 20px, rgb(255, 255, 255) -3px -3px 10px;
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
-/* Neumorphic Buttons - Primary (Green) */
-.btn-neumorphic-primary {
-  height: 42px;
-  padding: 0px 20px;
+/* Button Primary */
+.btn-primary {
+  padding: 12px 18px;
   border-radius: 14px;
-  background: rgb(29, 168, 90);
-  color: rgb(255, 255, 255);
+  background: #1DA85A;
+  color: #FFFFFF;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
   border: none;
-  box-shadow: rgba(29, 168, 90, 0.35) 4px 4px 10px, rgb(255, 255, 255) -3px -3px 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.btn-neumorphic-primary:hover {
-  background: rgb(24, 148, 76);
-  box-shadow: rgba(24, 148, 76, 0.35) 6px 6px 12px, rgb(255, 255, 255) -3px -3px 8px;
-  transform: translateY(-2px);
+.btn-primary:hover {
+  background: #15884d;
+  box-shadow: 0 4px 12px rgba(29, 168, 90, 0.15);
+  transform: translateY(-1px);
 }
 
-.btn-neumorphic-primary:active {
-  box-shadow: rgba(29, 168, 90, 0.25) 2px 2px 6px inset, rgb(255, 255, 255) -1px -1px 3px inset;
+.btn-primary:active {
   transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.btn-neumorphic-primary:disabled {
+.btn-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Neumorphic Buttons - Secondary */
-.btn-neumorphic-secondary {
-  height: 42px;
-  padding: 0px 20px;
+/* Neumorphic Buttons - Primary (Legacy) */
+.btn-neumorphic-primary {
+  @extend .btn-primary;
+}
+
+/* Button Secondary */
+.btn-secondary {
+  padding: 12px 18px;
   border-radius: 14px;
-  background: rgb(240, 242, 247);
-  color: rgb(80, 90, 110);
+  background: #F0F2F7;
+  color: #3A4154;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
-  border: none;
-  box-shadow: rgb(196, 200, 212) 3px 3px 8px, rgb(255, 255, 255) -2px -2px 6px;
+  border: 1px solid #E8EAF0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.btn-neumorphic-secondary:hover {
-  background: rgb(245, 247, 252);
-  box-shadow: rgb(196, 200, 212) 4px 4px 10px, rgb(255, 255, 255) -2px -2px 6px;
-  transform: translateY(-2px);
+.btn-secondary:hover {
+  background: #F7F8FB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
-.btn-neumorphic-secondary:active {
-  box-shadow: rgb(196, 200, 212) 1px 1px 4px inset, rgb(255, 255, 255) -1px -1px 3px inset;
+.btn-secondary:active {
   transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Neumorphic Input Fields */
-.input-neumorphic {
+/* Neumorphic Buttons - Secondary (Legacy) */
+.btn-neumorphic-secondary {
+  @extend .btn-secondary;
+}
+
+/* Input Primary */
+.input-primary {
   width: 100%;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 14px;
-  background: rgb(255, 255, 255);
-  color: rgb(50, 55, 70);
-  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid #E8EAF0;
+  border-radius: 12px;
+  background: #FFFFFF;
+  color: #3A4154;
+  font-size: 13px;
   font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
-  box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
 }
 
-.input-neumorphic:focus {
+.input-primary:focus {
   outline: none;
-  box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  border-color: #4353E8;
+  box-shadow: 0 0 0 3px rgba(67, 83, 232, 0.1);
 }
 
-/* Neumorphic Textarea */
-.textarea-neumorphic {
+/* Neumorphic Input Fields (Legacy) */
+.input-neumorphic {
+  @extend .input-primary;
+}
+
+/* Textarea Primary */
+.textarea-primary {
   width: 100%;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 14px;
-  background: rgb(255, 255, 255);
-  color: rgb(50, 55, 70);
-  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid #E8EAF0;
+  border-radius: 12px;
+  background: #FFFFFF;
+  color: #3A4154;
+  font-size: 13px;
   font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
-  box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease-in-out;
   resize: vertical;
 }
 
-.textarea-neumorphic:focus {
+.textarea-primary:focus {
   outline: none;
-  box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  border-color: #4353E8;
+  box-shadow: 0 0 0 3px rgba(67, 83, 232, 0.1);
 }
 
-/* Neumorphic Select */
-.select-neumorphic {
+/* Neumorphic Textarea (Legacy) */
+.textarea-neumorphic {
+  @extend .textarea-primary;
+}
+
+/* Select Primary */
+.select-primary {
   width: 100%;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 14px;
-  background: rgb(255, 255, 255);
-  color: rgb(50, 55, 70);
-  font-size: 14px;
-  font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
-  box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(80,90,110)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  padding: 12px 14px;
+  border: 1px solid #E8EAF0;
+  border-radius: 12px;
+  background: #FFFFFF url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 20px;
+  color: #3A4154;
+  font-size: 13px;
+  font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  appearance: none;
   padding-right: 40px;
 }
 
-.select-neumorphic:focus {
+.select-primary:focus {
   outline: none;
-  box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+  border-color: #4353E8;
+  box-shadow: 0 0 0 3px rgba(67, 83, 232, 0.1);
+}
+
+/* Neumorphic Select (Legacy) */
+.select-neumorphic {
+  @extend .select-primary;
 }
 
 /* Neumorphic Option Block (for grouped options) */
@@ -303,80 +338,89 @@ select:disabled {
   color: rgb(160, 20, 30);
 }
 
-/* Tailwind Utility Overrides */
+/* Tailwind Utility Overrides - SisZap Design System */
 @layer components {
+  /* Primary Button */
   .btn-nm-primary {
-    @apply h-[42px] px-5 rounded-[14px] bg-[#1DA85A] text-white text-sm font-bold cursor-pointer font-sans;
-    box-shadow: rgba(29, 168, 90, 0.35) 4px 4px 10px, rgb(255, 255, 255) -3px -3px 8px;
+    @apply px-4 py-3 rounded-[14px] bg-[#1DA85A] text-white text-sm font-bold cursor-pointer font-sans;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease-in-out;
   }
 
   .btn-nm-primary:hover {
-    background: rgb(24, 148, 76);
-    box-shadow: rgba(24, 148, 76, 0.35) 6px 6px 12px, rgb(255, 255, 255) -3px -3px 8px;
-    transform: translateY(-2px);
+    background: #15884d;
+    box-shadow: 0 4px 12px rgba(29, 168, 90, 0.15);
+    transform: translateY(-1px);
   }
 
   .btn-nm-primary:active {
-    box-shadow: rgba(29, 168, 90, 0.25) 2px 2px 6px inset, rgb(255, 255, 255) -1px -1px 3px inset;
     transform: translateY(0);
   }
 
+  /* Secondary Button */
   .btn-nm-secondary {
-    @apply h-[42px] px-5 rounded-[14px] bg-[#F0F2F7] text-[#505A6E] text-sm font-bold cursor-pointer font-sans;
-    box-shadow: rgb(196, 200, 212) 3px 3px 8px, rgb(255, 255, 255) -2px -2px 6px;
+    @apply px-4 py-3 rounded-[14px] bg-[#F0F2F7] text-[#3A4154] text-sm font-bold cursor-pointer font-sans;
+    border: 1px solid #E8EAF0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease-in-out;
   }
 
   .btn-nm-secondary:hover {
-    background: rgb(245, 247, 252);
-    box-shadow: rgb(196, 200, 212) 4px 4px 10px, rgb(255, 255, 255) -2px -2px 6px;
-    transform: translateY(-2px);
+    background: #F7F8FB;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
   }
 
+  /* Card */
   .card-nm {
-    @apply bg-white rounded-[20px] p-5;
-    box-shadow: rgb(196, 200, 212) 6px 6px 16px, rgb(255, 255, 255) -2px -2px 8px;
-    transition: all 0.3s ease-in-out;
+    @apply bg-white rounded-[12px] p-[18px];
+    border: 1px solid #E8EAF0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
   }
 
   .card-nm:hover {
-    box-shadow: rgb(196, 200, 212) 8px 8px 20px, rgb(255, 255, 255) -3px -3px 10px;
-    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
   }
 
+  /* Input */
   .input-nm {
-    @apply w-full px-4 py-3 rounded-[14px] bg-white text-[#323746] text-sm font-sans;
-    box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    @apply w-full px-3.5 py-3 rounded-[12px] bg-white text-[#3A4154] text-sm font-sans;
+    border: 1px solid #E8EAF0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease-in-out;
-    border: none;
   }
 
   .input-nm:focus {
     outline: none;
-    box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    border-color: #4353E8;
+    box-shadow: 0 0 0 3px rgba(67, 83, 232, 0.1);
   }
 
+  /* Textarea */
   .textarea-nm {
-    @apply w-full px-4 py-3 rounded-[14px] bg-white text-[#323746] text-sm font-sans;
-    box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    @apply w-full px-3.5 py-3 rounded-[12px] bg-white text-[#3A4154] text-sm font-sans;
+    border: 1px solid #E8EAF0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease-in-out;
-    border: none;
     resize: vertical;
   }
 
   .textarea-nm:focus {
     outline: none;
-    box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    border-color: #4353E8;
+    box-shadow: 0 0 0 3px rgba(67, 83, 232, 0.1);
   }
 
+  /* Select */
   .select-nm {
-    @apply w-full px-4 py-3 rounded-[14px] bg-white text-[#323746] text-sm font-sans cursor-pointer;
-    box-shadow: rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    @apply w-full px-3.5 py-3 rounded-[12px] bg-white text-[#3A4154] text-sm font-sans cursor-pointer;
+    border: 1px solid #E8EAF0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease-in-out;
-    border: none;
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(80,90,110)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 20px;
@@ -385,6 +429,28 @@ select:disabled {
 
   .select-nm:focus {
     outline: none;
-    box-shadow: rgb(29, 168, 90) 0 0 0 2px, rgb(196, 200, 212) 4px 4px 12px inset, rgb(255, 255, 255) -2px -2px 6px inset;
+    border-color: #4353E8;
+    box-shadow: 0 0 0 3px rgba(67, 83, 232, 0.1);
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold;
+  }
+
+  .badge-success {
+    @apply bg-[#E8F8EF] text-[#22C55E];
+  }
+
+  .badge-warning {
+    @apply bg-[#FFF7DE] text-[#F59E0B];
+  }
+
+  .badge-error {
+    @apply bg-[#F8D2D4] text-[#D1383E];
+  }
+
+  .badge-info {
+    @apply bg-[#EEF0FE] text-[#4353E8];
   }
 }
