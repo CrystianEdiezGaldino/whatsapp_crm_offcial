@@ -96,7 +96,7 @@ class ReportController extends Controller
             ->get();
 
         // 7. Tempo médio de resposta
-        $avgResponseTime = Message::selectRaw('AVG(TIMESTAMPDIFF(SECOND, inbound.created_at, outbound.created_at)) as seconds')
+        $avgResponseTime = Message::selectRaw('AVG(DATEDIFF(SECOND, inbound.created_at, outbound.created_at)) as seconds')
             ->from('messages as outbound')
             ->join('messages as inbound', 'outbound.conversation_id', '=', 'inbound.conversation_id')
             ->where('inbound.direction', 'inbound')
