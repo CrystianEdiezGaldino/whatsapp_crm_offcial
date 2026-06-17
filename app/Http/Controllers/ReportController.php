@@ -18,12 +18,20 @@ class ReportController extends Controller
     // GET /reports/dashboard-data
     public function dashboardData(Request $request)
     {
-        $startDate = $request->query('start_date', now()->subDays(30)->startOfDay());
-        $endDate = $request->query('end_date', now()->endOfDay());
+        $startDate = $request->query('start_date') ?: now()->subDays(30)->startOfDay();
+        $endDate = $request->query('end_date') ?: now()->endOfDay();
         $agentId = $request->query('agent_id', null);
 
+        // Ensure dates are Carbon instances
+        if (is_string($startDate)) {
+            $startDate = \Carbon\Carbon::parse($startDate)->startOfDay();
+        }
+        if (is_string($endDate)) {
+            $endDate = \Carbon\Carbon::parse($endDate)->endOfDay();
+        }
+
         // Cache key única por parâmetros
-        $cacheKey = 'reports:dashboard:' . md5($startDate . $endDate . $agentId);
+        $cacheKey = 'reports:dashboard:' . md5($startDate->toDateTimeString() . $endDate->toDateTimeString() . $agentId);
 
         $data = Cache::remember($cacheKey, 300, function () use ($startDate, $endDate, $agentId) {
             return $this->computeDashboardData($startDate, $endDate, $agentId);
@@ -42,11 +50,11 @@ class ReportController extends Controller
         }
 
         // 1. Mensagens por hora
-        $byHour = Message::selectRaw('DATE_FORMAT(created_at, "%Y-%m-%d %H:00") as hour, COUNT(*) as count')
+        $byHour = Message::selectRaw("FORMAT(created_at, 'yyyy-MM-dd HH:00') as hour, COUNT(*) as count")
             ->whereBetween('created_at', [$startDate, $endDate])
             ->when($agentId, fn($q) => $q->whereHas('conversation', fn($sq) => $sq->where('assigned_to', $agentId)))
-            ->groupBy('hour')
-            ->orderBy('hour')
+            ->groupBy("FORMAT(created_at, 'yyyy-MM-dd HH:00')")
+            ->orderBy("FORMAT(created_at, 'yyyy-MM-dd HH:00')")
             ->get();
 
         // 2. Mensagens por tipo
