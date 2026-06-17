@@ -7,6 +7,7 @@ use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
@@ -53,8 +54,8 @@ class ReportController extends Controller
         $byHour = Message::selectRaw("FORMAT(created_at, 'yyyy-MM-dd HH:00') as hour, COUNT(*) as count")
             ->whereBetween('created_at', [$startDate, $endDate])
             ->when($agentId, fn($q) => $q->whereHas('conversation', fn($sq) => $sq->where('assigned_to', $agentId)))
-            ->groupBy("FORMAT(created_at, 'yyyy-MM-dd HH:00')")
-            ->orderBy("FORMAT(created_at, 'yyyy-MM-dd HH:00')")
+            ->groupByRaw("FORMAT(created_at, 'yyyy-MM-dd HH:00')")
+            ->orderByRaw("FORMAT(created_at, 'yyyy-MM-dd HH:00')")
             ->get();
 
         // 2. Mensagens por tipo
