@@ -15,30 +15,29 @@ class ProcessDistributionQueue extends Command
     {
         $this->info('Processing distribution queue...');
 
-        // Get conversations without an active claim (regardless of status)
-        $pendingConversations = Conversation::whereDoesntHave('activeClaim')
+        // Get new conversations without an active claim
+        $pendingConversations = Conversation::where('status', 'new')
+            ->whereDoesntHave('activeClaim')
             ->orderBy('created_at', 'asc')
             ->get();
 
         if ($pendingConversations->isEmpty()) {
-            $this->info('No pending conversations to distribute.');
             return 0;
         }
-
-        $this->info("Found {$pendingConversations->count()} pending conversations to distribute.");
 
         $distributed = 0;
         foreach ($pendingConversations as $conversation) {
             try {
                 DistributionService::assign($conversation);
                 $distributed++;
-                $this->line("✓ Conversation #{$conversation->id} processed");
             } catch (\Exception $e) {
-                $this->error("✗ Failed to process conversation #{$conversation->id}: {$e->getMessage()}");
+                \Log::error("[Distribution] Failed to process conversation #{$conversation->id}: {$e->getMessage()}");
             }
         }
 
-        $this->info("Distribution complete. {$distributed} conversations processed.");
+        if ($distributed > 0) {
+            \Log::info("[Distribution Queue] Processed {$distributed} conversations");
+        }
         return 0;
     }
 }

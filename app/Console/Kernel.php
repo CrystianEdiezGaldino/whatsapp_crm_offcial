@@ -12,10 +12,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        // Processar fila de distribuição de conversas a cada minuto (priority)
+        $schedule->command('distribution:process-queue')->everyMinute();
+
         // Executar retry de mensagens a cada minuto
         $schedule->command('messages:retry')->everyMinute();
 
-        // Verificar e renovar token WhatsApp a cada 6 horas
+        // Verificar e renovar token WhatsApp a cada 3 horas
         $schedule->command('whatsapp:refresh-token')->everyThreeHours();
     }
 
