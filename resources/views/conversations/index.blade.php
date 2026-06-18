@@ -588,6 +588,7 @@
 <script src="{{ asset('js/helpers/chat-list-poller.js') }}"></script>
 <script src="{{ asset('js/helpers/macros-menu.js') }}"></script>
 <script src="{{ asset('js/helpers/emoji-picker.js') }}"></script>
+<script src="{{ asset('js/conversations.js') }}"></script>
 <script>
     // Debug logging
     console.log('[App] Initializing conversation page');
