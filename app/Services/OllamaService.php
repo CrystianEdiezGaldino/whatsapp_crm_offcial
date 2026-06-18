@@ -57,10 +57,10 @@ class OllamaService
      */
     private static function callOllama(string $prompt): string
     {
-        $apiKey = config('services.ollama.key') ?? env('KEY_OLLAMA');
+        $apiKey = env('OLLMA_KEY_CODE');
 
         if (!$apiKey) {
-            throw new \Exception('Ollama API key not configured. Set KEY_OLLAMA in .env');
+            throw new \Exception('Ollama API key not configured. Set OLLMA_KEY_CODE in .env');
         }
 
         try {
