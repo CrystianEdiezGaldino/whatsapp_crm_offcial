@@ -13,7 +13,6 @@ function openImproveTextModal() {
     const text = textarea.value.trim();
 
     if (!text) {
-        alert('Digite algo para melhorar');
         return;
     }
 
@@ -112,7 +111,100 @@ function applyImprovedText() {
 
     // Close modal
     closeImproveTextModal();
+}
 
-    // Show native notification
-    alert('Texto melhorado aplicado!');
+// Contact Notes Improvement Functions
+let currentImprovedContactNotes = {
+    original: '',
+    improved: '',
+    type: 'grammar'
+};
+
+function openImproveContactNotesModal() {
+    const textarea = document.getElementById('contactNotes');
+    const text = textarea.value.trim();
+
+    if (!text) {
+        return;
+    }
+
+    currentImprovedContactNotes.original = text;
+
+    document.getElementById('improveContactNotesModal').classList.remove('hidden');
+    document.getElementById('improveContactNotesOriginalText').textContent = text;
+    document.getElementById('improveContactNotesTypeSelect').value = 'grammar';
+
+    document.getElementById('improveContactNotesImprovedText').classList.add('hidden');
+    document.getElementById('improveContactNotesLoadingSpinner').classList.remove('hidden');
+    document.getElementById('improveContactNotesErrorMessage').classList.add('hidden');
+    document.getElementById('improveContactNotesUseBtn').disabled = true;
+
+    refreshImproveContactNotes();
+}
+
+function closeImproveContactNotesModal() {
+    document.getElementById('improveContactNotesModal').classList.add('hidden');
+    currentImprovedContactNotes = { original: '', improved: '', type: 'grammar' };
+}
+
+function refreshImproveContactNotes() {
+    const type = document.getElementById('improveContactNotesTypeSelect').value;
+    const text = currentImprovedContactNotes.original;
+    const conversationId = document.querySelector('[data-conversation-id]')?.getAttribute('data-conversation-id');
+
+    if (!conversationId || !text) {
+        return;
+    }
+
+    document.getElementById('improveContactNotesLoadingSpinner').classList.remove('hidden');
+    document.getElementById('improveContactNotesImprovedText').classList.add('hidden');
+    document.getElementById('improveContactNotesErrorMessage').classList.add('hidden');
+    document.getElementById('improveContactNotesUseBtn').disabled = true;
+
+    fetch(`/conversations/${conversationId}/improve-text`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+            content: text,
+            type: type
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(data.message || 'Erro ao processar requisição');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            currentImprovedContactNotes.improved = data.improved;
+            currentImprovedContactNotes.type = type;
+
+            document.getElementById('improveContactNotesLoadingSpinner').classList.add('hidden');
+            document.getElementById('improveContactNotesImprovedText').textContent = data.improved;
+            document.getElementById('improveContactNotesImprovedText').classList.remove('hidden');
+            document.getElementById('improveContactNotesUseBtn').disabled = false;
+        } else {
+            throw new Error(data.message || 'Erro desconhecido');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('improveContactNotesLoadingSpinner').classList.add('hidden');
+        document.getElementById('improveContactNotesErrorMessage').textContent = 'Erro: ' + error.message;
+        document.getElementById('improveContactNotesErrorMessage').classList.remove('hidden');
+    });
+}
+
+function applyImprovedContactNotes() {
+    const textarea = document.getElementById('contactNotes');
+    textarea.value = currentImprovedContactNotes.improved;
+    textarea.focus();
+
+    closeImproveContactNotesModal();
 }
