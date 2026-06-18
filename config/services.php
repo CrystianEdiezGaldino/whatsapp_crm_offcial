@@ -43,4 +43,8 @@ return [
         'app_secret' => env('META_APP_SECRET', ''),
     ],
 
+    'ollama' => [
+        'key' => env('KEY_OLLAMA'),
+    ],
+
 ];

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactController;
@@ -28,7 +29,8 @@ Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')-
     Route::patch('/sectors/{sector}/toggle-active', [\App\Http\Controllers\Admin\SectorController::class, 'toggleActive'])->name('sectors.toggle-active');
 
     // Agents
-    Route::resource('agents', \App\Http\Controllers\Admin\AgentController::class);
+    Route::resource('agents', \App\Http\Controllers\Admin\AgentController::class)
+        ->parameters(['agents' => 'user']);
     Route::post('/agents/{user}/reset-password', [\App\Http\Controllers\Admin\AgentController::class, 'resetPassword'])->name('agents.reset-password');
     Route::patch('/agents/{user}/toggle-active', [\App\Http\Controllers\Admin\AgentController::class, 'toggleActive'])->name('agents.toggle-active');
     Route::get('/agents/export/csv', [\App\Http\Controllers\Admin\AgentController::class, 'export'])->name('agents.export');
@@ -52,7 +54,7 @@ Route::middleware(['auth', 'ensure_is_admin'])->prefix('admin')->name('admin.')-
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class);
     Route::patch('/tags/{tag}/toggle-active', [\App\Http\Controllers\Admin\TagController::class, 'toggleActive'])->name('tags.toggle-active');
 
-    // Complaints (rotas fixas antes do resource para não conflitar com {complaint})
+    // Complaints (rotas fixas antes do resource para n??o conflitar com {complaint})
     Route::get('/complaints/dashboard', [\App\Http\Controllers\Admin\ComplaintController::class, 'dashboard'])->name('complaints.dashboard');
     Route::resource('complaints', \App\Http\Controllers\Admin\ComplaintController::class, ['only' => ['index', 'show']]);
     Route::get('/complaints/{complaint}/review', [\App\Http\Controllers\Admin\ComplaintController::class, 'review'])->name('complaints.review');
@@ -94,8 +96,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('contacts', ContactController::class);
+    Route::patch('/contacts/{contact}/notes', [ContactController::class, 'updateNotes'])->name('contacts.notes.update');
 
     Route::get('/conversations', [ConversationController::class, 'index'])->name('conversations.index');
+    Route::get('/conversations/list-poll', [ConversationController::class, 'pollList'])->name('conversations.list-poll');
+    Route::get('/conversations/macros-json', [ConversationController::class, 'macrosJson'])->name('conversations.macros-json');
     Route::post('/conversations/send', [ConversationController::class, 'sendMessage'])->name('conversations.send');
     Route::get('/conversations/{conversation}/poll', [ConversationController::class, 'poll'])->name('conversations.poll');
     Route::post('/conversations/start', [ConversationController::class, 'startConversation'])->name('conversations.start');
@@ -114,6 +119,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
     Route::post('/tags', [TagController::class, 'store'])->name('tags.store');
+    Route::get('/conversations/{conversation}/tags-json', [TagController::class, 'conversationTags'])->name('conversations.tags.json');
     Route::post('/conversations/{conversation}/tags', [TagController::class, 'attachToConversation'])->name('conversations.tags.attach');
     Route::delete('/conversations/{conversation}/tags/{tag}', [TagController::class, 'detachFromConversation'])->name('conversations.tags.detach');
 
@@ -124,11 +130,36 @@ Route::middleware('auth')->group(function () {
     Route::get('/audit/conversations', [AuditController::class, 'conversation'])->name('audit.conversations');
     Route::get('/audit/activity', [AuditController::class, 'agentActivity'])->name('audit.activity');
 
+    // Text improvement
+    Route::post('/conversations/{conversation}/improve-text', [ConversationController::class, 'improveText'])
+        ->name('conversations.improve-text');
+
     Route::resource('macros', MacroController::class);
     Route::post('/macros/{macro}/files', [MacroFileController::class, 'store'])->name('macros.files.store');
     Route::delete('/macros/{macro}/files/{file}', [MacroFileController::class, 'destroy'])->name('macros.files.destroy');
     Route::patch('/macros/{macro}/files/{file}/reorder', [MacroFileController::class, 'reorder'])->name('macros.files.reorder');
     Route::get('/macros/{macro}/preview', [MacroFileController::class, 'preview'])->name('macros.preview');
+
+    // Debug endpoint for macros and emojis
+    Route::get('/debug/macros', function() {
+        $macros = \Illuminate\Support\Facades\Cache::remember(
+            'macros_' . \Illuminate\Support\Facades\Auth::id(),
+            3600,
+            fn() => \App\Models\Macro::where('user_id', \Illuminate\Support\Facades\Auth::id())->orWhereNull('user_id')->get()
+        );
+        return response()->json([
+            'success' => true,
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'macro_count' => $macros->count(),
+            'macros' => $macros->map(fn($m) => [
+                'id' => $m->id,
+                'name' => $m->name,
+                'shortcut' => $m->shortcut,
+                'content' => substr($m->content, 0, 100) . '...',
+                'user_id' => $m->user_id,
+            ]),
+        ]);
+    })->name('debug.macros');
 
     Route::prefix('reports')->group(function () {
         Route::get('/dashboard-data', [ReportController::class, 'dashboardData'])->name('reports.dashboard-data');
@@ -140,7 +171,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/docs', [DocumentationController::class, 'index'])->name('documentation.index');
 Route::get('/docs/components/{component}', [DocumentationController::class, 'component'])->name('documentation.component');
 
-// API endpoints para modal de transferência
+// API endpoints para modal de transfer??ncia
 Route::middleware('auth')->get('/api/agents', function () {
     $agents = \App\Models\User::select('id', 'name', 'email', 'role')
         ->orderBy('name')
@@ -177,6 +208,102 @@ Route::get('/termos-privacidade', function () {
     return file_get_contents(public_path('termos-privacidade.html'));
 })->name('termos-privacidade');
 
-Route::get('/', function () {
-    return redirect()->route('dashboard');
+// Test SQL Server connection to a specific host
+Route::get('/test-connect', function (Request $request) {
+    $host = $request->query('host', '192.168.1.6');
+    $port = (int) $request->query('port', 1433);
+    $user = $request->query('user', 'Php');
+    $pass = $request->query('pass', '$89%3a7');
+    $db = $request->query('db', 'Whatsapp');
+
+    $results = ['host' => $host, 'port' => $port];
+
+    // Test socket
+    $socket = @fsockopen($host, $port, $errno, $errstr, 5);
+    if ($socket) {
+        fclose($socket);
+        $results['socket'] = ['status' => 'OK'];
+
+        // Try PDO connection
+        try {
+            $dsn = "sqlsrv:Server=$host,$port;Database=$db;Encrypt=optional;TrustServerCertificate=true";
+            $pdo = new \PDO($dsn, $user, $pass, [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            ]);
+            $results['status'] = 'OK';
+            $results['message'] = "??? Connected to SQL Server at $host:$port";
+
+            $stmt = $pdo->query('SELECT COUNT(*) as table_count FROM information_schema.TABLES WHERE TABLE_CATALOG = ?', [\PDO::FETCH_ASSOC]);
+            $count = $stmt->fetchColumn();
+            $results['tables'] = $count;
+
+        } catch (\Exception $e) {
+            $results['status'] = 'FAILED';
+            $results['error'] = $e->getMessage();
+        }
+    } else {
+        $results['status'] = 'FAILED';
+        $results['socket'] = ['status' => 'FAILED', 'error' => $errstr];
+    }
+
+    return response()->json($results);
 });
+
+// Database Diagnostic Route
+Route::get('/diagnose/db', function () {
+    $host = '192.168.1.6';
+    $port = 1433;
+    $user = 'Php';
+    $pass = '$89%3a7';
+    $db = 'Whatsapp';
+
+    $results = [
+        'timestamp' => now()->toIso8601String(),
+        'host' => $host,
+        'port' => $port,
+        'database' => $db,
+    ];
+
+    // 1. Test Socket Connection
+    $socket = @fsockopen($host, $port, $errno, $errstr, 5);
+    if ($socket) {
+        fclose($socket);
+        $results['socket'] = ['status' => 'OK', 'message' => 'Port 1433 is reachable'];
+    } else {
+        $results['socket'] = ['status' => 'FAILED', 'error' => $errstr, 'error_code' => $errno];
+    }
+
+    // 2. Test PHP Extensions
+    $results['php_extensions'] = [
+        'sqlsrv' => extension_loaded('sqlsrv') ? 'INSTALLED' : 'MISSING',
+        'pdo_sqlsrv' => extension_loaded('pdo_sqlsrv') ? 'INSTALLED' : 'MISSING',
+    ];
+
+    // 3. Test PDO Connection (if driver installed)
+    if (extension_loaded('pdo_sqlsrv')) {
+        try {
+            $dsn = "sqlsrv:Server=$host,$port;Database=$db;Encrypt=no;TrustServerCertificate=false";
+            $pdo = new \PDO($dsn, $user, $pass, [
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            ]);
+            $results['pdo'] = ['status' => 'OK', 'message' => 'Connected to SQL Server'];
+
+            // Try a simple query
+            $stmt = $pdo->query('SELECT 1');
+            $results['query'] = ['status' => 'OK', 'message' => 'Query executed successfully'];
+
+        } catch (\PDOException $e) {
+            $results['pdo'] = ['status' => 'FAILED', 'error' => $e->getMessage()];
+            $results['query'] = ['status' => 'SKIPPED'];
+        }
+    } else {
+        $results['pdo'] = ['status' => 'SKIPPED', 'reason' => 'pdo_sqlsrv driver not installed'];
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+});
+
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
