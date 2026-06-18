@@ -1,116 +1,80 @@
-@extends('layouts.app', ['hideSidebar' => true])
+@extends('layouts.app', ['fullHeight' => true])
 
-@section('title', 'Chats')
+@section('title', 'Atendimentos')
 
 @section('content')
-<div class="flex h-[calc(100vh)] w-full">
-    <!-- Mini Sidebar -->
-    <aside class="w-[68px] h-screen bg-primary flex flex-col items-center py-4 border-r border-gray-200 shrink-0 z-50">
-        <div class="w-10 h-10 bg-secondary-fixed rounded flex items-center justify-center mb-6">
-            <span class="material-symbols-outlined text-on-secondary-fixed text-lg">hub</span>
+<div class="flex h-full w-full min-h-0">
+    <!-- Coluna: lista de chats -->
+    <section class="chat-list-column">
+        <div class="chat-list-header">
+            <div class="chat-list-header__row">
+                <h2 class="chat-list-header__title">Atendimentos</h2>
+                <span class="chat-status-badge">WhatsApp conectado</span>
+            </div>
+            <div class="chat-search-bar">
+                <span class="material-symbols-outlined text-gray-400 text-[16px]">search</span>
+                <input type="text" id="chatSearchInput" class="chat-search-bar__field" placeholder="Buscar nome ou telefone...">
+            </div>
         </div>
-        <nav class="flex-1 flex flex-col items-center gap-2">
-            @php $current = request()->route()->getName() ?? ''; @endphp
-            <a href="{{ route('dashboard') }}" title="Dashboard" class="w-10 h-10 rounded-lg flex items-center justify-center {{ $current === 'dashboard' ? 'bg-gray-100-highest/10 text-secondary-container' : 'text-white/70 hover:bg-primary/50 hover:text-on-primary' }} transition-colors">
-                <span class="material-symbols-outlined text-xl">dashboard</span>
-            </a>
-            <a href="{{ route('conversations.index') }}" title="Chats" class="w-10 h-10 rounded-lg flex items-center justify-center {{ str_starts_with($current, 'conversations') ? 'bg-gray-100-highest/10 text-secondary-container' : 'text-white/70 hover:bg-primary/50 hover:text-on-primary' }} transition-colors">
-                <span class="material-symbols-outlined text-xl">chat</span>
-            </a>
-            <a href="{{ route('contacts.index') }}" title="Contatos" class="w-10 h-10 rounded-lg flex items-center justify-center text-white/70 hover:bg-primary/50 hover:text-on-primary transition-colors">
-                <span class="material-symbols-outlined text-xl">person_book</span>
-            </a>
-            <a href="{{ route('macros.index') }}" title="Macros" class="w-10 h-10 rounded-lg flex items-center justify-center text-white/70 hover:bg-primary/50 hover:text-on-primary transition-colors">
-                <span class="material-symbols-outlined text-xl">bolt</span>
-            </a>
-        </nav>
-        <div class="mt-auto">
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" title="Sair" class="w-10 h-10 rounded-lg flex items-center justify-center text-white/70 hover:text-on-primary transition-colors">
-                    <span class="material-symbols-outlined text-xl">logout</span>
-                </button>
-            </form>
-        </div>
-    </aside>
 
-    <!-- Left: Conversation List -->
-    <section class="w-[360px] border-r border-gray-200 bg-gradient-to-b from-white to-slate-50/50 flex flex-col overflow-hidden shrink-0">
-        <div class="p-4 border-b border-gray-200/50 bg-white/70 backdrop-blur-sm">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-on-surface">💬 Chats Ativos</h2>
-                @if($pendingCount > 0)
-                <span class="bg-error text-on-error text-xs font-bold px-3 py-1 rounded-full animate-pulse shadow-md">
-                    {{ $pendingCount }} pendente{{ $pendingCount !== 1 ? 's' : '' }}
-                </span>
-                @endif
-            </div>
-            <div class="flex gap-2 flex-wrap">
-                @if(auth()->user()->isAdmin())
-                <a href="{{ route('conversations.index') }}" class="px-3 py-1.5 text-xs rounded-lg font-medium transition-all {{ !request('assigned') && !request('status') ? 'bg-primary text-on-primary shadow-md' : 'text-gray-600 hover:bg-gray-100 border border-gray-200/50' }}">
-                    Todos <span class="text-[10px] ml-1 opacity-75">({{ $totalCount }})</span>
-                </a>
-                @endif
-                <a href="{{ route('conversations.index', ['status' => 'pending']) }}" class="px-3 py-1.5 text-xs rounded-lg font-medium transition-all flex items-center gap-1 {{ request('status') === 'pending' ? 'bg-error text-on-error shadow-md' : 'text-gray-600 hover:bg-gray-100 border border-gray-200/50' }}">
-                    <span class="material-symbols-outlined text-[14px]">schedule</span>
-                    Pendentes
-                    @if($pendingCount > 0)
-                    <span class="text-[10px] ml-1 font-bold">{{ $pendingCount }}</span>
-                    @endif
-                </a>
-                <a href="{{ route('conversations.index', ['assigned' => 'mine']) }}" class="px-3 py-1.5 text-xs rounded-lg font-medium transition-all {{ request('assigned') === 'mine' ? 'bg-primary text-on-primary shadow-md' : 'text-gray-600 hover:bg-gray-100 border border-gray-200/50' }}">Meus</a>
-            </div>
-        </div>
-        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 p-2">
+        @php
+            $queueTabs = [];
+            if (auth()->user()->isAdmin()) {
+                $queueTabs[] = [
+                    'label' => 'Todos',
+                    'count' => $totalCount,
+                    'countKey' => 'total',
+                    'href' => route('conversations.index'),
+                    'active' => !request('assigned') && !request('status'),
+                ];
+            }
+            $queueTabs[] = [
+                'label' => 'Fila',
+                'count' => $pendingCount,
+                'countKey' => 'pending',
+                'href' => route('conversations.index', ['status' => 'pending']),
+                'active' => request('status') === 'pending',
+            ];
+            $queueTabs[] = [
+                'label' => 'Meus',
+                'href' => route('conversations.index', ['assigned' => 'mine']),
+                'active' => request('assigned') === 'mine',
+            ];
+        @endphp
+        <x-chat.queue-tabs :tabs="$queueTabs" />
+        <div class="chat-list-scroll design-scrollbar">
+            <div class="chat-list-items">
             @forelse($conversations as $conv)
             @php
-                $convPending = !$conv->getActiveClaim();
+                $convPending = $conv->isPendingInQueue();
                 $convResolved = $conv->status === 'resolved' || $conv->status === 'closed';
-                $shouldShow = !request('status') || (request('status') === 'pending' && $convPending);
+                $shouldShow = !request('status') || (request('status') === 'pending' && $conv->isPendingInQueue());
             @endphp
             @if($shouldShow && $conv->contact)
-            <a href="{{ route('conversations.index', ['conversation' => $conv->id] + request()->all()) }}" class="group flex gap-3 p-3 cursor-pointer transition-all rounded-lg backdrop-blur-sm border {{ ($activeConversation?->id === $conv->id) ? 'bg-primary/10 border-primary/30 shadow-md' : ($convPending ? 'bg-error/10 border-error/30 hover:bg-error/20 hover:shadow-sm' : ($convResolved ? 'bg-gray-100 border-surface-container opacity-60 hover:opacity-80 hover:shadow-sm' : 'bg-white/60 border-gray-200/30 hover:bg-white/80 hover:shadow-sm hover:border-gray-200/50')) }}">
-                <div class="relative shrink-0">
-                    <div class="w-12 h-12 rounded-full {{ $convPending ? 'bg-gradient-to-br from-error to-error/80' : 'bg-gradient-to-br from-primary-fixed to-primary-fixed/80' }} flex items-center justify-center font-bold text-sm {{ $convPending ? 'text-on-error' : 'text-on-primary-fixed' }} shadow-sm">
-                        {{ $conv->contact->initials }}
-                    </div>
-                    @if($convPending)
-                    <span class="absolute -top-1 -right-1 w-5 h-5 bg-error text-on-error rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-white shadow-md animate-bounce">!</span>
-                    @endif
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-start gap-2 mb-1">
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-bold {{ $convPending ? 'text-error' : 'text-on-surface' }} truncate">{{ $conv->contact->name }}</h3>
-                            @if($convPending)
-                            <span class="text-[10px] text-error font-semibold">⏱️ Pendente de atendimento</span>
-                            @elseif($convResolved)
-                            <span class="text-[10px] text-gray-500 font-semibold">✓ Encerrada</span>
-                            @else
-                            <span class="text-[10px] text-secondary font-semibold">🔒 {{ $conv->getActiveClaim()?->user->name ?? 'Sem atribuição' }}</span>
-                            @endif
-                        </div>
-                        <span class="text-[11px] text-gray-600 shrink-0 font-medium">{{ $conv->last_message_at?->diffForHumans(short: true) ?? '-' }}</span>
-                    </div>
-                    <p class="text-xs text-gray-600 truncate mt-1 line-clamp-1">{{ $conv->lastMessage?->content ?? '(sem mensagens)' }}</p>
-                </div>
-            </a>
+                <x-chat.list-item
+                    :href="route('conversations.index', ['conversation' => $conv->id] + request()->all())"
+                    :contact="$conv->contact"
+                    :conversation="$conv"
+                    :active="$activeConversation?->id === $conv->id"
+                    :pending="$convPending"
+                    :resolved="$convResolved"
+                />
             @endif
             @empty
-            <div class="p-12 text-center text-gray-600 text-sm">
-                <span class="text-3xl block mb-2">💭</span>
+            <div class="chat-list-empty">
                 @if(request('status') === 'pending')
-                    ✓ Nenhum atendimento pendente!
+                    Nenhum atendimento na fila.
                 @else
-                    Nenhuma conversa ativa.
+                    Nenhum atendimento aqui.
                 @endif
             </div>
             @endforelse
+            </div>
         </div>
     </section>
 
-    <!-- Center: Chat -->
-    <section class="flex-1 flex flex-col bg-gradient-to-b from-white/50 to-slate-50/50 relative overflow-hidden">
+    <!-- Coluna: conversa -->
+    <section class="flex-1 flex flex-col bg-gray-50 relative overflow-hidden min-w-0">
         <!-- Toast de Notificação -->
         <div id="notificationToast" class="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg shadow-lg hidden transition-all duration-300 z-50 max-w-xs animate-slideInUp">
             <div class="flex items-center gap-3">
@@ -119,7 +83,7 @@
                     <p class="text-sm font-semibold" id="toastSender">Nova mensagem</p>
                     <p class="text-xs opacity-90" id="toastMessage">Você tem uma mensagem</p>
                 </div>
-                <button onclick="document.getElementById('notificationToast').classList.add('hidden')" class="text-white hover:opacity-75 flex-shrink-0">✕</button>
+                <button onclick="document.getElementById('notificationToast').classList.add('hidden')" class="text-white hover:opacity-75 flex-shrink-0">✓</button>
             </div>
         </div>
 
@@ -131,15 +95,15 @@
                     <p class="text-sm font-semibold">Novo Pendente</p>
                     <p class="text-xs opacity-90" id="pendingName">Aguardando sua ação</p>
                 </div>
-                <button onclick="document.getElementById('pendingBadge').classList.add('hidden')" class="text-on-error hover:opacity-75 flex-shrink-0">✕</button>
+                <button onclick="document.getElementById('pendingBadge').classList.add('hidden')" class="text-on-error hover:opacity-75 flex-shrink-0">✓</button>
             </div>
         </div>
 
         @if($activeConversation?->contact)
         <!-- Chat Header -->
-        <div class="p-5 bg-white/70 backdrop-blur-md border-b border-gray-200/50 flex justify-between items-center shadow-sm">
-            <div class="flex items-center gap-4 flex-1 min-w-0">
-                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-fixed to-primary-fixed/80 flex items-center justify-center font-bold text-sm text-on-primary-fixed shadow-md shrink-0">
+        <div class="h-[66px] shrink-0 flex items-center gap-3 px-[18px] bg-white border-b border-gray-200">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+                <div class="w-[42px] h-[42px] rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold text-base shrink-0">
                     {{ $activeConversation->contact->initials }}
                 </div>
                 <div class="flex-1 min-w-0">
@@ -148,7 +112,7 @@
                         @php
                             $activeClaim = $activeConversation->getActiveClaim();
                             $isAdmin = Auth::user()->isAdmin();
-                            $hasMyClaim = $activeClaim && $activeClaim->user_id === Auth::id();
+                            $hasMyClaim = $activeClaim && (int) $activeClaim->user_id === (int) Auth::id();
                         @endphp
                     </div>
                     <div class="flex items-center gap-3 flex-wrap">
@@ -239,14 +203,14 @@
                         <div class="flex justify-between items-start gap-2 mb-1">
                             <div>
                                 <p class="text-xs font-bold text-on-surface">
-                                    {{ $prev->created_at->format('d/m/Y \à\s H:i') }}
+                                    {{ $prev->created_at->format('d/m/Y \às H:i') }}
                                 </p>
                                 @php
                                     $lastClaim = $prev->claims()->latest('claimed_at')->first();
                                 @endphp
                                 @if($lastClaim)
                                 <p class="text-[11px] text-gray-600 mt-0.5">
-                                    👤 {{ $lastClaim->user->name ?? 'Agente desconhecido' }}
+                                    📩 {{ $lastClaim->user->name ?? 'Agente desconhecido' }}
                                 </p>
                                 @endif
                             </div>
@@ -268,7 +232,7 @@
         <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
             <div class="flex justify-center sticky top-0">
                 <span class="text-[10px] uppercase text-gray-600 bg-white/60 backdrop-blur-sm py-1.5 px-4 rounded-full tracking-wider border border-gray-200/30 shadow-sm">
-                    📅 {{ $activeConversation->created_at->format('d \d\e M \d\e Y') }}
+                    📩 {{ $activeConversation->created_at->format('d \d\e M \d\e Y') }}
                 </span>
             </div>
             @foreach($activeConversation->messages as $msg)
@@ -386,7 +350,7 @@
         @if($macros->count() > 0)
         <div class="px-4 py-3 bg-white/60 backdrop-blur-sm border-t border-gray-200/50">
             <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
-                <span class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap mr-2 flex items-center">⚡ Rápido:</span>
+                <span class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap mr-2 flex items-center">✓ Rápido:</span>
                 @foreach($macros as $macro)
                 <button onclick="applyMacro('{{ addslashes($macro->content) }}')" class="whitespace-nowrap bg-white/80 border border-gray-200/50 px-3 py-1.5 rounded-full text-xs text-on-surface hover:bg-white hover:border-gray-200/80 transition-all shadow-sm hover:shadow-md shrink-0">
                     {{ $macro->name }}
@@ -424,14 +388,17 @@
                     </div>
 
                     <div class="absolute right-4 bottom-4 flex items-center gap-2 text-gray-600" id="chatActions">
-                        <button type="button" id="emojiBtn" class="hover:text-secondary transition-colors relative text-lg {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Emoji" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
-                            😊
+                        <button type="button" id="emojiBtn" class="hover:text-secondary transition-colors relative {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Emoji" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
+                            <span class="material-symbols-outlined text-xl">sentiment_satisfied</span>
+                        </button>
+                        <button type="button" id="improveTextBtn" class="hover:text-secondary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Melhorar com IA" onclick="openImproveTextModal()" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
+                            <span class="material-symbols-outlined text-xl">auto_awesome</span>
                         </button>
                         <label class="cursor-pointer hover:text-secondary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Arquivo">
                             <span class="material-symbols-outlined">attach_file</span>
                             <input type="file" name="attachment" id="fileInput" class="hidden" accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                         </label>
-                        <button type="button" id="audioRecordBtn" class="hover:text-secondary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Áudio" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
+                        <button type="button" id="audioRecordBtn" class="hover:text-secondary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Audio" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="material-symbols-outlined">mic</span>
                         </button>
                         <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md hover:shadow-lg active:scale-95 transition-all {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
@@ -440,10 +407,10 @@
                     </div>
 
                     <!-- Emoji Picker -->
-                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white/95 backdrop-blur-md border border-gray-200/50 rounded-xl shadow-lg z-50 w-96 h-96 flex flex-col">
+                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white/95 backdrop-blur-md border border-gray-200/50 rounded-xl shadow-lg z-50 w-80 sm:w-96 max-h-80 flex flex-col">
                         <div class="flex gap-1 p-2 border-b border-gray-200/50 overflow-x-auto custom-scrollbar flex-shrink-0" id="emojiCategories"></div>
                         <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
-                            <div class="grid grid-cols-7 gap-2" id="emojiGrid"></div>
+                            <div class="grid grid-cols-7 gap-1" id="emojiGrid"></div>
                         </div>
                     </div>
                 </div>
@@ -485,7 +452,7 @@
             .glass-modal { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
         </style>
         <div class="glass-modal rounded-xl shadow-2xl max-w-md w-full p-6 border border-white/30">
-            <h3 class="text-lg font-bold text-on-surface mb-2">✔️ Encerrar Conversa</h3>
+            <h3 class="text-lg font-bold text-on-surface mb-2">✅ Encerrar Conversa</h3>
             <p class="text-sm text-gray-600 mb-6">Registre o motivo do encerramento para gerar relatórios precisos</p>
 
             <form id="resolutionForm" class="space-y-4">
@@ -497,19 +464,19 @@
                     <select name="resolution_reason" required class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary">
                         <option value="">Selecione um motivo...</option>
                         <option value="problem_solved">✓ Problema Resolvido</option>
-                        <option value="customer_satisfied">😊 Cliente Satisfeito</option>
-                        <option value="follow_up_needed">→ Acompanhamento Necessário</option>
-                        <option value="transferred">↗️ Transferido</option>
-                        <option value="duplicate">📋 Conversa Duplicada</option>
-                        <option value="spam">⚠️ Spam/Abuso</option>
-                        <option value="no_response">⏱️ Sem Resposta do Cliente</option>
-                        <option value="other">❓ Outro</option>
+                        <option value="customer_satisfied">📩 Cliente Satisfeito</option>
+                        <option value="follow_up_needed">✓ Acompanhamento Necessário</option>
+                        <option value="transferred">✅ Transferido</option>
+                        <option value="duplicate">📩 Conversa Duplicada</option>
+                        <option value="spam">✅ Spam/Abuso</option>
+                        <option value="no_response">✅ Sem Resposta do Cliente</option>
+                        <option value="other">✓ Outro</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="text-sm font-semibold text-on-surface block mb-2">O que foi feito?</label>
-                    <textarea name="resolution_notes" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary resize-none" placeholder="Descreva as ações tomadas..." required></textarea>
+                    <textarea name="resolution_notes" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary resize-none" placeholder="Descreva as a📩es tomadas..." required></textarea>
                 </div>
 
                 <div>
@@ -532,8 +499,8 @@
     <!-- Reopen Request Modal -->
     <div id="reopenRequestModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="glass-modal rounded-xl shadow-2xl max-w-md w-full p-6 border border-white/30">
-            <h3 class="text-lg font-bold text-on-surface mb-2">🔓 Pedir Reabertura</h3>
-            <p class="text-sm text-gray-600 mb-6">Explique por que esta conversa precisa ser reaberта</p>
+            <h3 class="text-lg font-bold text-on-surface mb-2">📩 Pedir Reabertura</h3>
+            <p class="text-sm text-gray-600 mb-6">Explique por que esta conversa precisa ser reaberta</p>
 
             <form id="reopenRequestForm" class="space-y-4">
                 @csrf
@@ -541,7 +508,7 @@
 
                 <div>
                     <label class="text-sm font-semibold text-on-surface block mb-2">Motivo da Reabertura</label>
-                    <textarea name="reason" rows="4" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary resize-none" placeholder="Descreva por que a conversa precisa ser reaberта..." required minlength="10"></textarea>
+                    <textarea name="reason" rows="4" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary resize-none" placeholder="Descreva por que a conversa precisa ser reaberta..." required minlength="10"></textarea>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4">
@@ -556,106 +523,86 @@
         </div>
     </div>
 
-    <!-- Right: Contact Details -->
     @if($activeConversation?->contact)
-    <section class="w-[300px] border-l border-gray-200/50 bg-gradient-to-b from-white to-slate-50/50 flex flex-col overflow-y-auto custom-scrollbar shrink-0">
-        <div class="p-6 space-y-6">
-            <!-- Contact Identity -->
-            <div class="text-center p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-gray-200/30 shadow-sm">
-                <div class="w-20 h-20 rounded-2xl mx-auto mb-4 bg-gradient-to-br from-primary-fixed to-primary-fixed/80 flex items-center justify-center font-bold text-2xl text-on-primary-fixed shadow-md">
-                    {{ $activeConversation->contact->initials }}
-                </div>
-                <h2 class="text-base font-bold text-on-surface mb-1">{{ $activeConversation->contact->name }}</h2>
-                <p class="text-xs text-gray-600">{{ $activeConversation->contact->email ?? '(sem email)' }}</p>
-                @if($activeConversation->contact->tags && count($activeConversation->contact->tags) > 0)
-                <div class="flex justify-center gap-1 mt-3 flex-wrap">
-                    @foreach($activeConversation->contact->tags ?? [] as $tag)
-                    <span class="bg-secondary-100/40 text-on-secondary-container px-2.5 py-0.5 rounded-full text-xs font-semibold backdrop-blur-sm">{{ $tag }}</span>
-                    @endforeach
-                </div>
-                @endif
-            </div>
+    <x-chat.contact-panel :contact="$activeConversation->contact" :conversation="$activeConversation" />
+    @endif
 
-            <!-- Contact Details -->
-            <div class="space-y-2.5">
-                <div class="flex items-center gap-3 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200/20 hover:bg-white/80 transition-all">
-                    <span class="material-symbols-outlined text-secondary text-lg">call</span>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[11px] text-gray-600 font-medium">WhatsApp</p>
-                        <p class="text-sm font-semibold text-on-surface truncate">{{ $activeConversation->contact->phone }}</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200/20 hover:bg-white/80 transition-all">
-                    <span class="material-symbols-outlined text-gray-600 text-lg">person</span>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[11px] text-gray-600 font-medium">Agente Ativo</p>
-                        <p class="text-sm font-semibold text-on-surface">{{ $activeConversation->assignedUser?->name ?? '(nenhum)' }}</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-white/60 backdrop-blur-sm rounded-lg border border-gray-200/20 hover:bg-white/80 transition-all">
-                    <span class="material-symbols-outlined text-gray-600 text-lg">schedule</span>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[11px] text-gray-600 font-medium">Última Mensagem</p>
-                        <p class="text-sm font-semibold text-on-surface">{{ $activeConversation->last_message_at?->diffForHumans(short: true) ?? '-' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes -->
-            <div class="space-y-2">
-                <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wide">📝 Notas</h3>
-                <div class="bg-white/60 backdrop-blur-sm p-3 rounded-lg text-xs text-gray-600 border border-gray-200/20 leading-relaxed">
-                    {{ $activeConversation->contact->notes ?? '(sem notas)' }}
-                </div>
-            </div>
-
-            <!-- Conversation Tags -->
-            <div class="space-y-2">
+    <!-- Improve Text Modal -->
+    <div id="improveTextModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="glass-modal rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200/50">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wide">🏷️ Atendimento</h3>
-                    <button onclick="openTagsModal({{ $activeConversation->id }})" class="text-xs text-secondary hover:text-secondary/80 transition-colors font-semibold flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">add</span>
-                    </button>
-                </div>
-                <div id="conversationTags" class="flex flex-wrap gap-2">
-                    @forelse($activeConversation->tags as $tag)
-                    <div class="group relative">
-                        <span class="px-3 py-1.5 rounded-full text-xs font-semibold text-white transition-all shadow-sm" style="background-color: {{ $tag->color }}; opacity: 0.9;">
-                            {{ $tag->name }}
-                        </span>
-                        <button onclick="removeTag({{ $activeConversation->id }}, {{ $tag->id }})" class="absolute -top-2 -right-2 hidden group-hover:flex w-5 h-5 rounded-full bg-error text-on-error items-center justify-center text-[10px] font-bold transition-all hover:scale-110 shadow-md">
-                            ✕
-                        </button>
-                    </div>
-                    @empty
-                    <p class="text-xs text-gray-600 italic">(nenhuma)</p>
-                    @endforelse
+                    <h2 class="text-lg font-bold text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined">auto_awesome</span>
+                        Melhorar Texto com IA
+                    </h2>
+                    <button onclick="closeImproveTextModal()" class="material-symbols-outlined text-gray-600 hover:text-error transition-colors">close</button>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Tags Modal -->
-    <div id="tagsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-        <div class="glass-modal rounded-xl shadow-2xl max-w-md w-full p-6 max-h-96 flex flex-col border border-white/30">
-            <h3 class="text-lg font-bold text-on-surface mb-4">🏷️ Tipo de Atendimento</h3>
-            <div class="flex-1 overflow-y-auto custom-scrollbar space-y-2 mb-4" id="tagsContainer">
-                <!-- Tags will be loaded here -->
+            <div class="p-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-on-surface mb-2">Tipo de Melhoria:</label>
+                    <select id="improveTypeSelect" class="w-full border border-gray-200/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-secondary-container/50 focus:border-secondary transition-all" onchange="refreshImprovement()">
+                        <option value="grammar">✓ Corrigir Ortografia/Gramática</option>
+                        <option value="professional">👔 Reformular para Tom Profissional</option>
+                        <option value="both">🎯 Ambos (Gramática + Profissional)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-on-surface mb-2">Texto Original:</label>
+                    <div id="improveOriginalText" class="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg p-4 text-sm text-on-surface min-h-[80px] max-h-[120px] overflow-y-auto custom-scrollbar"></div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-on-surface mb-2">Versão Melhorada:</label>
+                    <div id="improveLoadingSpinner" class="w-full bg-gray-100/50 border border-gray-200/50 rounded-lg p-4 min-h-[80px] max-h-[120px] flex items-center justify-center">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="w-6 h-6 border-2 border-secondary border-t-transparent rounded-full animate-spin"></div>
+                            <p class="text-xs text-gray-600">Processando com IA...</p>
+                        </div>
+                    </div>
+                    <div id="improveImprovedText" class="hidden w-full bg-secondary/10 border border-secondary/30 rounded-lg p-4 text-sm text-on-surface min-h-[80px] max-h-[120px] overflow-y-auto custom-scrollbar whitespace-pre-wrap"></div>
+                </div>
+
+                <div id="improveErrorMessage" class="hidden bg-error/20 border border-error/30 rounded-lg p-3 text-sm text-error"></div>
             </div>
-            <div class="flex justify-end gap-2 pt-4 border-t border-gray-200">
-                <button type="button" onclick="closeTagsModal()" class="px-4 py-2 border border-gray-200 rounded-lg text-on-surface hover:bg-gray-100 transition-colors">
-                    Fechar
+
+            <div class="p-6 border-t border-gray-200/50 flex gap-3 justify-end">
+                <button onclick="closeImproveTextModal()" class="px-4 py-2 rounded-lg text-sm font-semibold text-on-surface border border-gray-200/50 hover:bg-gray-100/50 transition-all">
+                    Cancelar
+                </button>
+                <button id="improveUseBtn" onclick="applyImprovedText()" disabled class="px-4 py-2 rounded-lg text-sm font-semibold bg-secondary text-on-secondary hover:shadow-md shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    Usar
                 </button>
             </div>
         </div>
     </div>
-    @endif
 </div>
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/helpers/contact-panel.js') }}"></script>
 <script src="{{ asset('js/helpers/chat-inbox.js') }}"></script>
+<script src="{{ asset('js/helpers/chat-list-poller.js') }}"></script>
+<script src="{{ asset('js/helpers/macros-menu.js') }}"></script>
+<script src="{{ asset('js/helpers/emoji-picker.js') }}"></script>
 <script>
+    // Debug logging
+    console.log('[App] Initializing conversation page');
+    console.log('[Auth] Has claim:', {{ $hasMyClaim ?? 'false' }});
+    console.log('[Auth] Is Admin:', {{ $isAdmin ?? 'false' }});
+
+    document.getElementById('chatSearchInput')?.addEventListener('input', function () {
+        const q = this.value.toLowerCase().trim();
+        document.querySelectorAll('[data-chat-name]').forEach((row) => {
+            const name = row.dataset.chatName || '';
+            const phone = row.dataset.chatPhone || '';
+            row.style.display = !q || name.includes(q) || phone.includes(q) ? '' : 'none';
+        });
+    });
+
     const chatEl = document.getElementById('chatMessages');
     if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
 
@@ -750,7 +697,16 @@
 
     function applyMacro(content) {
         const input = document.getElementById('messageInput');
-        if (input) { input.value = content; input.focus(); }
+        if (!input || !content) return;
+        const vars = window.macroVariables || {};
+        let out = content;
+        for (const [key, val] of Object.entries(vars)) {
+            const v = val == null ? '' : String(val);
+            out = out.split('{' + key + '}').join(v);
+            out = out.split('{{' + key + '}}').join(v);
+        }
+        input.value = out;
+        input.focus();
     }
 
     // === File Preview ===
@@ -853,14 +809,33 @@
         lastMessageId: {{ $activeConversation->messages->last()->id ?? 0 }},
     });
 
-    chatInbox.bindSendForm(document.getElementById('chatForm'), function () {
+    chatInbox.bindSendForm(document.getElementById('chatForm'), function (data) {
         const input = document.getElementById('messageInput');
         if (input) input.value = '';
         clearAttachment();
+        if (data?.conversation_id && data?.message) {
+            window.dispatchEvent(new CustomEvent('chat-message-sent', {
+                detail: {
+                    conversation_id: data.conversation_id,
+                    content: data.message.content,
+                    preview: data.message.content || 'Midia',
+                },
+            }));
+        }
     });
 
     chatInbox.startPolling();
     @endif
+
+    if (typeof ChatListPoller !== 'undefined') {
+        window.chatListPoller = new ChatListPoller({
+            url: @json(route('conversations.list-poll', request()->query())),
+            intervalMs: 4000,
+            activeConversationId: {{ $activeConversation?->id ?? 'null' }},
+            initialIds: @json($conversations->pluck('id')),
+        });
+        window.chatListPoller.start();
+    }
 
     const chatForm = document.getElementById('chatForm');
     const msgInput = document.getElementById('messageInput');
@@ -1058,170 +1033,21 @@
         }
     }
 
-    // ===== Macros Menu com Slash Command =====
-    const macrosData = @json($macros ?? []);
-    const messageInput = document.getElementById('messageInput');
-    const macrosMenu = document.getElementById('macrosMenu');
-    const macrosMenuItems = document.getElementById('macrosMenuItems');
+    @if($activeConversation?->contact)
+    window.macroVariables = {
+        nome: @json($activeConversation->contact->name),
+        telefone: @json($activeConversation->contact->phone),
+        setor: @json($activeConversation->sector?->name ?? 'Geral'),
+    };
+    @endif
 
-    // Only initialize macros menu if the elements exist in the DOM
-    if (messageInput && macrosMenu) {
-    let allMacros = [];
-    let selectedMacroIndex = -1;
-
-    // Handle both array and grouped structure
-    if (Array.isArray(macrosData)) {
-        allMacros = macrosData;
-    } else {
-        // Flatten macros from grouped structure
-        Object.values(macrosData).forEach(categoryMacros => {
-            if (Array.isArray(categoryMacros)) {
-                allMacros.push(...categoryMacros);
-            }
+    if (typeof initMacrosMenu === 'function') {
+        initMacrosMenu({
+            url: @json(route('conversations.macros-json')),
+            variables: window.macroVariables || {},
+            initialMacros: @json($macros ?? []),
         });
     }
-
-    function getMacrosQuery() {
-        const text = messageInput.value;
-        const slashIndex = text.lastIndexOf('/');
-
-        if (slashIndex === -1) return null;
-
-        const afterSlash = text.substring(slashIndex + 1);
-        const beforeSlash = text.substring(0, slashIndex);
-
-        // Se tem espaço antes do /, não é comando
-        if (beforeSlash && !beforeSlash.match(/[\s\n]$/)) return null;
-
-        return { query: afterSlash.toLowerCase(), slashPos: slashIndex };
-    }
-
-    function filterMacros(query) {
-        if (query === '') {
-            return allMacros;
-        }
-
-        return allMacros.filter(macro =>
-            macro.name.toLowerCase().includes(query) ||
-            macro.shortcut?.toLowerCase().includes(query) ||
-            macro.content.toLowerCase().substring(0, 50).includes(query)
-        );
-    }
-
-    function renderMacrosMenu(query) {
-        const filtered = filterMacros(query);
-
-        if (filtered.length === 0) {
-            macrosMenuItems.innerHTML = '<div class="px-3 py-2 text-xs text-gray-600 text-center">Nenhuma macro encontrada</div>';
-            selectedMacroIndex = -1;
-            return;
-        }
-
-        selectedMacroIndex = -1;
-        macrosMenuItems.innerHTML = filtered.map((macro, index) => `
-            <button type="button"
-                class="macro-menu-item w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-sm"
-                data-index="${index}"
-                data-macro-id="${macro.id}"
-                data-content="${macro.content.replace(/"/g, '&quot;')}">
-                <div class="font-semibold text-on-surface text-sm">${macro.name}</div>
-                <div class="text-xs text-gray-600 line-clamp-1">${macro.content.substring(0, 60)}...</div>
-                ${macro.shortcut ? `<div class="text-[10px] text-secondary font-mono mt-0.5">/${macro.shortcut}</div>` : ''}
-            </button>
-        `).join('');
-
-        // Add click handlers
-        document.querySelectorAll('.macro-menu-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                selectMacro(parseInt(item.dataset.index));
-            });
-        });
-    }
-
-    function showMacrosMenu() {
-        const query = getMacrosQuery();
-
-        if (!query) {
-            macrosMenu.classList.add('hidden');
-            return;
-        }
-
-        renderMacrosMenu(query.query);
-        macrosMenu.classList.remove('hidden');
-    }
-
-    function selectMacro(index) {
-        const query = getMacrosQuery();
-        if (!query) return;
-
-        const filtered = filterMacros(query.query);
-        if (index < 0 || index >= filtered.length) return;
-
-        const macro = filtered[index];
-        const text = messageInput.value;
-        const beforeSlash = text.substring(0, query.slashPos);
-
-        messageInput.value = beforeSlash + macro.content;
-        messageInput.focus();
-
-        macrosMenu.classList.add('hidden');
-
-        // Auto-scroll to bottom
-        messageInput.scrollTop = messageInput.scrollHeight;
-    }
-
-    function updateMenuSelection(direction) {
-        const query = getMacrosQuery();
-        if (!query) return;
-
-        const filtered = filterMacros(query.query);
-
-        if (direction === 'down') {
-            selectedMacroIndex = (selectedMacroIndex + 1) % filtered.length;
-        } else if (direction === 'up') {
-            selectedMacroIndex = selectedMacroIndex === -1 ? filtered.length - 1 : selectedMacroIndex - 1;
-        }
-
-        updateMenuVisuals(filtered);
-    }
-
-    function updateMenuVisuals(filtered) {
-        document.querySelectorAll('.macro-menu-item').forEach((item, idx) => {
-            item.classList.toggle('bg-gray-100', idx === selectedMacroIndex);
-        });
-    }
-
-    // Event listeners
-    messageInput.addEventListener('input', showMacrosMenu);
-
-    messageInput.addEventListener('keydown', (e) => {
-        const query = getMacrosQuery();
-        if (!query || macrosMenu.classList.contains('hidden')) return;
-
-        const filtered = filterMacros(query.query);
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            updateMenuSelection('down');
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            updateMenuSelection('up');
-        } else if (e.key === 'Enter' && selectedMacroIndex >= 0) {
-            e.preventDefault();
-            selectMacro(selectedMacroIndex);
-        } else if (e.key === 'Escape') {
-            macrosMenu.classList.add('hidden');
-        }
-    });
-
-    // Close menu on outside click
-    document.addEventListener('click', (e) => {
-        if (!messageInput.contains(e.target) && !macrosMenu.contains(e.target)) {
-            macrosMenu.classList.add('hidden');
-        }
-    });
-    } // End of macros menu initialization
 
     // ===== Notificação de Novo Atendimento Pendente =====
     function showPendingNotification(contactName) {
@@ -1240,7 +1066,7 @@
             setTimeout(() => badge.classList.add('hidden'), 7000);
         } else if (!toast || toast.classList.contains('hidden')) {
             // Mostrar toast normal
-            document.getElementById('toastIcon').textContent = '🔔';
+            document.getElementById('toastIcon').textContent = '📩';
             document.getElementById('toastSender').textContent = contactName || 'Novo Contato';
             document.getElementById('toastMessage').textContent = 'Novo atendimento aguardando';
 
@@ -1259,79 +1085,6 @@
             showPendingNotification(sender);
             if (originalShowNotificationToast) originalShowNotificationToast(sender, message);
         };
-    }
-
-    // ===== Emoji Picker =====
-    const emojiBtn = document.getElementById('emojiBtn');
-    const emojiPicker = document.getElementById('emojiPicker');
-    const emojiGrid = document.getElementById('emojiGrid');
-    const emojiCategories = document.getElementById('emojiCategories');
-
-    const emojisByCategory = {
-        'Reações': ['👍', '👎', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '👏', '🙌', '👏', '🎉', '🎊', '😍', '🥰', '😘', '💋'],
-        'Sentimentos': ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '🥲', '😋', '😛', '😜', '🤪', '😌', '😔', '😑', '😐', '😶', '🤐', '🤨', '🤔', '🤫', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤮', '🤧', '🤬', '🤯', '😳', '��', '😕', '😟', '🙁', '☹️', '😮', '😯', '😲', '😳', '🥺', '😦', '😧', '😨', '😰', '😥', '😢', '😭', '😱', '😖', '😣', '😞', '😓', '😩', '😫', '🥱', '😤', '😡', '😠', '🤬', '😈', '👿', '💀', '☠️', '💩', '🤡', '👹', '👺', '👻', '👽', '👾', '🤖'],
-        'Gestos': ['👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👍', '👎', '👊', '👊', '👊', '✊', '👋', '👏', '🙌', '👐', '🤲', '🤝', '🤜', '🤛', '🦵', '🦶', '👂', '👃', '🧠', '🦷', '🦴'],
-        'Objetos': ['⌚', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️', '💽', '💾', '💿', '📀', '📧', '📨', '📩', '📤', '📥', '📦', '🏷️', '📪', '📫', '📬', '📭', '📮', '📯', '📜', '📞', '☎️', '📟', '📠', '🔋', '🔌', '💡', '🔦', '🕯️', '📔', '📕', '📖', '📗', '📘', '📙', '📚', '📓', '📒', '📑', '🧷', '🧹', '🧺', '🧻', '🔒', '🔓', '🔏', '🔐', '🔑', '🗝️', '🚪', '🪑', '🚽', '🚿', '🛁', '🛒', '🚬', '⚰️', '⚱️', '🏺', '🔮', '📿', '💈', '⚗️', '⚖️', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🔩', '⌛', '⏳', '⏱️', '⏲️', '🧿', '🎞️', '🎬', '📺', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰'],
-        'Natureza': ['🌍', '🌎', '🌏', '🌐', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🌙', '🌚', '🌝', '🌛', '🌜', '⭐', '🌟', '✨', '⚡', '☄️', '💥', '🔥', '🌪️', '🌈', '☀️', '🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️', '⛄', '🌬️', '💨', '💧', '💦', '☔', '🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥑', '🍆', '🍅', '🌶️', '🌽', '🥒', '🥬', '🥦', '🧄', '🧅', '🍄', '🥜', '🌰', '🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇', '🥚', '🍳', '🧈', '🥞', '🥓', '🍗', '🍖', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆', '🌮', '🌯', '🥗', '🥘', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🍰', '🎂', '🧁', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🍯', '🥛', '🍼', '☕', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧋', '🧃', '🧉'],
-        'Atividades': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎳', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🥅', '⛳', '⛸️', '🎣', '🎽', '🎿', '⛷️', '🏂', '🪂', '🛼', '🛹', '🛷', '🥌', '🎯', '🪀', '🪁', '🎪', '🎨', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁', '🎷', '🎺', '🎸', '🪕', '🎻', '🎲', '♟️', '🎮', '🎰', '🧩'],
-        'Viagem': ['✈️', '🛫', '🛬', '🛩️', '💺', '🛰️', '🚁', '🛶', '⛵', '🚤', '🛳️', '⛴️', '🛥️', '🚢', '🚧', '⚓', '⛽', '🚨', '🚥', '🚦', '🛑', '🚒', '🚓', '🚑', '🚐', '🛻', '🚚', '🚕', '🚙', '🚗', '🚌', '🚎', '🏎️', '🏍️', '🛵', '🦯', '🦽', '🦼', '🛺', '🚲', '🛴', '🌍', '🌎', '🌏', '🗺️', '🗿', '🗽', '🗼', '🏔️', '⛰️', '🌋', '⛰️', '🏕️', '⛺', '⛲', '⛺', '🏠', '🏡', '🏘️', '🏚️', '🏗️', '🏭', '🏢', '🏬', '🏣', '🏤', '🏥', '🏦', '🏧', '🏨', '🏪', '🏫', '🏩', '💒', '🏛️', '⛪', '🕌', '🕍', '🛕', '🕋', '⛩️', '🛤️', '🛣️', '🗾', '🎑', '🏞️', '🌅', '🌄', '🌠', '🎇', '🎆', '🌇', '🌆', '🏙️', '🌃', '🌌', '🌉', '🌁'],
-        'Símbolos': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🤜', '🤛', '✊', '👊', '✔️', '❌', '❎', '✅', '❌', '❓', '❔', '❕', '❗', '⁉️', '🔰', '🔱', '⚜️', '🔯', '💠', '🔷', '🔶', '🔹', '🔸', '🔺', '🔻', '💎', '💠', '🔘', '🔳', '🔲'],
-        'Bandeiras': ['🇧🇷', '🇺🇸', '🇪🇸', '🇮🇹', '🇫🇷', '🇩🇪', '🇯🇵', '🇨🇳', '🇷🇺', '🇰🇷', '🇮🇳', '🇲🇽', '🇨🇦', '🇦🇺', '🇿🇦', '🇬🇧'],
-    };
-
-    function initEmojiPicker() {
-        // Create category buttons
-        const categoryBtns = Object.keys(emojisByCategory).map((category, index) =>
-            `<button type="button" data-category="${category}"
-             class="emoji-category-btn px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${index === 0 ? 'bg-primary text-on-primary' : 'hover:bg-gray-100 text-gray-600'}">${category}</button>`
-        ).join('');
-
-        emojiCategories.innerHTML = categoryBtns;
-
-        // Display first category
-        showEmojiCategory(Object.keys(emojisByCategory)[0]);
-
-        // Add category click handlers
-        document.querySelectorAll('.emoji-category-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.emoji-category-btn').forEach(b => {
-                    b.classList.remove('bg-primary', 'text-on-primary');
-                    b.classList.add('hover:bg-gray-100', 'text-gray-600');
-                });
-                btn.classList.add('bg-primary', 'text-on-primary');
-                btn.classList.remove('hover:bg-gray-100', 'text-gray-600');
-                showEmojiCategory(btn.dataset.category);
-            });
-        });
-    }
-
-    function showEmojiCategory(category) {
-        const emojis = emojisByCategory[category] || [];
-        emojiGrid.innerHTML = emojis.map(emoji =>
-            `<button type="button" onclick="insertEmoji('${emoji}')" class="text-2xl p-2 rounded-lg hover:bg-gray-100 transition-colors">${emoji}</button>`
-        ).join('');
-    }
-
-    function insertEmoji(emoji) {
-        if (messageInput) {
-            messageInput.value += emoji;
-            messageInput.focus();
-            emojiPicker.classList.add('hidden');
-        }
-    }
-
-    if (emojiBtn) {
-        initEmojiPicker();
-        emojiBtn.addEventListener('click', () => {
-            emojiPicker.classList.toggle('hidden');
-        });
-
-        // Close emoji picker when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
-                emojiPicker.classList.add('hidden');
-            }
-        });
     }
 
     // ===== History Modal =====
@@ -1418,15 +1171,15 @@
                 <div class="glass-modal rounded-xl shadow-2xl flex flex-col w-full max-w-4xl max-h-[85vh] border border-white/30">
                     <div class="p-6 border-b border-gray-200 flex justify-between items-start">
                         <div>
-                            <h2 class="text-2xl font-bold text-on-surface">📋 Histórico: ${conv.contact_name}</h2>
+                            <h2 class="text-2xl font-bold text-on-surface">📩 Histórico: ${conv.contact_name}</h2>
                             <div class="flex gap-6 mt-3 text-sm text-gray-600">
-                                <span>📞 ${conv.contact_phone}</span>
-                                <span>⏱️ Duração: ${conv.duration}</span>
-                                <span>💬 ${conv.message_count} mensagens</span>
-                                <span>👤 Atendido por: ${conv.claimed_by}</span>
+                                <span>📩 ${conv.contact_phone}</span>
+                                <span>✅ Duração: ${conv.duration}</span>
+                                <span>📩 ${conv.message_count} mensagens</span>
+                                <span>📩 Atendido por: ${conv.claimed_by}</span>
                             </div>
                         </div>
-                        <button onclick="document.getElementById('historyModal').remove()" class="text-gray-600 hover:text-on-surface text-2xl">✕</button>
+                        <button onclick="document.getElementById('historyModal').remove()" class="text-gray-600 hover:text-on-surface text-2xl">✓</button>
                     </div>
                     <div class="flex-1 overflow-y-auto custom-scrollbar flex gap-4">
                         <div class="w-1/3 p-6 border-r border-gray-200 bg-surface-bright">
@@ -1460,147 +1213,9 @@
         }
     }
 
-    // ===== Tags Management =====
-    async function openTagsModal(conversationId) {
-        const modal = document.getElementById('tagsModal');
-        const container = document.getElementById('tagsContainer');
-
-        try {
-            const response = await fetch('{{ route("tags.index") }}');
-            const data = await response.json();
-
-            if (!data.success) throw new Error('Failed to load tags');
-
-            // Get current conversation tags
-            const conversationResponse = await fetch(`/conversations/${conversationId}`);
-
-            let currentTagIds = [];
-            @if($activeConversation)
-            currentTagIds = @json($activeConversation->tags->pluck('id')->toArray());
-            @endif
-
-            // Group tags by category
-            const grouped = {};
-            data.tags.forEach(tag => {
-                if (!grouped[tag.category]) grouped[tag.category] = [];
-                grouped[tag.category].push(tag);
-            });
-
-            let html = '';
-            for (const [category, tags] of Object.entries(grouped)) {
-                html += `<div class="mb-4"><h4 class="text-xs font-bold text-gray-600 uppercase mb-2">${getCategoryLabel(category)}</h4>`;
-                tags.forEach(tag => {
-                    const isSelected = currentTagIds.includes(tag.id);
-                    html += `
-                        <label class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100-low cursor-pointer transition-colors">
-                            <input type="checkbox" value="${tag.id}" ${isSelected ? 'checked' : ''} onchange="updateConversationTags(${conversationId})">
-                            <span class="w-3 h-3 rounded-full" style="background-color: ${tag.color}"></span>
-                            <span class="flex-1 text-sm text-on-surface">${tag.name}</span>
-                        </label>
-                    `;
-                });
-                html += '</div>';
-            }
-
-            container.innerHTML = html;
-            modal.classList.remove('hidden');
-        } catch (error) {
-            alert('Erro ao carregar tags: ' + error.message);
-        }
-    }
-
-    function closeTagsModal() {
-        document.getElementById('tagsModal').classList.add('hidden');
-    }
-
-    async function updateConversationTags(conversationId) {
-        const checked = Array.from(document.querySelectorAll('#tagsContainer input[type="checkbox"]:checked')).map(el => parseInt(el.value));
-
-        try {
-            const response = await fetch(`/conversations/${conversationId}/tags`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
-                body: JSON.stringify({ tag_ids: checked }),
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao atualizar tags: ' + data.message);
-            }
-        } catch (error) {
-            alert('Erro: ' + error.message);
-        }
-    }
-
-    async function removeTag(conversationId, tagId) {
-        if (!confirm('Remover esta tag?')) return;
-
-        try {
-            const response = await fetch(`/conversations/${conversationId}/tags/${tagId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                },
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao remover tag: ' + data.message);
-            }
-        } catch (error) {
-            alert('Erro: ' + error.message);
-        }
-    }
-
-    function getCategoryLabel(category) {
-        const labels = {
-            'priority': 'Prioridade',
-            'status': 'Status',
-            'outcome': 'Resultado',
-            'custom': 'Tipo de Atendimento',
-        };
-        return labels[category] || category;
-    }
-
-    // Close tags modal on outside click
-    document.getElementById('tagsModal')?.addEventListener('click', function(e) {
-        if (e.target === this) closeTagsModal();
-    });
-
-    // Initialize SSE connections
-    document.addEventListener('DOMContentLoaded', function() {
-        const conversationId = new URLSearchParams(window.location.search).get('conversation');
-
-        if (conversationId) {
-            console.log('[Init] Starting SSE connection for conversation', conversationId);
-            window.SSEManager.connectToConversation(conversationId);
-            window.SSEManager.connectToMessages();
-        }
-
-        // Also connect to global conversations channel
-        window.SSEManager.connectToConversations();
-
-        // Listen to custom events
-        window.addEventListener('message-status-changed', (e) => {
-            console.log('[Event] Message status changed:', e.detail);
-        });
-
-        window.addEventListener('conversation-status-changed', (e) => {
-            console.log('[Event] Conversation status changed:', e.detail);
-        });
-    });
-
-    // Cleanup on page leave
-    window.addEventListener('beforeunload', function() {
-        window.SSEManager.disconnectAll();
-    });
+    // Polling: ChatListPoller + ChatInboxHelper (SSEManager desativado aqui — evita ERR_NO_BUFFER_SPACE)
 </script>
 @endpush
+
+
+
