@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('conversation_reopen_requests', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('conversation_id')->constrained()->onDelete('cascade');
-            $table->foreignId('requested_by')->constrained('users')->onDelete('restrict');
-            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->text('reason');
-            $table->text('admin_notes')->nullable();
-            $table->timestamp('approved_at')->nullable();
-            $table->timestamps();
-            $table->index('status');
-        });
+        if (!Schema::hasTable('conversation_reopen_requests')) {
+            Schema::create('conversation_reopen_requests', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('conversation_id')->constrained()->onDelete('cascade');
+                $table->foreignId('requested_by')->constrained('users');
+                $table->foreignId('approved_by')->nullable()->constrained('users');
+                $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+                $table->text('reason');
+                $table->text('admin_notes')->nullable();
+                $table->timestamp('approved_at')->nullable();
+                $table->timestamps();
+                $table->index('status');
+            });
+        }
     }
 
     /**

@@ -2,26 +2,32 @@
 @props([
     'type' => 'button',
     'variant' => 'primary',
+    'size' => 'md',
     'disabled' => false,
     'href' => null,
     'class' => '',
 ])
 
 @php
-    $baseClasses = 'px-4 py-2 rounded-lg text-sm font-semibold transition-all';
     $variantClasses = match($variant) {
-        'primary' => 'bg-secondary text-on-secondary hover:bg-secondary/90 active:scale-95',
-        'secondary' => 'bg-gray-100 text-on-surface hover:bg-gray-100/80',
-        'danger' => 'bg-error text-on-error hover:bg-error/90',
-        'text' => 'text-secondary hover:bg-secondary/10',
-        default => 'bg-secondary text-on-secondary hover:bg-secondary/90',
+        'primary' => 'btn-nm-primary',
+        'secondary' => 'btn-nm-secondary',
+        'ghost' => 'btn-nm-ghost',
+        'danger' => 'btn-nm-danger',
+        'text' => 'btn-nm-text',
+        default => 'btn-nm-primary',
     };
-    $disabledClasses = $disabled ? 'opacity-60 cursor-not-allowed' : '';
-    $allClasses = "$baseClasses $variantClasses $disabledClasses $class";
+    $sizeClass = match($size) {
+        'sm' => 'btn-nm-sm',
+        'lg' => 'btn-nm-lg',
+        default => '',
+    };
+    $disabledClasses = $disabled ? 'opacity-60 cursor-not-allowed pointer-events-none' : '';
+    $allClasses = trim("$variantClasses $sizeClass $disabledClasses $class");
 @endphp
 
 @if($href)
-    <a href="{{ $href }}" class="{{ $allClasses }}" {{ $disabled ? 'style="pointer-events:none;"' : '' }}>
+    <a href="{{ $href }}" class="{{ $allClasses }}" {{ $disabled ? 'aria-disabled=true' : '' }}>
         {{ $slot }}
     </a>
 @else

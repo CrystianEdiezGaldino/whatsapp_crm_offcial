@@ -89,4 +89,18 @@ class ContactController extends Controller
         $contact->delete();
         return redirect()->route('contacts.index')->with('success', 'Contato removido!');
     }
+
+    public function updateNotes(Request $request, Contact $contact)
+    {
+        $validated = $request->validate([
+            'notes' => 'nullable|string|max:5000',
+        ]);
+
+        $contact->update(['notes' => $validated['notes'] ?? null]);
+
+        return response()->json([
+            'success' => true,
+            'notes' => $contact->notes,
+        ]);
+    }
 }

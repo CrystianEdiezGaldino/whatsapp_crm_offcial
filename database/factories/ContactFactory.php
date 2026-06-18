@@ -12,7 +12,7 @@ class ContactFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->optional()->name(),
+            'name' => $this->faker->name(),
             'phone' => '55' . $this->faker->numerify('119########'),
             'email' => $this->faker->safeEmail(),
             'tags' => $this->faker->randomElement([

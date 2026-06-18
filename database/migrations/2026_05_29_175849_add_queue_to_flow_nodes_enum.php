@@ -1,24 +1,51 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    private array $upValues = ['message', 'menu', 'action', 'queue'];
+    private array $downValues = ['message', 'menu', 'action'];
+
     public function up(): void
     {
-        DB::statement("ALTER TABLE flow_nodes MODIFY node_type ENUM('message', 'menu', 'action', 'queue') DEFAULT 'message'");
+        if (DB::getDriverName() === 'sqlsrv') {
+            $this->replaceSqlServerCheckConstraint($this->upValues);
+            return;
+        }
+
+        DB::statement("ALTER TABLE flow_nodes MODIFY node_type ENUM('".implode("', '", $this->upValues)."') DEFAULT 'message'");
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        DB::statement("ALTER TABLE flow_nodes MODIFY node_type ENUM('message', 'menu', 'action') DEFAULT 'message'");
+        if (DB::getDriverName() === 'sqlsrv') {
+            $this->replaceSqlServerCheckConstraint($this->downValues);
+            return;
+        }
+
+        DB::statement("ALTER TABLE flow_nodes MODIFY node_type ENUM('".implode("', '", $this->downValues)."') DEFAULT 'message'");
+    }
+
+    private function replaceSqlServerCheckConstraint(array $values): void
+    {
+        if (! DB::getSchemaBuilder()->hasTable('flow_nodes')) {
+            return;
+        }
+
+        $constraints = DB::select("
+            SELECT cc.name
+            FROM sys.check_constraints cc
+            INNER JOIN sys.columns c ON cc.parent_object_id = c.object_id
+            WHERE c.object_id = OBJECT_ID('flow_nodes') AND c.name = 'node_type'
+        ");
+
+        foreach ($constraints as $constraint) {
+            DB::statement("ALTER TABLE flow_nodes DROP CONSTRAINT [{$constraint->name}]");
+        }
+
+        $list = implode("', '", $values);
+        DB::statement("ALTER TABLE flow_nodes ADD CONSTRAINT flow_nodes_node_type_check CHECK (node_type IN ('{$list}'))");
     }
 };

@@ -216,7 +216,16 @@
                             </div>
                             <span class="text-[10px] font-bold text-white bg-green-600 px-2 py-1 rounded">✓ Resolvido</span>
                         </div>
-                        @if($prev->lastMessage)
+                        @if($prev->resolution)
+                        <p class="text-[11px] text-gray-700 mt-1 font-medium">
+                            {{ \App\Models\ConversationResolution::getReasonLabels()[$prev->resolution->resolution_reason] ?? $prev->resolution->resolution_reason }}
+                        </p>
+                        @if($prev->resolution->resolution_notes)
+                        <p class="text-xs text-gray-600 mt-1 line-clamp-2">
+                            {{ $prev->resolution->resolution_notes }}
+                        </p>
+                        @endif
+                        @elseif($prev->lastMessage)
                         <p class="text-xs text-gray-600 mt-1 line-clamp-2">
                             {{ $prev->lastMessage->content ?? '(Sem mensagens de texto)' }}
                         </p>
@@ -361,8 +370,7 @@
         @endif
 
         <!-- Chat Input -->
-        @if($hasMyClaim || $isAdmin)
-        <div class="p-4 bg-white/70 backdrop-blur-sm border-t border-gray-200/50 space-y-3">
+        <div class="p-4 bg-white/70 backdrop-blur-sm border-t border-gray-200/50 space-y-3 @if(!$hasMyClaim && !$isAdmin) hidden @endif">
             <!-- File Preview -->
             <div id="filePreview" class="hidden bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-lg p-3 flex items-center gap-3 shadow-sm">
                 <div id="filePreviewThumb" class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
@@ -416,8 +424,9 @@
                 </div>
             </form>
         </div>
-        @else
+
         <!-- Chat Bloqueado - Precisa Clamar -->
+        @if(!$hasMyClaim && !$isAdmin)
         <div class="p-8 bg-gradient-to-r from-error/10 to-error/5 border-t border-error/20 flex flex-col items-center justify-center gap-4">
             <div class="text-center">
                 <span class="material-symbols-outlined text-5xl text-error block mb-3">lock</span>
@@ -435,6 +444,7 @@
             </button>
         </div>
         @endif
+
         @else
         <!-- No conversation selected -->
         <div class="flex-1 flex items-center justify-center">
@@ -611,8 +621,8 @@
 
     // Resolution Modal
     function openResolutionModal(conversationId) {
-        document.getElementById('conversationId').value = conversationId;
         document.getElementById('resolutionForm').reset();
+        document.getElementById('conversationId').value = conversationId;
         document.getElementById('resolutionModal').classList.remove('hidden');
     }
 
@@ -623,6 +633,12 @@
     document.getElementById('resolutionForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
+        const payload = {
+            conversation_id: formData.get('conversation_id'),
+            resolution_reason: formData.get('resolution_reason'),
+            resolution_notes: formData.get('resolution_notes'),
+            internal_comments: formData.get('internal_comments') || null,
+        };
 
         try {
             const response = await fetch('{{ route("conversations.resolve-with-reason") }}', {
@@ -630,18 +646,20 @@
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 },
-                body: JSON.stringify(Object.fromEntries(formData)),
+                body: JSON.stringify(payload),
             });
 
             const data = await response.json();
 
-            if (data.success) {
+            if (response.ok && data.success) {
                 alert('Conversa encerrada com sucesso!');
                 closeResolutionModal();
                 location.reload();
             } else {
-                alert('Erro: ' + (data.message || 'Erro ao encerrar conversa'));
+                const errors = data.errors ? Object.values(data.errors).flat().join('\n') : '';
+                alert('Erro: ' + (errors || data.message || 'Erro ao encerrar conversa'));
             }
         } catch (error) {
             alert('Erro: ' + error.message);
@@ -655,8 +673,8 @@
 
     // ===== Reopen Request Modal =====
     function openReopenRequestModal(conversationId) {
-        document.getElementById('reopenConversationId').value = conversationId;
         document.getElementById('reopenRequestForm').reset();
+        document.getElementById('reopenConversationId').value = conversationId;
         document.getElementById('reopenRequestModal').classList.remove('hidden');
     }
 
@@ -1109,6 +1127,28 @@
             const conv = data.conversation;
             const events = data.events || [];
             const messages = data.messages || [];
+            const resolution = data.resolution;
+
+            const escapeHtml = (text) => {
+                const div = document.createElement('div');
+                div.textContent = text ?? '';
+                return div.innerHTML;
+            };
+
+            let resolutionHtml = '';
+            if (resolution) {
+                resolutionHtml = `
+                    <div class="mb-6 p-4 rounded-lg border border-tertiary/30 bg-tertiary/10">
+                        <h3 class="font-bold text-on-surface mb-2">Encerramento</h3>
+                        <p class="text-sm text-gray-700"><strong>Motivo:</strong> ${escapeHtml(resolution.reason_label)}</p>
+                        ${resolution.notes ? `<p class="text-sm text-gray-700 mt-2"><strong>O que foi feito:</strong> ${escapeHtml(resolution.notes)}</p>` : ''}
+                        ${resolution.internal_comments ? `<p class="text-sm text-gray-600 mt-2"><strong>Comentários internos:</strong> ${escapeHtml(resolution.internal_comments)}</p>` : ''}
+                        <p class="text-[11px] text-gray-500 mt-2">
+                            Por ${escapeHtml(resolution.resolved_by || 'Agente')} em ${escapeHtml(resolution.resolved_at || conv.closed_at)}
+                        </p>
+                    </div>
+                `;
+            }
 
             // Create modal
             const modal = document.createElement('div');
@@ -1183,8 +1223,9 @@
                         <button onclick="document.getElementById('historyModal').remove()" class="text-gray-600 hover:text-on-surface text-2xl">✓</button>
                     </div>
                     <div class="flex-1 overflow-y-auto custom-scrollbar flex gap-4">
-                        <div class="w-1/3 p-6 border-r border-gray-200 bg-surface-bright">
+                        <div class="w-1/3 p-6 border-r border-gray-200 bg-surface-bright overflow-y-auto">
                             <h3 class="font-bold text-on-surface mb-4">Timeline de Eventos</h3>
+                            ${resolutionHtml}
                             <div class="space-y-2">
                                 ${eventsHtml || '<p class="text-sm text-gray-600">Nenhum evento registrado</p>'}
                             </div>

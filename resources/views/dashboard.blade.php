@@ -4,58 +4,69 @@
 
 @section('content')
 
-<!-- Top Bar -->
-<header class="flex justify-between items-center h-16 px-8 w-full sticky top-0 z-40 bg-white border-b border-gray-200">
-    <div class="flex items-center gap-8">
-        <h2 class="text-xl font-bold text-[#1DA85A]">SisZap Dashboard</h2>
-        <div class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
-            <input class="pl-10 pr-4 py-2 bg-gray-100 border-none rounded-xl focus:ring-2 focus:ring-green-500 transition-all text-sm w-80" placeholder="Buscar chats ou agentes..." type="text">
+<x-layout.page-header title="SisZap Dashboard">
+    <x-slot:search>
+        <x-common.search-input placeholder="Buscar chats ou agentes..." />
+    </x-slot:search>
+
+    <x-slot:tabs>
+        <x-layout.nav-tabs :items="[
+            ['label' => 'Visão Geral', 'href' => route('dashboard'), 'active' => true],
+            ['label' => 'Relatórios', 'href' => route('conversations.index') . '?view=reports', 'active' => false],
+        ]" />
+    </x-slot:tabs>
+
+    <button type="button" class="icon-btn" title="Notificações">
+        <span class="material-symbols-outlined text-[20px]">notifications</span>
+    </button>
+
+    <div class="page-header__user">
+        <div>
+            <p class="page-header__user-name">{{ auth()->user()->name }}</p>
+            <p class="page-header__user-role">{{ auth()->user()->role === 'admin' ? 'Administrador' : 'Agente' }}</p>
         </div>
     </div>
-    <div class="flex items-center gap-6">
-        <div class="hidden md:flex items-center gap-6 text-gray-600">
-            <a class="text-[#1DA85A] font-bold border-b-2 border-[#1DA85A] pb-1" href="#">Visão Geral</a>
-            <a class="hover:text-[#1DA85A] transition-colors" href="#">Relatórios</a>
-        </div>
-        <div class="h-6 w-px bg-gray-200"></div>
-        <div class="flex items-center gap-4">
-            <button class="p-2 hover:bg-gray-100 rounded-full transition-all text-gray-600">
-                <span class="material-symbols-outlined">notifications</span>
-            </button>
-            <div class="flex items-center gap-2 pl-4">
-                <div class="text-right">
-                    <p class="text-sm font-medium">{{ auth()->user()->name }}</p>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">{{ auth()->user()->role === 'admin' ? 'Admin' : 'Agente' }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
+</x-layout.page-header>
 
 <!-- Dashboard Body -->
-<div class="p-8 overflow-y-auto custom-scrollbar flex-1 space-y-8 max-w-[1600px]">
-    <!-- Filtros -->
-    <div class="card-nm">
-        <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <input type="date" id="startDate" name="start_date" class="input-nm h-[42px]" placeholder="Data inicial">
-            <input type="date" id="endDate" name="end_date" class="input-nm h-[42px]" placeholder="Data final">
-            <select id="agentSelect" name="agent_id" class="select-nm h-[42px]">
-                <option value="">Todos os agentes</option>
-                @foreach ($agents as $agent)
-                    <option value="{{ $agent->id }}">{{ $agent->name }}</option>
-                @endforeach
-            </select>
-            <div class="flex gap-2">
-                <button type="submit" class="btn-nm-primary flex-1">Filtrar</button>
-                <button type="reset" class="btn-nm-secondary">Limpar</button>
-            </div>
-        </form>
-    </div>
-    <!-- Metrics KPIs Bento Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="page-body dashboard-content design-scrollbar">
+    <x-layout.page-section title="Filtros">
+        <x-layout.card>
+            <form id="filterForm" class="form-grid form-grid--filters">
+                <x-common.input
+                    type="date"
+                    id="startDate"
+                    name="start_date"
+                    label="Data inicial"
+                    variant="inset"
+                />
+                <x-common.input
+                    type="date"
+                    id="endDate"
+                    name="end_date"
+                    label="Data final"
+                    variant="inset"
+                />
+                <x-common.select
+                    id="agentSelect"
+                    name="agent_id"
+                    label="Agente"
+                    variant="inset"
+                    placeholder="Todos os agentes"
+                    :options="$agents->pluck('name', 'id')->all()"
+                />
+                <x-common.form-actions>
+                    <x-common.button type="submit" variant="primary">Filtrar</x-common.button>
+                    <x-common.button type="reset" variant="secondary">Limpar</x-common.button>
+                </x-common.form-actions>
+            </form>
+        </x-layout.card>
+    </x-layout.page-section>
+
+    <x-layout.page-section title="Indicadores">
+        <div class="dashboard-grid-kpi">
         <!-- Card 1: Total Mensagens -->
-        <div class="card-nm">
+        <div class="card-kpi">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-green-100 text-[#1DA85A] rounded-xl">
                     <span class="material-symbols-outlined">forum</span>
@@ -70,7 +81,7 @@
         </div>
 
         <!-- Card 2: Tempo Médio Resposta -->
-        <div class="card-nm">
+        <div class="card-kpi">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
                     <span class="material-symbols-outlined">schedule</span>
@@ -89,7 +100,7 @@
         </div>
 
         <!-- Card 3: Chats Abertos -->
-        <div class="card-nm">
+        <div class="card-kpi">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-purple-100 text-purple-600 rounded-xl">
                     <span class="material-symbols-outlined">chat</span>
@@ -107,7 +118,7 @@
         </div>
 
         <!-- Card 4: Taxa de Satisfação -->
-        <div class="card-nm">
+        <div class="card-kpi">
             <div class="flex justify-between items-start mb-4">
                 <div class="p-3 bg-yellow-100 text-yellow-600 rounded-xl">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -124,12 +135,13 @@
                 <span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
             </div>
         </div>
-    </div>
+        </div>
+    </x-layout.page-section>
 
-    <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <x-layout.page-section title="Análises">
+        <div class="dashboard-grid-2-1">
         <!-- Message Volume Chart -->
-        <div class="lg:col-span-2 card-nm">
+        <div class="card-nm">
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h3 class="text-lg font-bold">Volume de Mensagens</h3>
@@ -181,10 +193,11 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
+    </x-layout.page-section>
 
-    <!-- Bottom Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <x-layout.page-section>
+        <div class="dashboard-grid-2">
         <!-- Chart 3: Inbound vs Outbound -->
         <div class="card-nm">
             <div class="flex justify-between items-center mb-8">
@@ -210,11 +223,12 @@
                 <canvas id="byAgentChart"></canvas>
             </div>
         </div>
-    </div>
+        </div>
+    </x-layout.page-section>
 
-    <!-- Top Contatos -->
-    <div class="card-nm overflow-hidden">
-        <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+    <x-layout.page-section title="Contatos">
+        <div class="card-nm card-nm-flush">
+        <div class="card-nm-head">
             <div>
                 <h3 class="text-lg font-bold">Top 10 Contatos</h3>
                 <p class="text-gray-500 text-sm">Contatos com mais interações</p>
@@ -239,12 +253,14 @@
                 </tbody>
             </table>
         </div>
-    </div>
+        </div>
+    </x-layout.page-section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+    <x-layout.page-section title="Operação">
+        <div class="dashboard-grid-bottom">
         <!-- My Chats -->
-        <div class="lg:col-span-2 card-nm flex flex-col overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+        <div class="card-nm card-nm-flush flex flex-col">
+            <div class="card-nm-head">
                 <div>
                     <h3 class="text-lg font-bold">Meus Atendimentos</h3>
                     <p class="text-gray-500 text-sm">{{ $myChats->count() }} chats ativos</p>
@@ -303,8 +319,8 @@
         </div>
 
         <!-- Online Agents -->
-        <div class="card-nm flex flex-col overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+        <div class="card-nm card-nm-flush flex flex-col">
+            <div class="card-nm-head">
                 <div>
                     <h3 class="text-lg font-bold">Agentes Online</h3>
                     <p class="text-gray-500 text-sm">{{ $onlineAgents->count() }} agentes conectados</p>
@@ -333,8 +349,8 @@
         </div>
 
         <!-- Pending Chats -->
-        <div class="lg:col-span-3 card-nm flex flex-col overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+        <div class="card-nm card-nm-flush flex flex-col dashboard-full-width">
+            <div class="card-nm-head">
                 <div>
                     <h3 class="text-lg font-bold">Atendimentos Pendentes</h3>
                     <p class="text-gray-500 text-sm">Chats aguardando distribuição</p>
@@ -392,7 +408,8 @@
                 @endif
             </div>
         </div>
-    </div>
+        </div>
+    </x-layout.page-section>
 </div>
 @endsection
 

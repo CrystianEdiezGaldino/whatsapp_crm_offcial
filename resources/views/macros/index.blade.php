@@ -15,7 +15,7 @@
 @endpush
 
 @section('content')
-<header class="flex flex-wrap justify-between items-center gap-4 h-auto min-h-16 py-3 px-6 w-full sticky top-0 z-40 bg-surface/90 backdrop-blur-md border-b border-gray-200">
+<header class="page-header sticky top-0 z-40 flex-wrap gap-4 h-auto min-h-[64px] py-3">
     <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center">
             <span class="material-symbols-outlined text-secondary">bolt</span>
@@ -32,7 +32,7 @@
     </button>
 </header>
 
-<div class="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+<div class="page-body design-scrollbar !p-4 md:!p-6">
     @if(session('success'))
     <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm flex items-center gap-2">
         <span class="material-symbols-outlined text-lg">check_circle</span>
@@ -128,7 +128,15 @@
                             @endif
                         </div>
                         <div class="flex gap-0.5 shrink-0">
-                            <button type="button" onclick="editMacro({{ $macro->id }}, @json($macro->name), @json($macro->content), @json($macro->shortcut), @json($macro->category))"
+                            <button type="button"
+                                data-macro="{{ base64_encode(json_encode([
+                                    'id' => $macro->id,
+                                    'name' => $macro->name,
+                                    'content' => $macro->content,
+                                    'shortcut' => $macro->shortcut,
+                                    'category' => $macro->category,
+                                ], JSON_UNESCAPED_UNICODE)) }}"
+                                onclick="editMacroFromButton(this)"
                                 class="p-1.5 hover:bg-gray-100-high text-gray-600 rounded-lg transition-colors" title="Editar">
                                 <span class="material-symbols-outlined text-lg">edit</span>
                             </button>
@@ -155,7 +163,9 @@
                             Texto
                         </span>
                         @endif
-                        <button type="button" onclick="copyMacroContent(@json($macro->content))"
+                        <button type="button"
+                            data-content="{{ base64_encode(json_encode($macro->content, JSON_UNESCAPED_UNICODE)) }}"
+                            onclick="copyMacroContent(JSON.parse(atob(this.dataset.content)))"
                             class="ml-auto text-[11px] font-semibold text-secondary hover:underline flex items-center gap-0.5">
                             <span class="material-symbols-outlined text-[14px]">content_copy</span>
                             Copiar
@@ -344,6 +354,15 @@ document.querySelectorAll('.category-pill').forEach(btn => {
         filterMacros();
     });
 });
+
+function parseMacroData(encoded) {
+    return JSON.parse(atob(encoded));
+}
+
+function editMacroFromButton(btn) {
+    const data = parseMacroData(btn.dataset.macro);
+    editMacro(data.id, data.name, data.content, data.shortcut, data.category);
+}
 
 function editMacro(id, name, content, shortcut, category) {
     currentMacroId = id;

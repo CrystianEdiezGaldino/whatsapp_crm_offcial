@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ConversationClaim extends Model
 {
     protected $fillable = ['conversation_id', 'user_id', 'claimed_at', 'released_at', 'reason'];
-    protected $casts = ['claimed_at' => 'datetime', 'released_at' => 'datetime'];
+    protected $casts = ['claimed_at' => 'datetime', 'released_at' => 'datetime', 'user_id' => 'integer', 'conversation_id' => 'integer'];
 
     public function conversation(): BelongsTo
     {

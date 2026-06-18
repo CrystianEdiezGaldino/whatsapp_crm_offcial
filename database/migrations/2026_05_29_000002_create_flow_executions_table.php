@@ -12,11 +12,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('conversation_id')->constrained('conversations');
             $table->foreignId('flow_id')->constrained('conversation_flows');
-            $table->foreignId('node_id')->nullable()->constrained('flow_nodes')->nullOnDelete();
+            $table->unsignedBigInteger('node_id')->nullable();
+            $table->foreign('node_id')->references('id')->on('flow_nodes');
             $table->integer('client_choice')->nullable();
             $table->enum('status', ['started', 'in_progress', 'completed', 'failed'])->default('in_progress');
-            $table->foreignId('result_sector_id')->nullable()->constrained('sectors')->nullOnDelete();
-            $table->foreignId('result_subflow_id')->nullable()->constrained('conversation_flows')->nullOnDelete();
+            $table->unsignedBigInteger('result_sector_id')->nullable();
+            $table->unsignedBigInteger('result_subflow_id')->nullable();
+            $table->foreign('result_sector_id')->references('id')->on('sectors');
+            $table->foreign('result_subflow_id')->references('id')->on('conversation_flows');
             $table->timestamps();
         });
     }

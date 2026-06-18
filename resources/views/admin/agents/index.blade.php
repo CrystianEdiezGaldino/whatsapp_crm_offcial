@@ -5,7 +5,7 @@
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Topbar -->
-    <div class="h-16 px-6 sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between">
+    <div class="page-header sticky top-0 z-40">
         <div>
             <h1 class="text-2xl font-bold text-on-surface">Atendentes</h1>
             <p class="text-xs text-gray-600 mt-1">Gerencie os atendentes do sistema</p>
@@ -80,11 +80,11 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-2">
-                                        <a href="{{ route('admin.agents.edit', $agent->id) }}" class="text-secondary hover:text-secondary/80 font-semibold text-xs">
+                                        <a href="{{ route('admin.agents.edit', $agent) }}" class="text-secondary hover:text-secondary/80 font-semibold text-xs">
                                             <span class="material-symbols-outlined inline text-sm">edit</span> Editar
                                         </a>
                                         @if($agent->conversations()->whereIn('status', ['new', 'in_attendance'])->count() === 0 && !$agent->isAdmin())
-                                        <form action="{{ route('admin.agents.destroy', $agent->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este atendente?');" class="inline">
+                                        <form action="{{ route('admin.agents.destroy', $agent) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja deletar este atendente?');" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-error hover:text-error/80 font-semibold text-xs">

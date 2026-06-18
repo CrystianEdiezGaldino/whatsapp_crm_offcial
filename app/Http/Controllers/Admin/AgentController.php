@@ -95,6 +95,7 @@ class AgentController extends Controller
 
     public function edit(User $user)
     {
+        $user->load('sector', 'agentCapacity');
         $sectors = Sector::active()->byOption()->get();
         $roles = [
             'agent' => 'Atendente',
@@ -122,7 +123,7 @@ class AgentController extends Controller
                 'email' => $validated['email'],
                 'role' => $validated['role'],
                 'sector_id' => $validated['sector_id'] ?? null,
-                'is_active' => $validated['is_active'] ?? true,
+                'is_active' => $request->boolean('is_active'),
                 'notes' => $validated['notes'] ?? null,
             ]);
 

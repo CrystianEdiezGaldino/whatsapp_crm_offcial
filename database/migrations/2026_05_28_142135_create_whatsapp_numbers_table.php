@@ -28,7 +28,8 @@ return new class extends Migration
         // Add active_whatsapp_number_id to settings if not exists
         if (Schema::hasTable('settings') && !Schema::hasColumn('settings', 'active_whatsapp_number_id')) {
             Schema::table('settings', function (Blueprint $table) {
-                $table->foreignId('active_whatsapp_number_id')->nullable()->constrained('whatsapp_numbers')->onDelete('set null');
+                $table->unsignedBigInteger('active_whatsapp_number_id')->nullable();
+                $table->foreign('active_whatsapp_number_id')->references('id')->on('whatsapp_numbers');
             });
         }
     }

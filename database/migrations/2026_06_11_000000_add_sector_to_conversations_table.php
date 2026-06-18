@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::table('conversations', function (Blueprint $table) {
             if (!Schema::hasColumn('conversations', 'sector_id')) {
-                $table->foreignId('sector_id')->nullable()->after('contact_id')->constrained('sectors')->nullOnDelete();
+                $table->unsignedBigInteger('sector_id')->nullable()->after('contact_id');
+                $table->foreign('sector_id')->references('id')->on('sectors');
             }
         });
     }

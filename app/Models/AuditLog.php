@@ -8,7 +8,9 @@ class AuditLog extends Model
 {
     protected $fillable = ['auditable_type', 'auditable_id', 'action', 'description', 'user_id', 'old_values', 'new_values', 'ip_address', 'user_agent'];
     protected $casts = ['old_values' => 'json', 'new_values' => 'json', 'created_at' => 'datetime'];
-    public $timestamps = false;
+    public $timestamps = true;
+
+    const UPDATED_AT = null;
 
     public function user(): BelongsTo
     {

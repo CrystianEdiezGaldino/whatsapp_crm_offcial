@@ -5,7 +5,7 @@
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Topbar -->
-    <div class="h-16 px-6 sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-gray-200 flex items-center justify-between">
+    <div class="page-header sticky top-0 z-40">
         <div>
             <h1 class="text-2xl font-bold text-on-surface">Setores</h1>
             <p class="text-xs text-gray-600 mt-1">Gerencie os setores do pré-atendimento</p>

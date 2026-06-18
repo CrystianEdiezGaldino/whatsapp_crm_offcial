@@ -1,5 +1,5 @@
 /**
- * Chat inbox: envio AJAX, poll e deduplicação (texto, anexo, áudio).
+ * Chat inbox: envio AJAX, poll e deduplica????o (texto, anexo, ??udio).
  */
 (function (global) {
     class ChatInboxHelper {
@@ -7,7 +7,7 @@
             this.chatEl = options.chatEl || null;
             this.contactName = options.contactName || '';
             this.pollUrl = options.pollUrl || null;
-            this.pollIntervalMs = options.pollIntervalMs || 5000;
+            this.pollIntervalMs = options.pollIntervalMs || 3000;
             this.seenKeys = new Set(options.initialKeys || []);
             this.lastMessageId = options.lastMessageId || 0;
             this._sending = false;
@@ -110,6 +110,13 @@
 
                     if (response.ok && data.success) {
                         this.appendIfNew(data.message);
+                        window.dispatchEvent(new CustomEvent('chat-message-sent', {
+                            detail: {
+                                conversation_id: data.conversation_id,
+                                content: data.message?.content,
+                                preview: data.message?.content || 'M??dia',
+                            },
+                        }));
                         if (typeof onSuccess === 'function') {
                             onSuccess(data);
                         }
@@ -134,7 +141,7 @@
             this._pollTimer = setInterval(async () => {
                 try {
                     const res = await fetch(
-                        this.pollUrl + '?last_id=' + this.lastMessageId,
+                        this.pollUrl + '?last_id=' + encodeURIComponent(this.lastMessageId),
                         {
                             headers: {
                                 Accept: 'application/json',
@@ -240,3 +247,4 @@
 
     global.ChatInboxHelper = ChatInboxHelper;
 })(window);
+

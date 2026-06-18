@@ -16,7 +16,7 @@ class ConversationClaimController extends Controller
         $activeClaim = $conversation->getActiveClaim();
 
         // Se há um claim ativo e não é do usuário atual e ele não é admin, rejeita
-        if ($activeClaim && $activeClaim->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
+        if ($activeClaim && (int) $activeClaim->user_id !== (int) Auth::id() && !Auth::user()->isAdmin()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Este atendimento já foi clamado por ' . $activeClaim->user->name,
@@ -80,7 +80,7 @@ class ConversationClaimController extends Controller
             ], 422);
         }
 
-        if (!Auth::user()->isAdmin() && $activeClaim->user_id !== Auth::id()) {
+        if (!Auth::user()->isAdmin() && (int) $activeClaim->user_id !== (int) Auth::id()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Você não pode liberar o claim de outro agente',

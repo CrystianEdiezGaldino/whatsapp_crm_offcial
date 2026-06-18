@@ -12,7 +12,8 @@ return new class extends Migration
         Schema::table('conversations', function (Blueprint $table) {
             // Only add claimed_by if it doesn't exist
             if (!Schema::hasColumn('conversations', 'claimed_by')) {
-                $table->foreignId('claimed_by')->nullable()->constrained('users')->nullOnDelete()->after('assigned_to');
+                $table->unsignedBigInteger('claimed_by')->nullable()->after('assigned_to');
+                $table->foreign('claimed_by')->references('id')->on('users');
             }
 
             // Only add claimed_at if it doesn't exist

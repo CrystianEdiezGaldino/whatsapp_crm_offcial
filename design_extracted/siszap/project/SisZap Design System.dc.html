@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+
+<template id="__bundler_thumbnail" data-bg-color="#E8EBF1">
+  <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="300" fill="#E8EBF1"/>
+    <!-- Top bar -->
+    <rect x="0" y="0" width="400" height="44" rx="0" fill="#E8EBF1" filter="url(#sh)"/>
+    <rect x="16" y="12" width="20" height="20" rx="6" fill="#1DA85A"/>
+    <rect x="44" y="16" width="60" height="10" rx="4" fill="#14171F" opacity="0.8"/>
+    <!-- Sidebar -->
+    <rect x="0" y="44" width="80" height="256" fill="#E0E3EA"/>
+    <rect x="8" y="56" width="64" height="8" rx="4" fill="#4353E8" opacity="0.6"/>
+    <rect x="8" y="72" width="56" height="8" rx="4" fill="#5A6172" opacity="0.4"/>
+    <rect x="8" y="88" width="50" height="8" rx="4" fill="#5A6172" opacity="0.4"/>
+    <rect x="8" y="112" width="58" height="8" rx="4" fill="#5A6172" opacity="0.3"/>
+    <rect x="8" y="128" width="62" height="8" rx="4" fill="#5A6172" opacity="0.3"/>
+    <rect x="8" y="144" width="46" height="8" rx="4" fill="#5A6172" opacity="0.3"/>
+    <!-- Main content cards -->
+    <rect x="92" y="56" width="140" height="60" rx="12" fill="#E8EBF1" filter="url(#card)"/>
+    <rect x="102" y="66" width="60" height="8" rx="4" fill="#14171F" opacity="0.7"/>
+    <rect x="102" y="80" width="80" height="6" rx="3" fill="#6B7280" opacity="0.5"/>
+    <rect x="102" y="92" width="50" height="12" rx="4" fill="#1DA85A" opacity="0.7"/>
+    <rect x="244" y="56" width="140" height="60" rx="12" fill="#E8EBF1" filter="url(#card)"/>
+    <rect x="254" y="66" width="60" height="8" rx="4" fill="#14171F" opacity="0.7"/>
+    <rect x="254" y="80" width="80" height="6" rx="3" fill="#6B7280" opacity="0.5"/>
+    <rect x="254" y="92" width="50" height="12" rx="4" fill="#4353E8" opacity="0.7"/>
+    <rect x="92" y="128" width="292" height="50" rx="12" fill="#E8EBF1" filter="url(#card)"/>
+    <rect x="102" y="140" width="50" height="6" rx="3" fill="#14171F" opacity="0.6"/>
+    <rect x="102" y="153" width="120" height="8" rx="4" fill="#E8EBF1" filter="url(#inp)"/>
+    <rect x="230" y="153" width="80" height="8" rx="4" fill="#E8EBF1" filter="url(#inp)"/>
+    <rect x="92" y="190" width="292" height="50" rx="12" fill="#E8EBF1" filter="url(#card)"/>
+    <rect x="102" y="202" width="40" height="7" rx="3" fill="#14171F" opacity="0.5"/>
+    <rect x="102" y="214" width="25" height="14" rx="7" fill="#1DA85A" opacity="0.8"/>
+    <rect x="134" y="214" width="25" height="14" rx="7" fill="#4353E8" opacity="0.8"/>
+    <rect x="166" y="214" width="25" height="14" rx="7" fill="#D1383E" opacity="0.8"/>
+    <rect x="198" y="214" width="25" height="14" rx="7" fill="#14171F" opacity="0.8"/>
+    <!-- Label -->
+    <text x="200" y="288" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="700" fill="#5A6172" opacity="0.8">SisZap · Design System</text>
+    <defs>
+      <filter id="card"><feDropShadow dx="3" dy="3" stdDeviation="4" flood-color="#c4c8d4"/><feDropShadow dx="-3" dy="-3" stdDeviation="4" flood-color="#ffffff"/></filter>
+      <filter id="inp"><feDropShadow dx="2" dy="2" stdDeviation="2" flood-color="#c4c8d4" result="d1"/><feDropShadow dx="-2" dy="-2" stdDeviation="2" flood-color="#ffffff"/></filter>
+    </defs>
+  </svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com"></link>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet"></link>
+<style>
+:root{--bg:#E8EBF1;--sh-dark:#c4c8d4;--sh-light:#ffffff;}
+html,body{margin:0;padding:0;background:var(--bg);}
+*{box-sizing:border-box;}
+::-webkit-scrollbar{width:8px;} ::-webkit-scrollbar-thumb{background:#c4c8d4;border-radius:99px;} ::-webkit-scrollbar-track{background:transparent;}
+input:focus,textarea:focus,select:focus{outline:none;box-shadow:inset 3px 3px 8px var(--sh-dark),inset -3px -3px 8px var(--sh-light),0 0 0 2px rgba(67,83,232,0.18) !important;border-color:transparent !important;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pop{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+@keyframes blink{0%,100%{opacity:.25;}50%{opacity:1;}}
+</style>
+</helmet>
+
+<div style="font-family:'Figtree',sans-serif;color:#14171F;min-height:100vh;background:#E8EBF1;">
+
+  <!-- TOP BAR -->
+  <div style="position:sticky;top:0;z-index:50;background:#E8EBF1;box-shadow:0 4px 14px #c4c8d4,0 -2px 6px #ffffff;display:flex;align-items:center;gap:14px;padding:0 32px;height:60px;">
+    <div style="width:32px;height:32px;border-radius:10px;background:#1DA85A;display:flex;align-items:center;justify-content:center;">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l1.7-3.4A8 8 0 1 1 21 12z"></path></svg>
+    </div>
+    <div style="font-size:16px;font-weight:800;letter-spacing:-0.01em;">SisZap</div>
+    <div style="width:1px;height:24px;background:#E8EAF0;margin:0 4px;"></div>
+    <div style="font-size:14px;font-weight:600;color:#6B7280;">Design System · Referência de Componentes</div>
+    <div style="flex:1;"></div>
+    <div style="font-size:12px;font-weight:700;background:#E8F8EF;color:#1DA85A;border-radius:99px;padding:5px 12px;">v1.0 · Figtree · 2026</div>
+  </div>
+
+  <div style="display:flex;">
+    <!-- SIDEBAR NAV -->
+    <aside style="width:220px;flex-shrink:0;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;background:#E8EBF1;box-shadow:4px 0 14px #c4c8d4;padding:16px 12px;">
+      <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="10">
+        <a href="{{ sec.href }}" style="display:flex;align-items:center;gap:9px;height:36px;padding:0 10px;border-radius:9px;font-size:13px;font-weight:600;color:#5A6172;text-decoration:none;margin-bottom:2px;" style-hover="background:#F4F6FA;color:#14171F;">
+          <span style="font-size:16px;line-height:1;">{{ sec.icon }}</span>
+          {{ sec.label }}
+        </a>
+      </sc-for>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main style="flex:1;padding:36px 40px;max-width:1100px;">
+
+      <!-- ═══════════ COLORS ═══════════ -->
+      <section id="colors" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">FUNDAÇÃO</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Cores</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Paleta principal usada em todo o sistema</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;">
+          <sc-for list="{{ colorPrimary }}" as="c" hint-placeholder-count="5">
+            <div>
+              <div style="height:60px;border-radius:12px;background:{{ c.hex }};border:{{ c.border }};margin-bottom:6px;"></div>
+              <div style="font-size:12.5px;font-weight:700;">{{ c.name }}</div>
+              <div style="font-size:11px;font-weight:600;color:#9CA3AF;font-family:monospace;">{{ c.hex }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;">
+          <sc-for list="{{ colorNeutral }}" as="c" hint-placeholder-count="5">
+            <div>
+              <div style="height:60px;border-radius:12px;background:{{ c.hex }};border:{{ c.border }};margin-bottom:6px;"></div>
+              <div style="font-size:12.5px;font-weight:700;">{{ c.name }}</div>
+              <div style="font-size:11px;font-weight:600;color:#9CA3AF;font-family:monospace;">{{ c.hex }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+          <sc-for list="{{ colorState }}" as="c" hint-placeholder-count="5">
+            <div>
+              <div style="height:60px;border-radius:12px;background:{{ c.hex }};border:{{ c.border }};margin-bottom:6px;"></div>
+              <div style="font-size:12.5px;font-weight:700;">{{ c.name }}</div>
+              <div style="font-size:11px;font-weight:600;color:#9CA3AF;font-family:monospace;">{{ c.hex }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- ═══════════ TYPOGRAPHY ═══════════ -->
+      <section id="typography" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">FUNDAÇÃO</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Tipografia</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Família <strong>Figtree</strong> · pesos 400, 500, 600, 700, 800</div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:28px;display:flex;flex-direction:column;gap:18px;">
+          <sc-for list="{{ typeScale }}" as="t" hint-placeholder-count="6">
+            <div style="display:flex;align-items:baseline;gap:20px;padding-bottom:18px;border-bottom:1px solid #d6d9e2;">
+              <div style="width:140px;flex-shrink:0;">
+                <div style="font-size:11.5px;font-weight:700;color:#9CA3AF;margin-bottom:2px;">{{ t.label }}</div>
+                <div style="font-size:10.5px;font-family:monospace;color:#B6BCCB;">{{ t.spec }}</div>
+              </div>
+              <div style="font-size:{{ t.size }};font-weight:{{ t.weight }};line-height:{{ t.lh }};color:{{ t.color }};">{{ t.sample }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- ═══════════ BUTTONS ═══════════ -->
+      <section id="buttons" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Botões</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Variantes, tamanhos e estados</div>
+
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:14px;">VARIANTES PRIMÁRIAS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#1DA85A;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(29,168,90,0.35),-3px -3px 8px #ffffff;">Primary · Verde</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#4353E8;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(67,83,232,0.35),-3px -3px 8px #ffffff;">Primary · Índigo</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#D1383E;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(209,56,62,0.35),-3px -3px 8px #ffffff;">Destructive</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#14171F;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(20,23,31,0.3),-3px -3px 8px #ffffff;">Dark</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#F59E0B;color:#FFFFFF;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(245,158,11,0.35),-3px -3px 8px #ffffff;">Warning</button>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:14px;">VARIANTES SECUNDÁRIAS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#FFFFFF;color:#3A4154;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">Outline</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#FFFFFF;color:#4353E8;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">Outline · Índigo</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#FFFFFF;color:#D1383E;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(209,56,62,0.18),-2px -2px 6px #ffffff;">Outline · Danger</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#FFFFFF;color:#5A6172;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">Ghost</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#FFFFFF;color:#4353E8;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">Tonal · Índigo</button>
+            <button style="height:42px;padding:0 20px;border:none;border-radius:14px;background:#FFFFFF;color:#1DA85A;font-size:14px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">Tonal · Verde</button>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:14px;">TAMANHOS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <button style="height:28px;padding:0 12px;border:none;border-radius:8px;background:#1DA85A;color:#FFFFFF;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:3px 3px 8px rgba(29,168,90,0.3),-2px -2px 6px #ffffff;">XS</button>
+            <button style="height:32px;padding:0 14px;border:none;border-radius:9px;background:#1DA85A;color:#FFFFFF;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:3px 3px 8px rgba(29,168,90,0.3),-2px -2px 6px #ffffff;">SM</button>
+            <button style="height:40px;padding:0 18px;border:none;border-radius:11px;background:#1DA85A;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:3px 3px 8px rgba(29,168,90,0.3),-2px -2px 6px #ffffff;">MD</button>
+            <button style="height:46px;padding:0 22px;border:none;border-radius:12px;background:#1DA85A;color:#FFFFFF;font-size:15px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(29,168,90,0.3),-3px -3px 8px #ffffff;">LG</button>
+            <button style="height:54px;padding:0 28px;border:none;border-radius:14px;background:#1DA85A;color:#FFFFFF;font-size:16px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:5px 5px 12px rgba(29,168,90,0.3),-3px -3px 8px #ffffff;">XL</button>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:14px;">COM ÍCONE · ICON-ONLY</div>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+            <button style="height:42px;padding:0 18px;border:none;border-radius:12px;background:#1DA85A;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:3px 3px 8px rgba(29,168,90,0.3),-2px -2px 6px #ffffff;display:flex;align-items:center;gap:8px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l1.7-3.4A8 8 0 1 1 21 12z"></path></svg>
+              Iniciar atendimento
+            </button>
+            <button style="height:42px;padding:0 18px;border:none;border-radius:14px;background:#FFFFFF;color:#3A4154;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;display:flex;align-items:center;gap:8px;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h13l-3.5-3.5M20 17H7l3.5 3.5"></path></svg>
+              Transferir
+            </button>
+            <button style="width:42px;height:42px;border:none;border-radius:14px;background:#FFFFFF;color:#5A6172;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+            </button>
+            <button style="width:42px;height:42px;border:none;border-radius:12px;background:#EEF0FE;color:#4353E8;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+            </button>
+            <button style="width:42px;height:42px;border:1px solid #F8D2D4;border-radius:12px;background:#FEF1F2;color:#D1383E;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+            <button style="height:42px;padding:0 16px;border:none;border-radius:12px;background:#C9CEDC;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:not-allowed;font-family:'Figtree',sans-serif;opacity:.7;">Desabilitado</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ FORMS ═══════════ -->
+      <section id="forms" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Formulários</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Inputs, selects, textarea e estados de validação</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+          <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:22px;">
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:16px;">INPUT TEXT</div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:11.5px;font-weight:700;color:#5A6172;margin-bottom:6px;">Padrão</label>
+              <input type="text" placeholder="Ex.: Nome do sócio" style="width:100%;height:42px;border:1px solid #E2E5EE;border-radius:11px;padding:0 13px;font-size:14px;background:#E8EBF1;color:#14171F;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;border:none;"></input>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:11.5px;font-weight:700;color:#5A6172;margin-bottom:6px;">Com ícone à esquerda</label>
+              <div style="display:flex;align-items:center;gap:10px;height:42px;border:none;border-radius:14px;padding:0 13px;background:#E8EBF1;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+                <input type="text" placeholder="Buscar nome ou telefone..." style="flex:1;border:none;background:transparent;font-size:14px;color:#14171F;font-family:'Figtree',sans-serif;"></input>
+              </div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:11.5px;font-weight:700;color:#1DA85A;margin-bottom:6px;">Sucesso</label>
+              <input type="text" value="Tainá" style="width:100%;height:42px;border:none;border-radius:13px;padding:0 13px;font-size:14px;background:#E8EBF1;color:#14171F;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff,0 0 0 2px #1DA85A;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;border:none;"></input>
+              <div style="font-size:11.5px;font-weight:600;color:#1DA85A;margin-top:5px;">✓ Contato encontrado</div>
+            </div>
+            <div>
+              <label style="display:block;font-size:11.5px;font-weight:700;color:#D1383E;margin-bottom:6px;">Erro</label>
+              <input type="text" value="abc" style="width:100%;height:42px;border:none;border-radius:13px;padding:0 13px;font-size:14px;background:#E8EBF1;color:#14171F;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff,0 0 0 2px #D1383E;"></input>
+              <div style="font-size:11.5px;font-weight:600;color:#D1383E;margin-top:5px;">Número de telefone inválido</div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:22px;">
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:16px;">TEXTAREA · SELECT · DATE</div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:11.5px;font-weight:700;color:#5A6172;margin-bottom:6px;">Textarea · Mensagem</label>
+              <textarea placeholder="Digite a mensagem da macro..." rows="3" style="width:100%;border:1px solid #E2E5EE;border-radius:11px;padding:10px 13px;font-size:14px;line-height:1.5;background:#E8EBF1;color:#14171F;resize:vertical;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;border:none;"></textarea>
+              <div style="font-size:11px;font-weight:600;color:#B6BCCB;margin-top:4px;">0 / 500 caracteres</div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <label style="display:block;font-size:11.5px;font-weight:700;color:#5A6172;margin-bottom:6px;">Select</label>
+              <select style="width:100%;height:42px;border:1px solid #E2E5EE;border-radius:11px;padding:0 13px;font-size:14px;background:#E8EBF1;color:#14171F;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;border:none;cursor:pointer;">
+                <option>Todos os setores</option>
+                <option>Secretaria</option>
+                <option>Financeiro</option>
+                <option>Esportes</option>
+                <option>Eventos</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:11.5px;font-weight:700;color:#5A6172;margin-bottom:6px;">Date range</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <input type="date" style="height:42px;border:none;border-radius:13px;padding:0 11px;font-size:13px;background:#E8EBF1;color:#14171F;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;"></input>
+                <input type="date" style="height:42px;border:none;border-radius:13px;padding:0 11px;font-size:13px;background:#E8EBF1;color:#14171F;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;"></input>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══════════ BADGES & TAGS ═══════════ -->
+      <section id="badges" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Badges &amp; Etiquetas</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Status, contadores e etiquetas de conversa</div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;display:flex;flex-direction:column;gap:20px;">
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">STATUS</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <span style="font-size:11.5px;font-weight:700;background:#E8F8EF;color:#15803D;border-radius:99px;padding:5px 12px;">Online</span>
+              <span style="font-size:11.5px;font-weight:700;background:#FEF3C7;color:#B45309;border-radius:99px;padding:5px 12px;">Ausente</span>
+              <span style="font-size:11.5px;font-weight:700;background:#F0F2F7;color:#5A6172;border-radius:99px;padding:5px 12px;">Offline</span>
+              <span style="font-size:11.5px;font-weight:700;background:#EEF0FE;color:#4353E8;border-radius:99px;padding:5px 12px;">Em atendimento</span>
+              <span style="font-size:11.5px;font-weight:700;background:#FEE2E2;color:#B91C1C;border-radius:99px;padding:5px 12px;">SLA estourado</span>
+              <span style="font-size:11.5px;font-weight:700;background:#E8F8EF;color:#15803D;border-radius:99px;padding:5px 12px;">WhatsApp conectado</span>
+              <span style="font-size:11.5px;font-weight:700;background:#FEF3C7;color:#B45309;border-radius:99px;padding:5px 12px;">⏱ há 12 min</span>
+              <span style="font-size:11.5px;font-weight:700;background:#E8F8EF;color:#15803D;border-radius:99px;padding:5px 12px;">⏱ há 4 min</span>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">ETIQUETAS DE CONVERSA</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <span style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:99px;padding:4px 10px;">Reservas <span style="cursor:pointer;color:#8A93E8;">×</span></span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:99px;padding:4px 10px;">Financeiro <span style="cursor:pointer;color:#8A93E8;">×</span></span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:99px;padding:4px 10px;">VIP <span style="cursor:pointer;color:#8A93E8;">×</span></span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:99px;padding:4px 10px;">Sócio <span style="cursor:pointer;color:#8A93E8;">×</span></span>
+              <button style="font-size:11.5px;font-weight:700;color:#6B7280;background:#FFFFFF;border:none;border-radius:99px;padding:4px 10px;cursor:pointer;box-shadow:3px 3px 7px #c4c8d4,-2px -2px 5px #ffffff;">+ etiqueta</button>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">SETORES</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <span style="font-size:11px;font-weight:700;color:#5A6172;background:#dde0e8;border-radius:99px;padding:3px 9px;">Secretaria</span>
+              <span style="font-size:11px;font-weight:700;color:#5A6172;background:#dde0e8;border-radius:99px;padding:3px 9px;">Financeiro</span>
+              <span style="font-size:11px;font-weight:700;color:#5A6172;background:#dde0e8;border-radius:99px;padding:3px 9px;">Esportes</span>
+              <span style="font-size:11px;font-weight:700;color:#5A6172;background:#dde0e8;border-radius:99px;padding:3px 9px;">Eventos</span>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">COUNTERS · UNREAD</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+              <span style="min-width:20px;height:20px;border-radius:99px;background:#1DA85A;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px;">3</span>
+              <span style="min-width:20px;height:20px;border-radius:99px;background:#D1383E;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px;">12</span>
+              <span style="min-width:20px;height:20px;border-radius:99px;background:#4353E8;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 6px;">99+</span>
+              <span style="font-size:11px;font-weight:700;background:#B45309;color:#FEF3C7;border-radius:99px;padding:3px 8px;">★ 5,0</span>
+              <span style="font-size:11px;font-weight:700;background:#B45309;color:#FEF3C7;border-radius:99px;padding:3px 8px;">★ 4,0</span>
+              <span style="font-size:10.5px;font-weight:700;color:#FFFFFF;background:#1DA85A;border-radius:5px;padding:2px 6px;">LIVE</span>
+              <span style="font-size:10.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:5px;padding:2px 6px;">+12%</span>
+              <span style="font-size:10.5px;font-weight:700;color:#D1383E;background:#FEE2E2;border-radius:5px;padding:2px 6px;">-5%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ AVATARS ═══════════ -->
+      <section id="avatars" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Avatares</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Iniciais com paleta de cores · Indicadores de status</div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;display:flex;flex-direction:column;gap:20px;">
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">TAMANHOS</div>
+            <div style="display:flex;gap:12px;align-items:flex-end;">
+              <div style="width:28px;height:28px;border-radius:99px;background:#E0E7FF;color:#4338CA;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;">T</div>
+              <div style="width:36px;height:36px;border-radius:99px;background:#DCFCE7;color:#15803D;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;">M</div>
+              <div style="width:44px;height:44px;border-radius:99px;background:#FEF3C7;color:#B45309;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;">A</div>
+              <div style="width:56px;height:56px;border-radius:99px;background:#FCE7F3;color:#BE185D;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;">C</div>
+              <div style="width:68px;height:68px;border-radius:99px;background:#DBEAFE;color:#1D4ED8;font-weight:800;font-size:26px;display:flex;align-items:center;justify-content:center;">R</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">PALETA DE CORES</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <div style="width:42px;height:42px;border-radius:99px;background:#E0E7FF;color:#4338CA;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">A</div>
+              <div style="width:42px;height:42px;border-radius:99px;background:#DCFCE7;color:#15803D;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">B</div>
+              <div style="width:42px;height:42px;border-radius:99px;background:#FEF3C7;color:#B45309;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">C</div>
+              <div style="width:42px;height:42px;border-radius:99px;background:#FCE7F3;color:#BE185D;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">D</div>
+              <div style="width:42px;height:42px;border-radius:99px;background:#DBEAFE;color:#1D4ED8;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">E</div>
+              <div style="width:42px;height:42px;border-radius:99px;background:#F3E8FF;color:#7E22CE;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">F</div>
+              <div style="width:42px;height:42px;border-radius:99px;background:#FFE4E6;color:#BE123C;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">G</div>
+              <div style="width:42px;height:42px;border-radius:99px;background:#CCFBF1;color:#0F766E;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">H</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">COM STATUS ONLINE</div>
+            <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+              <div style="position:relative;">
+                <div style="width:42px;height:42px;border-radius:99px;background:#4353E8;color:#FFFFFF;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;">C</div>
+                <div style="position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:99px;background:#22C55E;border:2.5px solid #FFFFFF;"></div>
+              </div>
+              <div style="position:relative;">
+                <div style="width:42px;height:42px;border-radius:99px;background:#DCFCE7;color:#15803D;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;">M</div>
+                <div style="position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:99px;background:#F59E0B;border:2.5px solid #FFFFFF;"></div>
+              </div>
+              <div style="position:relative;">
+                <div style="width:42px;height:42px;border-radius:99px;background:#FEF3C7;color:#B45309;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;">P</div>
+                <div style="position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:99px;background:#9CA3AF;border:2.5px solid #FFFFFF;"></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:8px;height:8px;border-radius:99px;background:#22C55E;"></div><span style="font-size:12.5px;font-weight:700;color:#6B7280;">Online</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:8px;height:8px;border-radius:99px;background:#F59E0B;"></div><span style="font-size:12.5px;font-weight:700;color:#6B7280;">Ausente</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:8px;height:8px;border-radius:99px;background:#9CA3AF;"></div><span style="font-size:12.5px;font-weight:700;color:#6B7280;">Offline</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ CARDS ═══════════ -->
+      <section id="cards" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Cards</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Metric card, chat item, contact row, info card</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
+          <div style="background:#FFFFFF;border:none;border-radius:18px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="width:36px;height:36px;background:#E8F8EF;border-radius:11px;display:flex;align-items:center;justify-content:center;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1DA85A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l1.7-3.4A8 8 0 1 1 21 12z"></path></svg>
+              </div>
+              <span style="font-size:11.5px;font-weight:700;color:#15803D;background:#E8F8EF;border-radius:6px;padding:3px 8px;">+12%</span>
+            </div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:3px;">TOTAL MENSAGENS</div>
+            <div style="font-size:26px;font-weight:800;">102</div>
+          </div>
+          <div style="background:#FFFFFF;border:none;border-radius:18px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="width:36px;height:36px;background:#EEF0FE;border-radius:11px;display:flex;align-items:center;justify-content:center;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4353E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+              </div>
+              <span style="font-size:11.5px;font-weight:700;color:#B91C1C;background:#FEE2E2;border-radius:6px;padding:3px 8px;">-5%</span>
+            </div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:3px;">T. MÉDIO RESPOSTA</div>
+            <div style="font-size:26px;font-weight:800;">123m 18s</div>
+          </div>
+          <div style="background:#FFFFFF;border:none;border-radius:18px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="width:36px;height:36px;background:#E8F8EF;border-radius:11px;display:flex;align-items:center;justify-content:center;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1DA85A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l1.7-3.4A8 8 0 1 1 21 12z"></path></svg>
+              </div>
+              <span style="font-size:11.5px;font-weight:700;color:#FFFFFF;background:#1DA85A;border-radius:6px;padding:3px 8px;">LIVE</span>
+            </div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:3px;">CHATS ABERTOS</div>
+            <div style="font-size:26px;font-weight:800;">5</div>
+          </div>
+          <div style="background:#FFFFFF;border:none;border-radius:18px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:16px 18px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="width:36px;height:36px;background:#FEF3C7;border-radius:11px;display:flex;align-items:center;justify-content:center;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              </div>
+              <span style="font-size:11.5px;font-weight:700;color:#B45309;background:#FEF3C7;border-radius:6px;padding:3px 8px;">98%</span>
+            </div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:3px;">SATISFAÇÃO</div>
+            <div style="font-size:26px;font-weight:800;">4,9 / 5</div>
+          </div>
+        </div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:13px 16px;cursor:pointer;border-bottom:1px solid #d6d9e2;background:#EEF0FE;">
+            <div style="display:flex;gap:10px;">
+              <div style="width:40px;height:40px;flex-shrink:0;border-radius:99px;background:#DCFCE7;color:#15803D;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">T</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
+                  <div style="font-size:14px;font-weight:700;">Tainá</div>
+                  <div style="font-size:11px;font-weight:600;color:#9CA3AF;">10:05</div>
+                </div>
+                <div style="font-size:12.5px;color:#6B7280;margin-top:1px;">Perfeito! Pode confirmar o quiosque 3 então, por favor.</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding-left:50px;">
+              <span style="font-size:10.5px;font-weight:700;color:#5A6172;background:#dde0e8;border-radius:99px;padding:3px 8px;">Reservas</span>
+              <span style="font-size:10.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:99px;padding:3px 8px;">Sócio</span>
+            </div>
+          </div>
+          <div style="padding:13px 16px;cursor:pointer;border-bottom:1px solid #d6d9e2;">
+            <div style="display:flex;gap:10px;">
+              <div style="width:40px;height:40px;flex-shrink:0;border-radius:99px;background:#FEF3C7;color:#B45309;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">M</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
+                  <div style="font-size:14px;font-weight:700;">Maycon Fernandes</div>
+                  <div style="font-size:11px;font-weight:600;color:#9CA3AF;">09:49</div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:1px;">
+                  <div style="font-size:12.5px;color:#6B7280;">Consegue me enviar a segunda via?</div>
+                  <span style="min-width:18px;height:18px;border-radius:99px;background:#1DA85A;color:#FFFFFF;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;flex-shrink:0;">2</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding-left:50px;">
+              <span style="font-size:10.5px;font-weight:700;color:#5A6172;background:#dde0e8;border-radius:99px;padding:3px 8px;">Financeiro</span>
+            </div>
+          </div>
+          <div style="padding:13px 16px;cursor:pointer;">
+            <div style="display:flex;gap:10px;">
+              <div style="width:40px;height:40px;flex-shrink:0;border-radius:99px;background:#FFE4E6;color:#BE123C;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;">R</div>
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
+                  <div style="font-size:14px;font-weight:700;">Roberto Lima</div>
+                  <div style="font-size:11px;font-weight:600;color:#9CA3AF;">10:18</div>
+                </div>
+                <div style="font-size:12.5px;color:#6B7280;margin-top:1px;">Alô? Alguém aí?</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:8px;padding-left:50px;">
+              <span style="font-size:10.5px;font-weight:700;color:#5A6172;background:#dde0e8;border-radius:99px;padding:3px 8px;">Eventos</span>
+              <span style="font-size:10.5px;font-weight:700;color:#B91C1C;background:#FEE2E2;border-radius:99px;padding:3px 8px;">há 23 min</span>
+              <span style="flex:1;"></span>
+              <button style="height:24px;padding:0 12px;border:none;border-radius:8px;background:#1DA85A;color:#FFFFFF;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:3px 3px 8px rgba(29,168,90,0.3),-2px -2px 6px #ffffff;">Aceitar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ BUBBLES ═══════════ -->
+      <section id="bubbles" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Bolhas de Mensagem</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Entrada, saída, nota interna e mensagem de sistema</div>
+        <div style="background:#dde0e8;border:none;border-radius:20px;box-shadow:inset 4px 4px 10px #c4c8d4,inset -4px -4px 10px #f5f7fb;padding:24px;display:flex;flex-direction:column;gap:10px;">
+          <div style="align-self:center;font-size:11px;font-weight:700;color:#6B7280;background:#ECEEF4;border-radius:99px;padding:5px 14px;">Atendimento distribuído para Crystian · Setor Reservas</div>
+          <div style="align-self:flex-start;max-width:55%;background:#FFFFFF;border:none;border-radius:14px 14px 14px 4px;padding:9px 13px;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+            <div style="font-size:14px;line-height:1.5;">Oi! Queria reservar uma churrasqueira pra sábado, ainda tem disponível?</div>
+            <div style="font-size:10.5px;font-weight:600;color:#9CA3AF;text-align:right;margin-top:3px;">10:02</div>
+          </div>
+          <div style="align-self:flex-end;max-width:55%;background:#DCF7E3;border:1px solid #C5EDD2;border-radius:14px 14px 4px 14px;padding:9px 13px;">
+            <div style="font-size:14px;line-height:1.5;">Olá! Tudo bem? Deixa eu verificar a disponibilidade para sábado.</div>
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:4px;margin-top:3px;">
+              <span style="font-size:10.5px;font-weight:600;color:#6FA382;">10:04</span>
+              <svg width="14" height="11" viewBox="0 0 24 18" fill="none" stroke="#3BA3E8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10l4 4L14 6M10 12l2 2L22 4"></path></svg>
+            </div>
+          </div>
+          <div style="align-self:flex-end;max-width:55%;background:#DCF7E3;border:1px solid #C5EDD2;border-radius:14px 14px 4px 14px;padding:9px 13px;">
+            <div style="display:flex;align-items:center;gap:10px;width:230px;padding:4px 0;">
+              <div style="width:30px;height:30px;border-radius:99px;background:#1DA85A;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M7 4l13 8-13 8V4z"></path></svg>
+              </div>
+              <div style="flex:1;height:4px;border-radius:99px;background:#A9DDBA;position:relative;"><div style="position:absolute;left:30%;top:-4px;width:12px;height:12px;border-radius:99px;background:#1DA85A;"></div></div>
+              <span style="font-size:11px;font-weight:600;color:#6FA382;">10:05</span>
+            </div>
+          </div>
+          <div style="align-self:flex-end;max-width:55%;background:#FFF7DE;border:1px dashed #E5CE8F;border-radius:14px;padding:9px 13px;">
+            <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:800;letter-spacing:0.07em;color:#B45309;margin-bottom:3px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+              NOTA INTERNA
+            </div>
+            <div style="font-size:14px;line-height:1.5;color:#5B4A1E;">Sócia adimplente, título 4412. Quiosque 3 livre no sistema para sábado.</div>
+            <div style="font-size:10.5px;font-weight:600;color:#C2A766;text-align:right;margin-top:3px;">10:06</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ TOAST ═══════════ -->
+      <section id="toast" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Toast &amp; Notificações</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Feedback de ação — aparece na base da tela por 2.6s</div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <div style="background:#14171F;color:#FFFFFF;font-size:13.5px;font-weight:600;border-radius:12px;padding:12px 18px;box-shadow:0 12px 32px rgba(16,18,28,0.3);">Atendimento aceito</div>
+            <div style="display:flex;align-items:center;gap:9px;background:#14171F;color:#FFFFFF;font-size:13.5px;font-weight:600;border-radius:12px;padding:12px 18px;box-shadow:0 12px 32px rgba(16,18,28,0.3);">
+              <div style="width:7px;height:7px;border-radius:99px;background:#22C55E;"></div>
+              Transferido para Cheila
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;background:#14171F;color:#FFFFFF;font-size:13.5px;font-weight:600;border-radius:12px;padding:12px 18px;box-shadow:0 12px 32px rgba(16,18,28,0.3);">
+              <div style="width:7px;height:7px;border-radius:99px;background:#D1383E;"></div>
+              Atendimento encerrado
+            </div>
+            <div style="display:flex;align-items:center;gap:9px;background:#14171F;color:#FFFFFF;font-size:13.5px;font-weight:600;border-radius:12px;padding:12px 18px;box-shadow:0 12px 32px rgba(16,18,28,0.3);">
+              Macro salva
+            </div>
+          </div>
+          <div style="margin-top:4px;">
+            <button onClick="{{ fireToast }}" style="height:40px;padding:0 18px;border:none;border-radius:11px;background:#4353E8;color:#FFFFFF;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;">▶ Disparar toast de exemplo</button>
+          </div>
+        </div>
+        <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#14171F;color:#FFFFFF;font-size:13.5px;font-weight:600;border-radius:12px;padding:12px 18px;z-index:200;animation:fadeUp 0.2s ease;box-shadow:0 12px 32px rgba(16,18,28,0.3);">{{ toastMsg }}</div>
+        </sc-if>
+      </section>
+
+      <!-- ═══════════ MODALS ═══════════ -->
+      <section id="modals" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Modais</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Anatomia dos modais do sistema: estrutura, sombra e botões</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:20px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:100%;background:#FFFFFF;border-radius:20px;padding:22px;box-shadow:8px 8px 20px #c4c8d4,-2px -2px 8px #ffffff;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <div style="font-size:16px;font-weight:800;">Encerrar atendimento</div>
+                <button style="width:28px;height:28px;border:none;background:#FFFFFF;border-radius:9px;color:#5A6172;cursor:pointer;font-size:14px;font-weight:700;font-family:'Figtree',sans-serif;box-shadow:3px 3px 7px #c4c8d4,-2px -2px 5px #ffffff;">×</button>
+              </div>
+              <div style="font-size:13px;color:#6B7280;line-height:1.5;margin-bottom:16px;">Encerrar a conversa com <strong>Tainá</strong>? O chat sai da sua lista e vai para o histórico.</div>
+              <div style="display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:12px;border:none;background:#F7F8FB;box-shadow:inset 2px 2px 6px #c4c8d4,inset -2px -2px 6px #ffffff;margin-bottom:16px;">
+                <div style="width:38px;height:22px;border-radius:99px;background:#1DA85A;position:relative;flex-shrink:0;">
+                  <div style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:99px;background:#FFFFFF;box-shadow:0 1px 3px rgba(20,23,31,0.25);"></div>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:700;">Enviar pesquisa de satisfação</div>
+                  <div style="font-size:11.5px;color:#9CA3AF;">O cliente avalia de 1 a 5 estrelas</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;">
+                <button style="height:38px;padding:0 14px;border:none;border-radius:13px;background:#FFFFFF;color:#3A4154;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">Cancelar</button>
+                <button style="height:38px;padding:0 18px;border:none;border-radius:13px;background:#D1383E;color:#FFFFFF;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(209,56,62,0.3),-3px -3px 8px #ffffff;">Encerrar atendimento</button>
+              </div>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:20px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:100%;background:#FFFFFF;border-radius:20px;padding:22px;box-shadow:8px 8px 20px #c4c8d4,-2px -2px 8px #ffffff;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                <div style="font-size:16px;font-weight:800;">Transferir atendimento</div>
+                <button style="width:28px;height:28px;border:none;background:#FFFFFF;border-radius:9px;color:#5A6172;cursor:pointer;font-size:14px;font-weight:700;font-family:'Figtree',sans-serif;box-shadow:3px 3px 7px #c4c8d4,-2px -2px 5px #ffffff;">×</button>
+              </div>
+              <div style="font-size:13px;color:#6B7280;line-height:1.5;margin-bottom:14px;">A conversa com <strong>Tainá</strong> será movida com todo o histórico.</div>
+              <div style="font-size:11px;font-weight:800;letter-spacing:0.07em;color:#9CA3AF;margin-bottom:8px;">PARA UM SETOR</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px;">
+                <div style="display:flex;align-items:center;gap:7px;padding:10px 11px;border-radius:11px;border:1.5px solid #4353E8;background:#EEF0FE;cursor:pointer;">
+                  <div style="width:8px;height:8px;border-radius:99px;background:#4353E8;"></div>
+                  <span style="font-size:13px;font-weight:700;color:#4353E8;">Secretaria</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;padding:10px 11px;border-radius:13px;border:none;background:#FFFFFF;cursor:pointer;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+                  <div style="width:8px;height:8px;border-radius:99px;background:#1DA85A;"></div>
+                  <span style="font-size:13px;font-weight:700;">Financeiro</span>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;">
+                <button style="height:38px;padding:0 14px;border:none;border-radius:13px;background:#FFFFFF;color:#3A4154;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">Cancelar</button>
+                <button style="height:38px;padding:0 18px;border:none;border-radius:13px;background:#4353E8;color:#FFFFFF;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Figtree',sans-serif;box-shadow:4px 4px 10px rgba(67,83,232,0.3),-3px -3px 8px #ffffff;">Transferir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ TOGGLE / TABS ═══════════ -->
+      <section id="controls" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Controles · Toggle · Tabs</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Switches, tabs de fila e seletores</div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;display:flex;flex-direction:column;gap:22px;">
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">TOGGLE SWITCH</div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:42px;height:24px;border-radius:99px;background:#1DA85A;position:relative;">
+                  <div style="position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:99px;background:#FFFFFF;box-shadow:0 1px 3px rgba(20,23,31,0.25);"></div>
+                </div>
+                <span style="font-size:13.5px;font-weight:700;color:#14171F;">Ativo</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:42px;height:24px;border-radius:99px;background:#D7DBE6;position:relative;">
+                  <div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:99px;background:#FFFFFF;box-shadow:0 1px 3px rgba(20,23,31,0.25);"></div>
+                </div>
+                <span style="font-size:13.5px;font-weight:600;color:#9CA3AF;">Inativo</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">TABS DE FILA</div>
+            <div style="display:flex;gap:4px;">
+              <button style="flex:0;height:32px;padding:0 16px;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;color:#FFFFFF;background:#14171F;font-family:'Figtree',sans-serif;">Meus · 2</button>
+              <button style="flex:0;height:32px;padding:0 16px;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;color:#5A6172;background:#FFFFFF;font-family:'Figtree',sans-serif;box-shadow:3px 3px 8px #c4c8d4,-2px -2px 5px #ffffff;">Fila · 3</button>
+              <button style="flex:0;height:32px;padding:0 16px;border:none;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;color:#5A6172;background:#FFFFFF;font-family:'Figtree',sans-serif;box-shadow:3px 3px 8px #c4c8d4,-2px -2px 5px #ffffff;">Encerrados</button>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">TABS DE PERÍODO</div>
+            <div style="display:inline-flex;gap:4px;background:#E8EBF1;border-radius:13px;padding:4px;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;">
+              <button style="height:30px;padding:0 14px;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;color:#FFFFFF;background:#14171F;font-family:'Figtree',sans-serif;">24h</button>
+              <button style="height:30px;padding:0 14px;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;color:#5A6172;background:transparent;font-family:'Figtree',sans-serif;">7d</button>
+              <button style="height:30px;padding:0 14px;border:none;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;color:#5A6172;background:transparent;font-family:'Figtree',sans-serif;">30d</button>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:10px;">RADIO CARDS (distribuição)</div>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:380px;">
+              <div style="display:flex;gap:10px;padding:11px 12px;border-radius:12px;cursor:pointer;border:1.5px solid #4353E8;background:#EEF0FE;">
+                <div style="width:18px;height:18px;border-radius:99px;border:2px solid #4353E8;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">
+                  <div style="width:8px;height:8px;border-radius:99px;background:#4353E8;"></div>
+                </div>
+                <div><div style="font-size:13.5px;font-weight:700;color:#4353E8;">Rodízio</div><div style="font-size:11.5px;color:#6B7280;margin-top:1px;">Distribui em sequência entre os atendentes online.</div></div>
+              </div>
+              <div style="display:flex;gap:10px;padding:11px 12px;border-radius:14px;cursor:pointer;border:none;background:#FFFFFF;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+                <div style="width:18px;height:18px;border-radius:99px;border:2px solid #C9CEDC;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"></div>
+                <div><div style="font-size:13.5px;font-weight:700;">Manual</div><div style="font-size:11.5px;color:#6B7280;margin-top:1px;">Atendentes puxam os chats da fila manualmente.</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══════════ TABLES ═══════════ -->
+      <section id="tables" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Tabelas</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Tabela de atendentes e Top Contatos</div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 140px 130px 100px 80px;gap:10px;padding:11px 18px;background:#F7F8FB;border-bottom:1px solid #E8EAF0;">
+            <div style="font-size:11px;font-weight:700;color:#9CA3AF;">ATENDENTE</div>
+            <div style="font-size:11px;font-weight:700;color:#9CA3AF;">SETOR</div>
+            <div style="font-size:11px;font-weight:700;color:#9CA3AF;">STATUS</div>
+            <div style="font-size:11px;font-weight:700;color:#9CA3AF;">CHATS ATIVOS</div>
+            <div style="font-size:11px;font-weight:700;color:#9CA3AF;">ATIVO</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 140px 130px 100px 80px;gap:10px;align-items:center;padding:13px 18px;border-bottom:1px solid #d6d9e2;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:99px;background:#4353E8;color:#FFFFFF;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;">C</div>
+              <div><div style="font-size:13.5px;font-weight:700;">Crystian</div><div style="font-size:11.5px;font-weight:600;color:#9CA3AF;">Administrador</div></div>
+            </div>
+            <div style="font-size:13px;font-weight:600;">Secretaria</div>
+            <div style="display:flex;align-items:center;gap:6px;"><div style="width:8px;height:8px;border-radius:99px;background:#22C55E;"></div><span style="font-size:12.5px;font-weight:700;">Online</span></div>
+            <div style="font-size:13px;font-weight:700;">2</div>
+            <div style="width:38px;height:22px;border-radius:99px;background:#1DA85A;position:relative;"><div style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:99px;background:#FFFFFF;box-shadow:0 1px 3px rgba(20,23,31,0.25);"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 140px 130px 100px 80px;gap:10px;align-items:center;padding:13px 18px;border-bottom:1px solid #d6d9e2;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:99px;background:#DCFCE7;color:#15803D;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;">C</div>
+              <div><div style="font-size:13.5px;font-weight:700;">Cheila</div><div style="font-size:11.5px;font-weight:600;color:#9CA3AF;">Atendente</div></div>
+            </div>
+            <div style="font-size:13px;font-weight:600;">Financeiro</div>
+            <div style="display:flex;align-items:center;gap:6px;"><div style="width:8px;height:8px;border-radius:99px;background:#22C55E;"></div><span style="font-size:12.5px;font-weight:700;">Online</span></div>
+            <div style="font-size:13px;font-weight:700;">0</div>
+            <div style="width:38px;height:22px;border-radius:99px;background:#1DA85A;position:relative;"><div style="position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:99px;background:#FFFFFF;box-shadow:0 1px 3px rgba(20,23,31,0.25);"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 140px 130px 100px 80px;gap:10px;align-items:center;padding:13px 18px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:36px;height:36px;border-radius:99px;background:#FEF3C7;color:#B45309;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;">P</div>
+              <div><div style="font-size:13.5px;font-weight:700;">Patrícia Ramos</div><div style="font-size:11.5px;font-weight:600;color:#9CA3AF;">Atendente</div></div>
+            </div>
+            <div style="font-size:13px;font-weight:600;">Eventos</div>
+            <div style="display:flex;align-items:center;gap:6px;"><div style="width:8px;height:8px;border-radius:99px;background:#9CA3AF;"></div><span style="font-size:12.5px;font-weight:700;color:#9CA3AF;">Offline</span></div>
+            <div style="font-size:13px;font-weight:700;color:#9CA3AF;">—</div>
+            <div style="width:38px;height:22px;border-radius:99px;background:#D7DBE6;position:relative;"><div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:99px;background:#FFFFFF;box-shadow:0 1px 3px rgba(20,23,31,0.25);"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ COMPOSER ═══════════ -->
+      <section id="composer" style="margin-bottom:60px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">COMPONENTES</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Composer de Mensagem</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Barra de envio com modos: mensagem, nota interna e popover de macros</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:18px;">
+            <div style="font-size:10.5px;font-weight:700;color:#9CA3AF;margin-bottom:10px;letter-spacing:0.08em;">MODO MENSAGEM</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button style="width:40px;height:42px;border-radius:13px;border:none;background:#FFFFFF;color:#5A6172;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.2-4.2L17 4l3 3L8.2 18.8 4 20z"></path></svg>
+              </button>
+              <button style="width:40px;height:42px;border-radius:13px;border:none;background:#FFFFFF;color:#5A6172;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"></path></svg>
+              </button>
+              <button style="width:40px;height:42px;border-radius:13px;border:none;background:#FFFFFF;color:#5A6172;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              </button>
+              <input type="text" placeholder="Digite uma mensagem..." style="flex:1;height:42px;border:1px solid #E2E5EE;border-radius:12px;padding:0 14px;font-size:14px;background:#E8EBF1;color:#14171F;font-family:'Figtree',sans-serif;box-shadow:inset 3px 3px 7px #c4c8d4,inset -3px -3px 7px #ffffff;border:none;"></input>
+              <button style="width:46px;height:42px;border:none;border-radius:12px;background:#C9CEDC;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 21 3l-8 18-2.5-7.5L3 11z"></path></svg>
+              </button>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:#B6BCCB;margin-top:7px;">Digite <span style="font-family:monospace;color:#4353E8;background:#EEF0FE;border-radius:5px;padding:1px 5px;">/</span> para abrir as macros · Enter envia</div>
+          </div>
+          <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:18px;">
+            <div style="font-size:10.5px;font-weight:700;color:#B45309;margin-bottom:8px;letter-spacing:0.08em;">MODO NOTA INTERNA</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:#B45309;background:#FFF7DE;border:1px dashed #E5CE8F;border-radius:9px;padding:6px 11px;margin-bottom:9px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+              Modo nota interna — visível apenas para a equipe
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button style="width:40px;height:42px;border-radius:11px;border:1px solid #E5CE8F;background:#FFF7DE;color:#B45309;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.2-4.2L17 4l3 3L8.2 18.8 4 20z"></path></svg>
+              </button>
+              <button style="width:40px;height:42px;border-radius:13px;border:none;background:#FFFFFF;color:#5A6172;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"></path></svg>
+              </button>
+              <button style="width:40px;height:42px;border-radius:13px;border:none;background:#FFFFFF;color:#5A6172;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:4px 4px 10px #c4c8d4,-2px -2px 6px #ffffff;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              </button>
+              <input type="text" placeholder="Escreva uma nota interna..." style="flex:1;height:42px;border:1px solid #E5CE8F;border-radius:12px;padding:0 14px;font-size:14px;background:#FFF7DE;color:#14171F;font-family:'Figtree',sans-serif;"></input>
+              <button style="width:46px;height:42px;border:none;border-radius:12px;background:#D9A514;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 21 3l-8 18-2.5-7.5L3 11z"></path></svg>
+              </button>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:18px;">
+            <div style="font-size:10.5px;font-weight:700;color:#4353E8;margin-bottom:10px;letter-spacing:0.08em;">POPOVER DE MACROS (digita /)</div>
+            <div style="border:none;border-radius:16px;padding:6px;background:#FFFFFF;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;">
+              <div style="font-size:10.5px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;padding:8px 12px 4px;">MACROS · RESPOSTAS RÁPIDAS</div>
+              <div style="padding:9px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;background:#EEF0FE;">
+                <span style="font-family:monospace;font-size:11.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:7px;padding:3px 8px;flex-shrink:0;border:1px solid #C7CCFB;">/ola</span>
+                <div style="min-width:0;">
+                  <div style="font-size:13px;font-weight:700;">Saudação</div>
+                  <div style="font-size:11.5px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Olá! Bem-vindo ao atendimento do Santa Mônica...</div>
+                </div>
+              </div>
+              <div style="padding:9px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;">
+                <span style="font-family:monospace;font-size:11.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:7px;padding:3px 8px;flex-shrink:0;">/boleto</span>
+                <div style="min-width:0;">
+                  <div style="font-size:13px;font-weight:700;">Segunda via de boleto</div>
+                  <div style="font-size:11.5px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Claro! Me informe o número do seu título...</div>
+                </div>
+              </div>
+              <div style="padding:9px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;">
+                <span style="font-family:monospace;font-size:11.5px;font-weight:700;color:#4353E8;background:#EEF0FE;border-radius:7px;padding:3px 8px;flex-shrink:0;">/tchau</span>
+                <div style="min-width:0;">
+                  <div style="font-size:13px;font-weight:700;">Encerramento</div>
+                  <div style="font-size:11.5px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Fico à disposição! Qualquer coisa é só chamar...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ SPACING ═══════════ -->
+      <section id="spacing" style="margin-bottom:80px;">
+        <div style="font-size:11px;font-weight:800;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:6px;">FUNDAÇÃO</div>
+        <div style="font-size:26px;font-weight:800;margin-bottom:4px;">Espaçamento &amp; Raios</div>
+        <div style="font-size:14px;color:#6B7280;margin-bottom:24px;">Escala de padding, gap e border-radius usados no sistema</div>
+        <div style="background:#FFFFFF;border:none;border-radius:20px;box-shadow:6px 6px 16px #c4c8d4,-2px -2px 8px #ffffff;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:14px;">ESCALA DE ESPAÇAMENTO</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <sc-for list="{{ spacingScale }}" as="sp" hint-placeholder-count="8">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:90px;font-size:11.5px;font-weight:700;color:#9CA3AF;font-family:monospace;flex-shrink:0;">{{ sp.label }}</div>
+                  <div style="height:10px;background:#4353E8;border-radius:3px;box-shadow:2px 2px 5px rgba(67,83,232,0.3);width:{{ sp.w }};flex-shrink:0;"></div>
+                  <span style="font-size:11.5px;font-weight:600;color:#5A6172;">{{ sp.use }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:14px;">BORDER RADIUS</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <sc-for list="{{ radiiScale }}" as="r" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:90px;font-size:11.5px;font-weight:700;color:#9CA3AF;font-family:monospace;flex-shrink:0;">{{ r.label }}</div>
+                  <div style="width:36px;height:36px;background:#EEF0FE;border-radius:{{ r.val }};flex-shrink:0;"></div>
+                  <span style="font-size:11.5px;font-weight:600;color:#5A6172;">{{ r.use }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { toast: null };
+  _tt = null;
+
+  showToast(t) {
+    clearTimeout(this._tt);
+    this.setState({ toast: t });
+    this._tt = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const sections = [
+      { icon: '🎨', label: 'Cores', href: '#colors' },
+      { icon: 'Aa', label: 'Tipografia', href: '#typography' },
+      { icon: '⬛', label: 'Botões', href: '#buttons' },
+      { icon: '📝', label: 'Formulários', href: '#forms' },
+      { icon: '🏷️', label: 'Badges & Tags', href: '#badges' },
+      { icon: '👤', label: 'Avatares', href: '#avatars' },
+      { icon: '🃏', label: 'Cards', href: '#cards' },
+      { icon: '💬', label: 'Bolhas', href: '#bubbles' },
+      { icon: '🔔', label: 'Toast', href: '#toast' },
+      { icon: '🗔', label: 'Modais', href: '#modals' },
+      { icon: '🔀', label: 'Controles', href: '#controls' },
+      { icon: '⊟', label: 'Tabelas', href: '#tables' },
+      { icon: '✏️', label: 'Composer', href: '#composer' },
+      { icon: '📐', label: 'Espaçamento', href: '#spacing' }
+    ];
+
+    const colorPrimary = [
+      { name: 'Índigo 600', hex: '#4353E8', border: 'none' },
+      { name: 'Índigo 50', hex: '#EEF0FE', border: '1px solid #DDE1FB' },
+      { name: 'Verde 600', hex: '#1DA85A', border: 'none' },
+      { name: 'Verde 50', hex: '#E8F8EF', border: '1px solid #C5EDD2' },
+      { name: 'Âmbar 500', hex: '#F59E0B', border: 'none' }
+    ];
+    const colorNeutral = [
+      { name: 'Preto', hex: '#14171F', border: 'none' },
+      { name: 'Cinza 700', hex: '#3A4154', border: 'none' },
+      { name: 'Cinza 400', hex: '#6B7280', border: 'none' },
+      { name: 'Cinza 200', hex: '#E8EAF0', border: '1px solid #D7DBE6' },
+      { name: 'Fundo', hex: '#F4F6FA', border: '1px solid #E8EAF0' }
+    ];
+    const colorState = [
+      { name: 'Danger 600', hex: '#D1383E', border: 'none' },
+      { name: 'Danger 50', hex: '#FEE2E2', border: '1px solid #FECACA' },
+      { name: 'Nota bg', hex: '#FFF7DE', border: '1px solid #E5CE8F' },
+      { name: 'Nota border', hex: '#E5CE8F', border: 'none' },
+      { name: 'Chat bg', hex: '#DCF7E3', border: '1px solid #C5EDD2' }
+    ];
+
+    const typeScale = [
+      { label: 'Heading XL', spec: '800 · 26px · 1.2', size: '26px', weight: '800', lh: '1.2', color: '#14171F', sample: 'Atendimentos' },
+      { label: 'Heading L', spec: '800 · 20px · 1.3', size: '20px', weight: '800', lh: '1.3', color: '#14171F', sample: 'Fila & Distribuição' },
+      { label: 'Heading M', spec: '800 · 17px · 1.4', size: '17px', weight: '800', lh: '1.4', color: '#14171F', sample: 'Transferir atendimento' },
+      { label: 'Body M', spec: '600 · 14px · 1.5', size: '14px', weight: '600', lh: '1.5', color: '#3A4154', sample: 'Olá! Queria reservar uma churrasqueira para sábado.' },
+      { label: 'Label', spec: '700 · 11.5px', size: '11.5px', weight: '700', lh: '1.4', color: '#5A6172', sample: 'SETOR · ATENDENTE · CATEGORIA' },
+      { label: 'Micro', spec: '600 · 10px · 0.08em', size: '10.5px', weight: '600', lh: '1.3', color: '#9CA3AF', sample: 'TOTAL MENSAGENS · T. MÉDIO RESPOSTA' }
+    ];
+
+    const spacingScale = [
+      { label: '4px', w: '16px', use: 'gap XS, ícone/texto' },
+      { label: '6px', w: '24px', use: 'gap SM (badges)' },
+      { label: '8px', w: '32px', use: 'gap entre botões' },
+      { label: '12px', w: '48px', use: 'padding card SM' },
+      { label: '16px', w: '64px', use: 'padding lateral padrão' },
+      { label: '18px', w: '72px', use: 'padding card M' },
+      { label: '24px', w: '96px', use: 'padding card L / gutter' },
+      { label: '32px', w: '128px', use: 'padding seções' }
+    ];
+
+    const radiiScale = [
+      { label: '5–7px', val: '6px', use: 'chips / tooltips' },
+      { label: '8–9px', val: '9px', use: 'botões XS–SM' },
+      { label: '10–11px', val: '11px', use: 'inputs / botões MD' },
+      { label: '12px', val: '12px', use: 'botões LG / composer' },
+      { label: '14–16px', val: '16px', use: 'cards / painéis' },
+      { label: '18px', val: '18px', use: 'modais' },
+      { label: '99px', val: '99px', use: 'avatares / badges / pills' }
+    ];
+
+    const toastMsgs = ['Macro salva ✓', 'Etiqueta adicionada', 'Atendimento aceito', 'Transferido para Cheila', 'Modo de distribuição: Rodízio'];
+    this._toastIdx = (this._toastIdx || 0);
+
+    return {
+      sections, colorPrimary, colorNeutral, colorState, typeScale, spacingScale, radiiScale,
+      toastMsg: s.toast,
+      hasToast: !!s.toast,
+      fireToast: () => {
+        const msg = toastMsgs[this._toastIdx % toastMsgs.length];
+        this._toastIdx++;
+        this.showToast(msg);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

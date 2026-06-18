@@ -81,64 +81,127 @@ class WhatsAppNumberController extends Controller
     {
         $validated = $request->validate([
             'access_token' => 'required|string',
+            'business_account_id' => 'nullable|string',
         ]);
+
+        // Se o token for "system", usar o token do .env
+        $token = $validated['access_token'];
+        if ($token === 'system') {
+            $token = config('services.whatsapp.access_token') ?? env('WA_ACCESS_TOKEN');
+            if (!$token) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nenhum token de acesso configurado no .env. Configure WA_ACCESS_TOKEN.',
+                ], 422);
+            }
+        }
 
         try {
             $client = new \GuzzleHttp\Client([
-                'base_uri' => 'https://graph.facebook.com/v23.0/',
+                'base_uri' => 'https://graph.facebook.com/v25.0/',
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $validated['access_token'],
+                    'Authorization' => 'Bearer ' . $token,
                     'Content-Type' => 'application/json',
                 ],
                 'timeout' => 30,
                 'verify' => storage_path('cacert.pem'),
             ]);
 
-            // Obter o Business Account ID do token
-            $meResponse = $client->get('me');
-            $meData = json_decode((string)$meResponse->getBody(), true);
-            $businessAccountId = $meData['id'] ?? null;
+            $businesses = [];
 
-            if (!$businessAccountId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Não foi possível obter o ID da conta. Verifique o token.',
-                ], 422);
+            // Se WABA ID foi fornecido, usar diretamente
+            if (!empty($validated['business_account_id'])) {
+                $businesses[] = ['id' => $validated['business_account_id']];
+            } else {
+                // Tentar obter automaticamente
+                try {
+                    $meResponse = $client->get('me?fields=id,name');
+                    $meData = json_decode((string)$meResponse->getBody(), true);
+                    $userId = $meData['id'] ?? null;
+
+                    if ($userId) {
+                        try {
+                            $businessResponse = $client->get($userId . '/businesses?fields=id,name');
+                            $businessData = json_decode((string)$businessResponse->getBody(), true);
+                            $businesses = $businessData['data'] ?? [];
+                        } catch (\Exception $e) {
+                            // Se falhar, tentar com WABA_ID do .env
+                            $wabaId = env('WA_WABA_ID');
+                            if ($wabaId) {
+                                $businesses[] = ['id' => $wabaId];
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $wabaId = env('WA_WABA_ID');
+                    if ($wabaId) {
+                        $businesses[] = ['id' => $wabaId];
+                    }
+                }
             }
 
-            // Buscar números da conta
-            $response = $client->get($businessAccountId . '/phone_numbers');
-            $data = json_decode((string)$response->getBody(), true);
-            $numbers = $data['data'] ?? [];
-
-            if (empty($numbers)) {
+            if (empty($businesses)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Nenhum número encontrado na conta Meta.',
+                    'message' => 'Nenhuma Business Account encontrada. Forneça o WABA_ID ou configure WA_WABA_ID no .env.',
                 ], 422);
             }
 
             $imported = 0;
-            foreach ($numbers as $number) {
-                $phoneNumber = $number['phone_number'] ?? null;
-                $displayName = $number['display_name'] ?? $phoneNumber;
-                $phoneNumberId = $number['id'] ?? null;
+            $errors = [];
 
-                if ($phoneNumber && !WhatsAppNumber::where('phone_number', $phoneNumber)->exists()) {
-                    WhatsAppNumber::create([
-                        'phone_number' => $phoneNumber,
-                        'display_name' => $displayName,
-                        'phone_number_id' => $phoneNumberId,
-                        'business_account_id' => $businessAccountId,
-                        'access_token' => $validated['access_token'],
-                    ]);
-                    $imported++;
+            // Buscar números de todas as Business Accounts
+            foreach ($businesses as $business) {
+                $businessAccountId = $business['id'] ?? null;
+                if (!$businessAccountId) continue;
+
+                try {
+                    $response = $client->get($businessAccountId . '/phone_numbers');
+                    $data = json_decode((string)$response->getBody(), true);
+                    $numbers = $data['data'] ?? [];
+
+                    if (empty($numbers)) {
+                        $errors[] = "Nenhum número encontrado em $businessAccountId";
+                        continue;
+                    }
+
+                    foreach ($numbers as $number) {
+                        $phoneNumber = $number['phone_number'] ?? null;
+                        $displayName = $number['display_name'] ?? $phoneNumber;
+                        $phoneNumberId = $number['id'] ?? null;
+
+                        if ($phoneNumber && !WhatsAppNumber::where('phone_number', $phoneNumber)->exists()) {
+                            WhatsAppNumber::create([
+                                'phone_number' => $phoneNumber,
+                                'display_name' => $displayName,
+                                'phone_number_id' => $phoneNumberId,
+                                'business_account_id' => $businessAccountId,
+                                'access_token' => $token,
+                            ]);
+                            $imported++;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    $errors[] = "Erro ao buscar números de $businessAccountId: " . $e->getMessage();
                 }
+            }
+
+            if ($imported === 0) {
+                $message = count($errors) > 0 ? implode('; ', $errors) : 'Nenhum número encontrado ou já importado.';
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
+            $successMsg = "Importados {$imported} número(s) da Meta com sucesso!";
+            if (count($errors) > 0) {
+                $successMsg .= " Avisos: " . implode('; ', $errors);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => "Importados {$imported} número(s) da Meta com sucesso!",
+                'message' => $successMsg,
                 'imported_count' => $imported,
             ]);
         } catch (\Exception $e) {

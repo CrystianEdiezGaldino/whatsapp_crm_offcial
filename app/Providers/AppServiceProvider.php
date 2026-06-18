@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Database\Grammars\SqlServerGrammar;
+use App\Database\Grammars\SqlServerQueryGrammar;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\Macro;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -31,6 +34,30 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
+        if ($appUrl = config('app.url')) {
+            URL::forceRootUrl(rtrim($appUrl, '/'));
+        }
+
+        if (config('database.default') === 'sqlsrv') {
+            $connection = DB::connection('sqlsrv');
+            $connection->setSchemaGrammar(new SqlServerGrammar);
+            $connection->setQueryGrammar(new SqlServerQueryGrammar);
+
+            // DATEFORMAT só na 1ª query — evita timeout de 60s em páginas sem DB (ex: login)
+            static $dateFormatSet = false;
+            DB::listen(function () use (&$dateFormatSet, $connection) {
+                if ($dateFormatSet) {
+                    return;
+                }
+                $dateFormatSet = true;
+                try {
+                    $connection->statement('SET DATEFORMAT ymd');
+                } catch (\Exception $e) {
+                    Log::warning('Failed to set DATEFORMAT on SQL Server: ' . $e->getMessage());
+                }
+            });
+        }
 
         // Register Model Observers for Audit Logging
         Conversation::observe(ConversationObserver::class);

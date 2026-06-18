@@ -6,17 +6,24 @@
     'value' => null,
     'error' => null,
     'required' => false,
+    'variant' => 'default',
+    'placeholder' => '-- Selecionar --',
     'class' => '',
 ])
 
 @php
     $value = $value ?? old($name);
-    $borderClass = $error ? 'border-error' : 'border-gray-200';
+    $fieldId = $attributes->get('id') ?? $name;
+    $isInset = $variant === 'inset';
+    $labelClass = 'form-label' . ($error ? ' form-label-error' : '');
+    $selectClass = $isInset
+        ? 'input-inset ' . ($error ? 'is-error' : '')
+        : 'select-nm ' . ($error ? 'border-error' : '');
 @endphp
 
-<div class="space-y-2">
+<div class="form-field {{ $class }}">
     @if($label)
-        <label class="block text-xs font-semibold text-gray-600 uppercase">
+        <label for="{{ $fieldId }}" class="{{ $labelClass }}">
             {{ $label }}
             @if($required)
                 <span class="text-error">*</span>
@@ -26,16 +33,18 @@
 
     <select
         name="{{ $name }}"
-        class="w-full border {{ $borderClass }} rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $class }}"
+        id="{{ $fieldId }}"
+        class="{{ $selectClass }}"
         @if($required) required @endif
+        {{ $attributes->except(['class', 'variant', 'label', 'error', 'options', 'placeholder']) }}
     >
-        <option value="">-- Selecionar --</option>
-        @foreach($options as $key => $label)
-            <option value="{{ $key }}" @selected($value == $key)>{{ $label }}</option>
+        <option value="">{{ $placeholder }}</option>
+        @foreach($options as $key => $optionLabel)
+            <option value="{{ $key }}" @selected((string) $value === (string) $key)>{{ $optionLabel }}</option>
         @endforeach
     </select>
 
     @if($error)
-        <span class="text-xs text-error">{{ $error }}</span>
+        <p class="form-error-msg">{{ $error }}</p>
     @endif
 </div>

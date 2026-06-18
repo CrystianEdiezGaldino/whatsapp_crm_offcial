@@ -42,20 +42,32 @@ class TagController extends Controller
         ]);
     }
 
+    public function conversationTags($conversationId)
+    {
+        $conversation = \App\Models\Conversation::with('tags')->findOrFail($conversationId);
+
+        return response()->json([
+            'success' => true,
+            'tag_ids' => $conversation->tags->pluck('id')->map(fn ($id) => (int) $id)->values(),
+            'tags' => $conversation->tags,
+        ]);
+    }
+
     public function attachToConversation(Request $request, $conversationId)
     {
         $validated = $request->validate([
-            'tag_ids' => 'required|array',
-            'tag_ids.*' => 'exists:tags,id',
+            'tag_ids' => 'present|array',
+            'tag_ids.*' => 'integer|exists:tags,id',
         ]);
 
         $conversation = \App\Models\Conversation::findOrFail($conversationId);
         $conversation->tags()->sync($validated['tag_ids']);
+        $conversation->load('tags');
 
         return response()->json([
             'success' => true,
-            'message' => 'Tags updated successfully',
-            'tags' => $conversation->tags()->get(),
+            'message' => 'Etiquetas atualizadas.',
+            'tags' => $conversation->tags,
         ]);
     }
 
@@ -63,10 +75,12 @@ class TagController extends Controller
     {
         $conversation = \App\Models\Conversation::findOrFail($conversationId);
         $conversation->tags()->detach($tagId);
+        $conversation->load('tags');
 
         return response()->json([
             'success' => true,
-            'message' => 'Tag removed successfully',
+            'message' => 'Etiqueta removida.',
+            'tags' => $conversation->tags,
         ]);
     }
 }

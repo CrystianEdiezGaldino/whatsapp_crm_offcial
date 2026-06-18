@@ -16,12 +16,12 @@ return new class extends Migration
             Schema::table('conversations', function (Blueprint $table) {
                 if (!Schema::hasColumn('conversations', 'owner_id')) {
                     $table->unsignedBigInteger('owner_id')->nullable()->after('claimed_by');
-                    $table->foreign('owner_id')->references('id')->on('users')->onDelete('set null');
+                    $table->foreign('owner_id')->references('id')->on('users');
                 }
 
                 if (!Schema::hasColumn('conversations', 'assigned_by')) {
                     $table->unsignedBigInteger('assigned_by')->nullable()->after('owner_id');
-                    $table->foreign('assigned_by')->references('id')->on('users')->onDelete('set null');
+                    $table->foreign('assigned_by')->references('id')->on('users');
                 }
 
                 if (!Schema::hasColumn('conversations', 'assigned_at')) {
@@ -71,7 +71,7 @@ return new class extends Migration
                     $table->unsignedBigInteger('overflow_sector_id')->nullable()->after('working_days');
                     $table->json('priority_rules')->nullable()->after('overflow_sector_id');
                     $table->enum('auto_assign_mode', ['manual', 'auto', 'queue'])->default('manual')->after('priority_rules');
-                    $table->foreign('overflow_sector_id')->references('id')->on('sectors')->onDelete('set null');
+                    $table->foreign('overflow_sector_id')->references('id')->on('sectors');
                 }
             });
         }
@@ -122,8 +122,8 @@ return new class extends Migration
                 $table->timestamps();
 
                 $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
-                $table->foreign('responsible_user_id')->references('id')->on('users')->onDelete('restrict');
-                $table->foreign('reviewed_by')->references('id')->on('users')->onDelete('set null');
+                $table->foreign('responsible_user_id')->references('id')->on('users');
+                $table->foreign('reviewed_by')->references('id')->on('users');
                 $table->index('status');
                 $table->index('severity');
             });
@@ -152,12 +152,15 @@ return new class extends Migration
                 $table->timestamps();
 
                 $table->foreign('conversation_id')->references('id')->on('conversations')->onDelete('cascade');
-                $table->foreign('from_user_id')->references('id')->on('users')->onDelete('restrict');
-                $table->foreign('to_user_id')->references('id')->on('users')->onDelete('restrict');
-                $table->foreign('requested_by')->references('id')->on('users')->onDelete('restrict');
-                $table->foreign('approved_by')->references('id')->on('users')->onDelete('set null');
-                $table->foreign('from_sector_id')->references('id')->on('sectors')->onDelete('set null');
-                $table->foreign('to_sector_id')->references('id')->on('sectors')->onDelete('set null');
+                $table->foreign('from_user_id')->references('id')->on('users');
+                $table->foreign('to_user_id')->references('id')->on('users');
+                $table->foreign('requested_by')->references('id')->on('users');
+                $table->foreign('approved_by')->references('id')->on('users');
+
+                if (Schema::hasTable('sectors')) {
+                    $table->foreign('from_sector_id')->references('id')->on('sectors');
+                    $table->foreign('to_sector_id')->references('id')->on('sectors');
+                }
 
                 $table->index('status');
                 $table->index(['conversation_id', 'status']);

@@ -107,6 +107,10 @@ class WhatsAppTokenManager
                 'status' => 'not_stored',
                 'message' => 'Token não está armazenado no banco de dados',
                 'action' => 'execute: WhatsAppTokenManager::storeTokenFromEnv()',
+                'expires_at' => null,
+                'time_until_expiration' => 'Não disponível',
+                'last_refreshed_at' => null,
+                'refresh_attempts' => 0,
             ];
         }
 

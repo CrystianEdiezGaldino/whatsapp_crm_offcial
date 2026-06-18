@@ -15,6 +15,10 @@ class Conversation extends Model
 
     protected $casts = [
         'last_message_at' => 'datetime',
+        'claimed_at' => 'datetime',
+        'claimed_by' => 'integer',
+        'assigned_to' => 'integer',
+        'contact_id' => 'integer',
     ];
 
     public function contact()
@@ -110,7 +114,16 @@ class Conversation extends Model
         if ($userId === null) {
             return true;
         }
-        return $claim->user_id === $userId;
+        return (int) $claim->user_id === (int) $userId;
+    }
+
+    public function isPendingInQueue(): bool
+    {
+        if ($this->status !== 'new' || $this->claimed_by) {
+            return false;
+        }
+
+        return !$this->getActiveClaim();
     }
 
     public function claim(int $userId, ?string $reason = null): ConversationClaim

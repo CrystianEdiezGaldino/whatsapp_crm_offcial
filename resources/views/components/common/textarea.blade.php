@@ -1,6 +1,6 @@
 {{-- Textarea Component --}}
 @props([
-    'name',
+    'name' => null,
     'label' => null,
     'placeholder' => null,
     'value' => null,
@@ -8,17 +8,20 @@
     'error' => null,
     'maxlength' => null,
     'required' => false,
+    'variant' => 'default',
     'class' => '',
 ])
 
 @php
-    $value = $value ?? old($name);
-    $borderClass = $error ? 'border-error' : 'border-gray-200';
+    $value = $value ?? ($name ? old($name) : null);
+    $fieldId = $attributes->get('id') ?? ($name ? $name : null);
+    $isInset = $variant === 'inset';
+    $labelClass = 'form-label' . ($error ? ' form-label-error' : '');
 @endphp
 
-<div class="space-y-2">
+<div class="form-field {{ $class }}">
     @if($label)
-        <label class="block text-xs font-semibold text-gray-600 uppercase">
+        <label @if($fieldId) for="{{ $fieldId }}" @endif class="{{ $labelClass }}">
             {{ $label }}
             @if($required)
                 <span class="text-error">*</span>
@@ -27,30 +30,30 @@
     @endif
 
     <textarea
-        name="{{ $name }}"
+        @if($name) name="{{ $name }}" @endif
+        @if($fieldId) id="{{ $fieldId }}" @endif
         rows="{{ $rows }}"
-        class="w-full border {{ $borderClass }} rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $class }}"
+        @class([
+            $isInset ? 'textarea-inset' : 'textarea-nm',
+            'is-error' => $error && $isInset,
+            'border-error' => $error && !$isInset,
+        ])
         @if($placeholder) placeholder="{{ $placeholder }}" @endif
         @if($maxlength) maxlength="{{ $maxlength }}" @endif
         @if($required) required @endif
+        {{ $attributes->except(['class', 'variant', 'label', 'error']) }}
     >{{ $value }}</textarea>
 
-    <div class="flex justify-between items-center">
-        @if($error)
-            <span class="text-xs text-error">{{ $error }}</span>
-        @else
-            <span></span>
-        @endif
-
-        @if($maxlength)
-            <span class="text-xs text-gray-600" id="char-count-{{ $name }}">
-                <span id="current-{{ $name }}">{{ strlen($value) }}</span> / {{ $maxlength }}
-            </span>
-        @endif
-    </div>
+    @if($error)
+        <p class="form-error-msg">{{ $error }}</p>
+    @elseif($maxlength && $name)
+        <p class="form-hint text-right">
+            <span id="current-{{ $name }}">{{ strlen($value ?? '') }}</span> / {{ $maxlength }}
+        </p>
+    @endif
 </div>
 
-@if($maxlength)
+@if($maxlength && $name)
     <script>
         document.querySelector('textarea[name="{{ $name }}"]')?.addEventListener('input', function() {
             document.getElementById('current-{{ $name }}').textContent = this.value.length;

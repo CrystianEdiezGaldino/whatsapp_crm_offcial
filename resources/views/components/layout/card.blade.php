@@ -4,10 +4,10 @@
     'class' => '',
 ])
 
-<div class="bg-white border border-gray-200 rounded-xl p-5 {{ $class }}">
+<div class="card-nm {{ $class }}">
     @if($title)
         <div class="mb-4">
-            <h3 class="text-lg font-bold text-on-surface">{{ $title }}</h3>
+            <h3 class="text-lg font-extrabold text-gray-900">{{ $title }}</h3>
             @if($subtitle)
                 <p class="text-sm text-gray-600 mt-1">{{ $subtitle }}</p>
             @endif

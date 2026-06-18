@@ -1,23 +1,28 @@
 {{-- Input Component --}}
 @props([
-    'name',
+    'name' => null,
     'type' => 'text',
     'label' => null,
     'placeholder' => null,
     'value' => null,
     'error' => null,
     'required' => false,
+    'variant' => 'default',
+    'icon' => null,
     'class' => '',
 ])
 
 @php
-    $value = $value ?? old($name);
-    $borderClass = $error ? 'border-error' : 'border-gray-200';
+    $value = $value ?? ($name ? old($name) : null);
+    $fieldId = $attributes->get('id') ?? ($name ? $name : null);
+    $isInset = $variant === 'inset';
+    $labelClass = 'form-label' . ($error ? ' form-label-error' : '');
+    $wrapClass = 'input-inset-wrap' . ($error ? ' is-error' : '');
 @endphp
 
-<div class="space-y-2">
+<div class="form-field {{ $class }}">
     @if($label)
-        <label class="block text-xs font-semibold text-gray-600 uppercase">
+        <label @if($fieldId) for="{{ $fieldId }}" @endif class="{{ $labelClass }}">
             {{ $label }}
             @if($required)
                 <span class="text-error">*</span>
@@ -25,16 +30,45 @@
         </label>
     @endif
 
-    <input
-        type="{{ $type }}"
-        name="{{ $name }}"
-        class="w-full border {{ $borderClass }} rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $class }}"
-        @if($value) value="{{ $value }}" @endif
-        @if($placeholder) placeholder="{{ $placeholder }}" @endif
-        @if($required) required @endif
-    >
+    @if($isInset && $icon)
+        <div class="{{ $wrapClass }}">
+            <span class="material-symbols-outlined text-gray-400 text-[18px] shrink-0">{{ $icon }}</span>
+            <input
+                type="{{ $type }}"
+                @if($name) name="{{ $name }}" @endif
+                @if($fieldId) id="{{ $fieldId }}" @endif
+                class="input-inset-inner"
+                @if($value !== null && $value !== '') value="{{ $value }}" @endif
+                @if($placeholder) placeholder="{{ $placeholder }}" @endif
+                @if($required) required @endif
+                {{ $attributes->except(['class', 'variant', 'icon', 'label', 'error']) }}
+            >
+        </div>
+    @elseif($isInset)
+        <input
+            type="{{ $type }}"
+            @if($name) name="{{ $name }}" @endif
+            @if($fieldId) id="{{ $fieldId }}" @endif
+            class="input-inset {{ $error ? 'is-error' : '' }}"
+            @if($value !== null && $value !== '') value="{{ $value }}" @endif
+            @if($placeholder) placeholder="{{ $placeholder }}" @endif
+            @if($required) required @endif
+            {{ $attributes->except(['class', 'variant', 'icon', 'label', 'error']) }}
+        >
+    @else
+        <input
+            type="{{ $type }}"
+            @if($name) name="{{ $name }}" @endif
+            @if($fieldId) id="{{ $fieldId }}" @endif
+            class="input-nm {{ $error ? 'border-error !bg-red-50' : '' }}"
+            @if($value !== null && $value !== '') value="{{ $value }}" @endif
+            @if($placeholder) placeholder="{{ $placeholder }}" @endif
+            @if($required) required @endif
+            {{ $attributes->except(['class', 'variant', 'icon', 'label', 'error']) }}
+        >
+    @endif
 
     @if($error)
-        <span class="text-xs text-error">{{ $error }}</span>
+        <p class="form-error-msg">{{ $error }}</p>
     @endif
 </div>

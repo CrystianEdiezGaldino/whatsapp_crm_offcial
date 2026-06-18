@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Tag;
 use App\Models\Sector;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 
 class InitialDataSeeder extends Seeder
 {
@@ -51,6 +52,10 @@ class InitialDataSeeder extends Seeder
         $sectors = Sector::all();
 
         foreach ($sectors as $sector) {
+            if (! Schema::hasColumn('sectors', 'sla_first_response_minutes')) {
+                continue;
+            }
+
             if (!$sector->sla_first_response_minutes) {
                 $sector->update([
                     'sla_first_response_minutes' => 15,

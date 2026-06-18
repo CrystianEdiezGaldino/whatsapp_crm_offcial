@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ChatInboxHelper;
 use App\Models\Conversation;
 use App\Models\Contact;
+use App\Models\ConversationResolution;
 use App\Models\Macro;
 use App\Models\User;
 use App\Services\WhatsAppService;
@@ -54,7 +55,7 @@ class ConversationController extends Controller
             }
 
             if ($activeConversation?->contact) {
-                $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
+                $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user', 'resolution.resolvedBy'])
                     ->where('contact_id', $activeConversation->contact_id)
                     ->where('id', '!=', $activeConversation->id)
                     ->whereIn('status', ['closed', 'resolved'])
@@ -480,17 +481,23 @@ class ConversationController extends Controller
             $conversation = Conversation::findOrFail($validated['conversation_id']);
             $oldStatus = $conversation->status;
 
-            // Create resolution record
-            \App\Models\ConversationResolution::create([
-                'conversation_id' => $validated['conversation_id'],
-                'resolved_by' => Auth::id(),
-                'resolution_reason' => $validated['resolution_reason'],
-                'resolution_notes' => $validated['resolution_notes'],
-                'internal_comments' => $validated['internal_comments'],
-            ]);
+            $conversation->releaseClaim('Atendimento encerrado');
 
-            // Update conversation status
-            $conversation->update(['status' => 'resolved']);
+            ConversationResolution::updateOrCreate(
+                ['conversation_id' => $conversation->id],
+                [
+                    'resolved_by' => Auth::id(),
+                    'resolution_reason' => $validated['resolution_reason'],
+                    'resolution_notes' => $validated['resolution_notes'],
+                    'internal_comments' => $validated['internal_comments'],
+                ]
+            );
+
+            $conversation->update([
+                'status' => 'resolved',
+                'claimed_by' => null,
+                'claimed_at' => null,
+            ]);
 
             // Dispatch event for real-time update
             event(new \App\Events\ConversationStatusChanged($conversation, $oldStatus));
@@ -517,7 +524,9 @@ class ConversationController extends Controller
 
     public function history(Conversation $conversation)
     {
-        $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user'])
+        $labels = ConversationResolution::getReasonLabels();
+
+        $previousConversations = Conversation::with(['contact', 'assignedUser', 'lastMessage', 'claims.user', 'resolution.resolvedBy'])
             ->where('contact_id', $conversation->contact_id)
             ->where('id', '!=', $conversation->id)
             ->whereIn('status', ['closed', 'resolved'])
@@ -534,12 +543,15 @@ class ConversationController extends Controller
                 'claimed_by' => $conv->claims()->latest('claimed_at')->first()?->user->name ?? 'Desconhecido',
                 'last_message' => $conv->lastMessage?->content ?? '(Sem mensagens)',
                 'message_count' => $conv->messages()->count(),
+                'resolution' => $this->formatResolutionPayload($conv->resolution, $labels),
             ]),
         ]);
     }
 
     public function showHistoryConversation(Conversation $conversation)
     {
+        $conversation->load(['contact', 'resolution.resolvedBy']);
+
         $messages = $conversation->messages()
             ->with(['conversation.contact'])
             ->orderBy('created_at', 'asc')
@@ -587,11 +599,16 @@ class ConversationController extends Controller
 
         // Evento: Conversa encerrada
         if ($conversation->status === 'resolved' || $conversation->status === 'closed') {
+            $resolution = $conversation->resolution;
+            $labels = ConversationResolution::getReasonLabels();
+
             $events->push([
                 'type' => 'resolved',
                 'title' => 'Atendimento encerrado',
-                'description' => 'Motivo: ' . ($conversation->resolution_category ?? 'N??o especificado'),
-                'timestamp' => $conversation->updated_at,
+                'description' => $resolution
+                    ? ($labels[$resolution->resolution_reason] ?? $resolution->resolution_reason)
+                    : 'Motivo não registrado',
+                'timestamp' => $resolution?->created_at ?? $conversation->updated_at,
                 'icon' => 'done_all',
                 'color' => 'tertiary',
             ]);
@@ -599,6 +616,8 @@ class ConversationController extends Controller
 
         // Ordenar eventos por timestamp
         $events = $events->sortBy('timestamp')->values();
+
+        $labels = ConversationResolution::getReasonLabels();
 
         return response()->json([
             'success' => true,
@@ -614,6 +633,7 @@ class ConversationController extends Controller
                 'status' => $conversation->status,
                 'duration' => $this->formatDuration($conversation->created_at, $conversation->updated_at),
             ],
+            'resolution' => $this->formatResolutionPayload($conversation->resolution, $labels),
             'events' => $events,
             'messages' => $messages->map(fn($msg) => [
                 'direction' => $msg->direction,
@@ -623,6 +643,24 @@ class ConversationController extends Controller
                 'has_media' => !is_null($msg->media_url),
             ]),
         ]);
+    }
+
+    private function formatResolutionPayload(?ConversationResolution $resolution, ?array $labels = null): ?array
+    {
+        if (!$resolution) {
+            return null;
+        }
+
+        $labels ??= ConversationResolution::getReasonLabels();
+
+        return [
+            'reason' => $resolution->resolution_reason,
+            'reason_label' => $labels[$resolution->resolution_reason] ?? $resolution->resolution_reason,
+            'notes' => $resolution->resolution_notes,
+            'internal_comments' => $resolution->internal_comments,
+            'resolved_by' => $resolution->resolvedBy?->name,
+            'resolved_at' => $resolution->created_at?->format('d/m/Y H:i'),
+        ];
     }
 
     private function formatDuration($start, $end)

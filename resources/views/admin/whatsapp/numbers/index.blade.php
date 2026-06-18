@@ -7,6 +7,9 @@
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-3xl font-bold text-on-surface">Números WhatsApp</h1>
         <div class="flex gap-2">
+            <button onclick="syncWithSystemToken()" class="bg-success text-on-success px-4 py-2 rounded-lg font-semibold hover:opacity-90 flex items-center gap-2 transition-all">
+                <span class="material-symbols-outlined">verified_user</span> Usar Token do Sistema
+            </button>
             <button onclick="openSyncModal()" class="bg-info text-on-info px-4 py-2 rounded-lg font-semibold hover:opacity-90 flex items-center gap-2 transition-all">
                 <span class="material-symbols-outlined">sync</span> Importar da Meta
             </button>
@@ -91,13 +94,19 @@
     <div id="syncMetaModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
             <h3 class="text-lg font-bold text-on-surface mb-4">Importar Números da Meta</h3>
-            <p class="text-sm text-gray-600 mb-6">Cole seu access token da Meta e nós buscaremos automaticamente todos os números cadastrados</p>
+            <p class="text-sm text-gray-600 mb-6">Cole seu access token da Meta. Opcionalmente, informe o WABA ID se a detecção automática falhar.</p>
 
             <form id="syncMetaForm" class="space-y-4">
                 @csrf
                 <div>
                     <label class="text-sm font-semibold text-on-surface block mb-2">Access Token *</label>
                     <textarea name="access_token" required class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info font-mono text-xs" rows="3" placeholder="Cole seu access token da Meta"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-on-surface block mb-2">WABA ID (opcional)</label>
+                    <input type="text" name="business_account_id" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-info focus:border-info" placeholder="Ex: 123456789012345">
+                    <p class="text-xs text-gray-500 mt-1">Se deixar vazio, será feita detecção automática ou usará WA_WABA_ID do .env</p>
                 </div>
 
                 <div class="flex justify-end gap-2 pt-4">
@@ -113,6 +122,33 @@
     </div>
 
 <script>
+    async function syncWithSystemToken() {
+        if (!confirm('Importar números usando o token do sistema?\n\nIsso buscará os números WhatsApp da sua Business Account registrada.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('{{ route("admin.whatsapp.numbers.sync-meta") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ access_token: 'system' }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert('✅ ' + data.message);
+                location.reload();
+            } else {
+                alert('❌ Erro: ' + (data.message || 'Erro ao importar números'));
+            }
+        } catch (error) {
+            alert('❌ Erro: ' + error.message);
+        }
+    }
+
     function openSyncModal() {
         document.getElementById('syncMetaModal').classList.remove('hidden');
     }

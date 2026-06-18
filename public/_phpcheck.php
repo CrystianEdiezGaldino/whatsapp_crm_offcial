@@ -1,0 +1,1 @@
+<?php echo "PHP: ".PHP_VERSION."\n"; echo "odbc: ".(function_exists("odbc_data_sources")?"yes":"no")."\n"; echo "sqlsrv: ".(extension_loaded("sqlsrv")?"yes":"no")."\n"; echo "pdo_sqlsrv: ".(extension_loaded("pdo_sqlsrv")?"yes":"no")."\n"; print_r(PDO::getAvailableDrivers());

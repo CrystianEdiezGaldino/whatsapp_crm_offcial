@@ -38,25 +38,34 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $admin = User::create([
-            'name' => 'Ricardo Silva',
-            'email' => 'admin@erp.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-            'status' => 'online',
-            'sector_id' => $supportSector->id,
-            'is_active' => true,
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@erp.com'],
+            [
+                'name' => 'Ricardo Silva',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'status' => 'online',
+                'sector_id' => $supportSector->id,
+                'is_active' => true,
+            ]
+        );
 
-        $agent = User::create([
-            'name' => 'Ana Paula',
-            'email' => 'ana@erp.com',
-            'password' => Hash::make('password'),
-            'role' => 'agent',
-            'status' => 'online',
-            'sector_id' => $supportSector->id,
-            'is_active' => true,
-        ]);
+        $agent = User::firstOrCreate(
+            ['email' => 'ana@erp.com'],
+            [
+                'name' => 'Ana Paula',
+                'password' => Hash::make('password'),
+                'role' => 'agent',
+                'status' => 'online',
+                'sector_id' => $supportSector->id,
+                'is_active' => true,
+            ]
+        );
+
+        if (Contact::count() > 0) {
+            $this->call(InitialDataSeeder::class);
+            return;
+        }
 
         $contacts = Contact::factory()->count(10)->create()->each(function ($contact) use ($admin, $agent) {
             $assignedTo = rand(0, 1) ? $admin->id : $agent->id;

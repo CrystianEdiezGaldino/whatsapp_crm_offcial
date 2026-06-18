@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /smcc-whatsapp/
+
+    # Redireciona para /public/ para URLs do Laravel ficarem corretas
+    RewriteRule ^$ public/login [R=302,L]
+    RewriteRule ^public/ - [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [R=302,L,QSA]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    <IfModule mod_alias.c>
+        RedirectMatch ^/smcc-whatsapp/?$ /smcc-whatsapp/public/login
+    </IfModule>
+</IfModule>

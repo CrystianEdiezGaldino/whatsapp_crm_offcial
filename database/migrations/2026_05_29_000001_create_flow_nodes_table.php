@@ -14,8 +14,10 @@ return new class extends Migration
             $table->enum('node_type', ['message', 'menu', 'action'])->default('message');
             $table->integer('position');
             $table->json('config');
-            $table->foreignId('target_sector_id')->nullable()->constrained('sectors')->nullOnDelete();
-            $table->foreignId('target_flow_id')->nullable()->constrained('conversation_flows')->nullOnDelete();
+            $table->unsignedBigInteger('target_sector_id')->nullable();
+            $table->unsignedBigInteger('target_flow_id')->nullable();
+            $table->foreign('target_sector_id')->references('id')->on('sectors');
+            $table->foreign('target_flow_id')->references('id')->on('conversation_flows');
             $table->timestamps();
         });
     }
