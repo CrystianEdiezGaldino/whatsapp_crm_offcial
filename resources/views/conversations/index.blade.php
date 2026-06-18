@@ -1214,6 +1214,91 @@
     }
 
     // Polling: ChatListPoller + ChatInboxHelper (SSEManager desativado aqui — evita ERR_NO_BUFFER_SPACE)
+
+    // Improve Text Modal Functions
+    let currentImprovedText = {
+        original: '',
+        improved: '',
+        type: 'grammar'
+    };
+
+    function openImproveTextModal() {
+        const textarea = document.getElementById('messageInput');
+        const text = textarea.value.trim();
+
+        if (!text) {
+            showToast('Digite algo para melhorar', 'error');
+            return;
+        }
+
+        currentImprovedText.original = text;
+
+        document.getElementById('improveTextModal').classList.remove('hidden');
+        document.getElementById('improveOriginalText').textContent = text;
+        document.getElementById('improveTypeSelect').value = 'grammar';
+
+        document.getElementById('improveImprovedText').classList.add('hidden');
+        document.getElementById('improveLoadingSpinner').classList.remove('hidden');
+        document.getElementById('improveErrorMessage').classList.add('hidden');
+        document.getElementById('improveUseBtn').disabled = true;
+
+        refreshImprovement();
+    }
+
+    function closeImproveTextModal() {
+        document.getElementById('improveTextModal').classList.add('hidden');
+        currentImprovedText = { original: '', improved: '', type: 'grammar' };
+    }
+
+    function refreshImprovement() {
+        const type = document.getElementById('improveTypeSelect').value;
+        const text = currentImprovedText.original;
+        const conversationId = document.querySelector('input[name="conversation_id"]')?.value;
+
+        if (!conversationId || !text) return;
+
+        document.getElementById('improveLoadingSpinner').classList.remove('hidden');
+        document.getElementById('improveImprovedText').classList.add('hidden');
+        document.getElementById('improveErrorMessage').classList.add('hidden');
+        document.getElementById('improveUseBtn').disabled = true;
+
+        fetch(`/conversations/${conversationId}/improve-text`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ content: text, type: type })
+        })
+        .then(response => response.ok ? response.json() : response.json().then(e => { throw new Error(e.message || 'Erro'); }))
+        .then(data => {
+            if (data.success) {
+                currentImprovedText.improved = data.improved;
+                currentImprovedText.type = type;
+
+                document.getElementById('improveLoadingSpinner').classList.add('hidden');
+                document.getElementById('improveImprovedText').textContent = data.improved;
+                document.getElementById('improveImprovedText').classList.remove('hidden');
+                document.getElementById('improveUseBtn').disabled = false;
+            } else {
+                throw new Error(data.message || 'Erro');
+            }
+        })
+        .catch(error => {
+            document.getElementById('improveLoadingSpinner').classList.add('hidden');
+            document.getElementById('improveErrorMessage').textContent = 'Erro: ' + error.message;
+            document.getElementById('improveErrorMessage').classList.remove('hidden');
+        });
+    }
+
+    function applyImprovedText() {
+        const textarea = document.getElementById('messageInput');
+        textarea.value = currentImprovedText.improved;
+        textarea.focus();
+
+        closeImproveTextModal();
+        showToast('Texto melhorado aplicado!', 'success');
+    }
 </script>
 @endpush
 
