@@ -26,6 +26,9 @@ assertContains($blade, 'contact-panel__notes-box', 'blade tem container de notas
 assertContains($blade, 'contact-panel__notes-ai-btn', 'blade tem botão IA estilizado');
 assertContains($blade, 'contact-panel__notes-counter', 'blade tem contador');
 assertContains($css, 'contact-panel__notes-box--filled', 'css tem estado preenchido');
+assertContains($css, 'contact-panel__notes-box--open', 'css tem estado aberto');
+assertContains($blade, 'contact-panel__notes-state', 'blade tem badge de estado');
+assertContains($js, 'contact-panel__notes-box--open', 'js alterna estado aberto');
 assertContains($js, 'syncNotesUi', 'js sincroniza estados da nota');
 
 exit($errors > 0 ? 1 : 0);

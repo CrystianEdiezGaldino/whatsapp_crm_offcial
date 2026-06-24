@@ -43,6 +43,7 @@
             this.notesBoxEl = panel.querySelector('#contactNotesBox');
             this.notesCounterEl = panel.querySelector('#contactNotesCounter');
             this.notesPreviewEl = panel.querySelector('#contactNotesPreview');
+            this.notesStateEl = panel.querySelector('#contactNotesState');
             this.saveBtnEl = panel.querySelector('#saveContactNotes');
             this.saveBtnLabelEl = panel.querySelector('#saveContactNotesLabel');
             this.improveBtnEl = panel.querySelector('#improveContactNotesBtn');
@@ -89,8 +90,14 @@
             });
 
             this.notesEl?.addEventListener('input', () => this.syncNotesUi());
-            this.notesEl?.addEventListener('focus', () => this.notesBoxEl?.classList.add('contact-panel__notes-box--focus'));
-            this.notesEl?.addEventListener('blur', () => this.notesBoxEl?.classList.remove('contact-panel__notes-box--focus'));
+            this.notesEl?.addEventListener('focus', () => {
+                this.notesBoxEl?.classList.add('contact-panel__notes-box--focus');
+                this.syncNotesUi();
+            });
+            this.notesEl?.addEventListener('blur', () => {
+                this.notesBoxEl?.classList.remove('contact-panel__notes-box--focus');
+                this.syncNotesUi();
+            });
 
             this.syncNotesUi();
         }
@@ -102,8 +109,19 @@
             const max = Number(this.notesEl?.maxLength) || 5000;
 
             this.notesBoxEl?.classList.toggle('contact-panel__notes-box--filled', trimmed.length > 0);
+            this.notesBoxEl?.classList.toggle('contact-panel__notes-box--open', trimmed.length === 0);
             this.notesBoxEl?.classList.toggle('contact-panel__notes-box--dirty', dirty);
             this.notesPreviewEl?.classList.toggle('hidden', trimmed.length === 0 || dirty);
+
+            if (this.notesStateEl) {
+                const isFocus = this.notesBoxEl?.classList.contains('contact-panel__notes-box--focus');
+                this.notesStateEl.textContent = isFocus
+                    ? 'Editando'
+                    : (trimmed.length > 0 ? 'Preenchido' : 'Aberto');
+                this.notesStateEl.classList.toggle('contact-panel__notes-state--filled', trimmed.length > 0 && !isFocus);
+                this.notesStateEl.classList.toggle('contact-panel__notes-state--open', trimmed.length === 0 && !isFocus);
+                this.notesStateEl.classList.toggle('contact-panel__notes-state--focus', !!isFocus);
+            }
 
             if (this.notesCounterEl) {
                 this.notesCounterEl.textContent = `${value.length}/${max}`;

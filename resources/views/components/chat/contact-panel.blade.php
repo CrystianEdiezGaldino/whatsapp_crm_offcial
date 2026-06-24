@@ -79,12 +79,15 @@
 
         <div
             id="contactNotesBox"
-            class="contact-panel__notes-box{{ $hasNotes ? ' contact-panel__notes-box--filled' : '' }}"
+            class="contact-panel__notes-box{{ $hasNotes ? ' contact-panel__notes-box--filled' : ' contact-panel__notes-box--open' }}"
         >
             <div class="contact-panel__notes-toolbar">
                 <div class="contact-panel__notes-toolbar-left">
                     <span class="material-symbols-outlined contact-panel__notes-icon">edit_note</span>
                     <span class="contact-panel__notes-hint">Nota interna</span>
+                    <span id="contactNotesState" class="contact-panel__notes-state{{ $hasNotes ? ' contact-panel__notes-state--filled' : ' contact-panel__notes-state--open' }}">
+                        {{ $hasNotes ? 'Preenchido' : 'Aberto' }}
+                    </span>
                 </div>
                 <button
                     type="button"

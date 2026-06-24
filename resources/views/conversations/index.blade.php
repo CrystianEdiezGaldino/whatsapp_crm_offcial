@@ -1002,7 +1002,7 @@
                 let html = '<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">';
 
                 agents.forEach(agent => {
-                    html += `<div style="padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; hover: background-color: #f5f5f5;" onclick="document.reassignSelectedId='${agent.id}'; this.closest('#reassignModal').style.display='none';">
+                    html += `<div style="padding: 12px; border-bottom: 1px solid #eee; cursor: pointer;" onmouseover="this.style.backgroundColor='#f5f5f5'" onmouseout="this.style.backgroundColor=''" onclick="document.reassignSelectedId='${agent.id}'; this.closest('#reassignModal').remove();">
                         <strong>${agent.name}</strong> ${agent.email ? '(' + agent.email + ')' : ''}
                     </div>`;
                 });
