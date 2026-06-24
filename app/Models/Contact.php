@@ -29,6 +29,11 @@ class Contact extends Model
         return $this->hasMany(Conversation::class);
     }
 
+    public function messages()
+    {
+        return $this->hasManyThrough(Message::class, Conversation::class);
+    }
+
     public function getInitialsAttribute(): string
     {
         $words = explode(' ', $this->name);

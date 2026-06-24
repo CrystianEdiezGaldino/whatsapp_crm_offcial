@@ -31,14 +31,33 @@
             this.tagsUrl = panel.dataset.tagsUrl;
             this.conversationTagsUrl = panel.dataset.conversationTagsUrl;
             this.attachTagsUrl = panel.dataset.attachTagsUrl;
+            this.sectorsUrl = panel.dataset.sectorsUrl;
+            this.conversationSectorUrl = panel.dataset.conversationSectorUrl;
+            this.updateSectorUrl = panel.dataset.updateSectorUrl;
             this.selectedTagIds = new Set();
+            this.selectedSectorId = null;
             this._savingNotes = false;
 
             this.notesEl = panel.querySelector('#contactNotes');
             this.notesStatusEl = panel.querySelector('#contactNotesStatus');
+            this.notesBoxEl = panel.querySelector('#contactNotesBox');
+            this.notesCounterEl = panel.querySelector('#contactNotesCounter');
+            this.notesPreviewEl = panel.querySelector('#contactNotesPreview');
+            this.saveBtnEl = panel.querySelector('#saveContactNotes');
+            this.saveBtnLabelEl = panel.querySelector('#saveContactNotesLabel');
+            this.improveBtnEl = panel.querySelector('#improveContactNotesBtn');
+            this._savedNotes = this.notesEl?.value ?? '';
             this.tagsListEl = panel.querySelector('#conversationTags');
+            this.sectorEl = panel.querySelector('#conversationSector');
             this.modalEl = panel.querySelector('#tagsModal');
             this.tagsContainerEl = panel.querySelector('#tagsContainer');
+            this.sectorModalEl = panel.querySelector('#sectorModal');
+            this.sectorsContainerEl = panel.querySelector('#sectorsContainer');
+
+            const initialSector = this.sectorEl?.querySelector('[data-sector-id]');
+            this.selectedSectorId = initialSector?.dataset.sectorId
+                ? Number(initialSector.dataset.sectorId)
+                : null;
 
             this.bindEvents();
         }
@@ -46,9 +65,14 @@
         bindEvents() {
             this.panel.querySelector('#saveContactNotes')?.addEventListener('click', () => this.saveNotes());
             this.panel.querySelector('#openTagsModalBtn')?.addEventListener('click', () => this.openTagsModal());
+            this.panel.querySelector('#openSectorModalBtn')?.addEventListener('click', () => this.openSectorModal());
 
             this.modalEl?.querySelectorAll('[data-close-tags-modal]').forEach((el) => {
                 el.addEventListener('click', () => this.closeTagsModal());
+            });
+
+            this.sectorModalEl?.querySelectorAll('[data-close-sector-modal]').forEach((el) => {
+                el.addEventListener('click', () => this.closeSectorModal());
             });
 
             this.tagsListEl?.addEventListener('click', (e) => {
@@ -63,6 +87,41 @@
                     this.saveNotes();
                 }
             });
+
+            this.notesEl?.addEventListener('input', () => this.syncNotesUi());
+            this.notesEl?.addEventListener('focus', () => this.notesBoxEl?.classList.add('contact-panel__notes-box--focus'));
+            this.notesEl?.addEventListener('blur', () => this.notesBoxEl?.classList.remove('contact-panel__notes-box--focus'));
+
+            this.syncNotesUi();
+        }
+
+        syncNotesUi() {
+            const value = this.notesEl?.value ?? '';
+            const trimmed = value.trim();
+            const dirty = value !== this._savedNotes;
+            const max = Number(this.notesEl?.maxLength) || 5000;
+
+            this.notesBoxEl?.classList.toggle('contact-panel__notes-box--filled', trimmed.length > 0);
+            this.notesBoxEl?.classList.toggle('contact-panel__notes-box--dirty', dirty);
+            this.notesPreviewEl?.classList.toggle('hidden', trimmed.length === 0 || dirty);
+
+            if (this.notesCounterEl) {
+                this.notesCounterEl.textContent = `${value.length}/${max}`;
+            }
+
+            if (this.saveBtnEl) {
+                this.saveBtnEl.disabled = !dirty || this._savingNotes;
+                this.saveBtnEl.classList.toggle('contact-panel__save-btn--dirty', dirty);
+            }
+
+            if (this.saveBtnLabelEl && !this._savingNotes) {
+                this.saveBtnLabelEl.textContent = dirty ? 'Salvar alterações' : 'Salvar nota';
+            }
+
+            if (this.improveBtnEl) {
+                this.improveBtnEl.disabled = trimmed.length === 0;
+                this.improveBtnEl.classList.toggle('contact-panel__notes-ai-btn--disabled', trimmed.length === 0);
+            }
         }
 
         setNotesStatus(text, type) {
@@ -93,6 +152,8 @@
                     throw new Error(data.message || 'Falha ao salvar nota');
                 }
 
+                this._savedNotes = this.notesEl?.value ?? '';
+                this.syncNotesUi();
                 this.setNotesStatus('Salvo', 'ok');
                 setTimeout(() => this.setNotesStatus('', ''), 2000);
             } catch (error) {
@@ -108,6 +169,7 @@
 
             if (!tags || tags.length === 0) {
                 this.tagsListEl.innerHTML = '<span class="contact-panel__tag-empty">Nenhuma etiqueta</span>';
+                this.updateChatListTags([]);
                 return;
             }
 
@@ -125,6 +187,28 @@
                 </div>`
                 )
                 .join('');
+        }
+
+        updateChatListTags(tags) {
+            const listItem = document.querySelector(`[data-conversation-id="${this.conversationId}"]`);
+            const tagsEl = listItem?.querySelector('.chat-list-item__tags');
+            if (!tagsEl) return;
+
+            const tagChips = (tags || [])
+                .map(
+                    (tag) =>
+                        `<span class="chat-list-chip chat-list-chip--tag" style="--tag-color: ${escapeHtml(tag.color || '#4353E8')}">${escapeHtml(tag.name)}</span>`
+                )
+                .join('');
+
+            let statusChip = '';
+            if (listItem.querySelector('.chat-list-item__unread')) {
+                statusChip = '<span class="chat-list-chip chat-list-chip--warning">Aguardando</span>';
+            } else if (listItem.classList.contains('chat-list-item--resolved')) {
+                statusChip = '<span class="chat-list-chip chat-list-chip--muted">Encerrado</span>';
+            }
+
+            tagsEl.innerHTML = tagChips + statusChip;
         }
 
         async fetchCurrentTagIds() {
@@ -281,6 +365,161 @@
 
         closeTagsModal() {
             this.modalEl?.classList.add('hidden');
+        }
+
+        renderConversationSector(sector) {
+            if (!this.sectorEl || !sector) return;
+
+            this.sectorEl.innerHTML = `
+                <span
+                    class="contact-panel__tag-pill contact-panel__sector-pill"
+                    style="--tag-color: ${escapeHtml(sector.color)}"
+                    data-sector-id="${sector.id ?? ''}"
+                >
+                    <span class="contact-panel__tag-dot"></span>
+                    <span class="contact-panel__tag-name">${escapeHtml(sector.name)}</span>
+                </span>`;
+
+            this.selectedSectorId = sector.id ? Number(sector.id) : null;
+        }
+
+        updateChatListSector(sector) {
+            window.dispatchEvent(
+                new CustomEvent('conversation-sector-updated', {
+                    detail: {
+                        conversation_id: this.conversationId,
+                        sector,
+                    },
+                })
+            );
+        }
+
+        async fetchCurrentSectorId() {
+            const response = await fetch(this.conversationSectorUrl, {
+                headers: { Accept: 'application/json' },
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error('Não foi possível carregar o setor da conversa');
+            }
+            this.selectedSectorId = data.sector_id ? Number(data.sector_id) : null;
+            return this.selectedSectorId;
+        }
+
+        async openSectorModal() {
+            if (!this.sectorModalEl || !this.sectorsContainerEl) return;
+
+            try {
+                const [sectorsResponse] = await Promise.all([
+                    fetch(this.sectorsUrl, { headers: { Accept: 'application/json' } }),
+                    this.fetchCurrentSectorId(),
+                ]);
+
+                const sectorsData = await sectorsResponse.json();
+                if (!sectorsResponse.ok || !sectorsData.success) {
+                    throw new Error('Não foi possível carregar setores');
+                }
+
+                this.sectorsContainerEl.innerHTML = this.buildSectorModalHtml(sectorsData.sectors || []);
+                this.sectorsContainerEl.querySelectorAll('.tags-modal__chip').forEach((chip) => {
+                    chip.addEventListener('click', () => this.selectModalSector(chip));
+                });
+
+                this.sectorModalEl.classList.remove('hidden');
+            } catch (error) {
+                alert('Erro ao carregar setores: ' + error.message);
+            }
+        }
+
+        buildSectorModalHtml(sectors) {
+            const chips = (sectors || [])
+                .map((sector) => {
+                    const selected = this.selectedSectorId === Number(sector.id);
+                    return `
+                    <button
+                        type="button"
+                        class="tags-modal__chip${selected ? ' tags-modal__chip--selected' : ''}"
+                        data-sector-id="${sector.id}"
+                        style="--tag-color: ${escapeHtml(sector.color)}"
+                    >
+                        <span class="tags-modal__chip-dot"></span>
+                        <span class="tags-modal__chip-label">${escapeHtml(sector.name)}</span>
+                        ${selected ? '<span class="material-symbols-outlined tags-modal__chip-check">check</span>' : ''}
+                    </button>`;
+                })
+                .join('');
+
+            const generalSelected = this.selectedSectorId === null;
+            const generalChip = `
+                <button
+                    type="button"
+                    class="tags-modal__chip${generalSelected ? ' tags-modal__chip--selected' : ''}"
+                    data-sector-id=""
+                    style="--tag-color: #9CA3AF"
+                >
+                    <span class="tags-modal__chip-dot"></span>
+                    <span class="tags-modal__chip-label">Geral</span>
+                    ${generalSelected ? '<span class="material-symbols-outlined tags-modal__chip-check">check</span>' : ''}
+                </button>`;
+
+            return `
+                <section class="tags-modal__group">
+                    <h4 class="tags-modal__group-title">Setores disponíveis</h4>
+                    <div class="tags-modal__chips">${generalChip}${chips}</div>
+                </section>`;
+        }
+
+        async selectModalSector(chip) {
+            const sectorIdRaw = chip.dataset.sectorId;
+            const sectorId = sectorIdRaw ? Number(sectorIdRaw) : null;
+
+            if (this.selectedSectorId === sectorId) {
+                return;
+            }
+
+            this.sectorsContainerEl?.querySelectorAll('.tags-modal__chip').forEach((el) => {
+                const selected = el === chip;
+                el.classList.toggle('tags-modal__chip--selected', selected);
+                const check = el.querySelector('.tags-modal__chip-check');
+                if (selected && !check) {
+                    const icon = document.createElement('span');
+                    icon.className = 'material-symbols-outlined tags-modal__chip-check';
+                    icon.textContent = 'check';
+                    el.appendChild(icon);
+                } else if (!selected && check) {
+                    check.remove();
+                }
+            });
+
+            await this.syncSector(sectorId);
+        }
+
+        async syncSector(sectorId) {
+            try {
+                const response = await fetch(this.updateSectorUrl, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken(),
+                    },
+                    body: JSON.stringify({ sector_id: sectorId }),
+                });
+
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Falha ao atualizar setor');
+                }
+
+                this.renderConversationSector(data.sector);
+            } catch (error) {
+                alert('Erro ao atualizar setor: ' + error.message);
+                throw error;
+            }
+        }
+
+        closeSectorModal() {
+            this.sectorModalEl?.classList.add('hidden');
         }
     }
 

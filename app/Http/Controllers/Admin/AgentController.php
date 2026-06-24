@@ -24,7 +24,9 @@ class AgentController extends Controller
             ->orderBy('name')
             ->paginate(15);
 
-        return view('admin.agents.index', compact('agents'));
+        $sectors = Sector::withCount('agents')->get();
+
+        return view('admin.agents.index', compact('agents', 'sectors'));
     }
 
     public function create()

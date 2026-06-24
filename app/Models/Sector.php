@@ -87,4 +87,41 @@ class Sector extends Model
     {
         return "{$this->keyboard_option}. {$this->name}";
     }
+
+    public function getDisplayName(): string
+    {
+        $name = trim((string) $this->name);
+        if ($name === '' || preg_match('/^Sector [a-f0-9]{6,}$/i', $name)) {
+            return 'Geral';
+        }
+
+        return $name;
+    }
+
+    public function getDisplayColor(): string
+    {
+        $colors = ['#4353E8', '#1DA85A', '#D97706', '#D1383E', '#8B5CF6', '#06B6D4', '#EC4899', '#F97316'];
+
+        return $colors[$this->id % count($colors)];
+    }
+
+    public function toUiArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->getDisplayName(),
+            'color' => $this->getDisplayColor(),
+            'keyboard_option' => $this->keyboard_option,
+        ];
+    }
+
+    public static function defaultUi(): array
+    {
+        return [
+            'id' => null,
+            'name' => 'Geral',
+            'color' => '#9CA3AF',
+            'keyboard_option' => null,
+        ];
+    }
 }

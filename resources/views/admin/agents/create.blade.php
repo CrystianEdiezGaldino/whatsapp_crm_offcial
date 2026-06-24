@@ -4,22 +4,22 @@
 
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Topbar -->
-    <div class="page-header sticky top-0 z-40">
-        <div>
-            <h1 class="text-2xl font-bold text-on-surface">Cadastrar Atendente</h1>
-            <p class="text-xs text-gray-600 mt-1">Crie uma nova conta de atendente</p>
-        </div>
+    <!-- Header -->
+    <div class="h-[66px] shrink-0 flex items-center gap-3 px-6 bg-white border-b border-[#E8EAF0]">
+        <a href="{{ route('admin.agents.index') }}" class="w-[34px] h-[34px] rounded-[9px] flex items-center justify-center hover:bg-gray-50 text-gray-400 hover:text-gray-700 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        </a>
+        <h1 class="text-lg font-extrabold text-gray-900">Novo Atendente</h1>
     </div>
 
     <!-- Content -->
-    <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
-        <div class="max-w-2xl">
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+    <div class="flex-1 overflow-y-auto design-scrollbar p-6 bg-app-bg">
+        <div class="max-w-xl mx-auto">
+            <div class="card-primary">
                 @if($errors->any())
-                <div class="mb-6 p-4 bg-error/10 border border-error text-error rounded-lg">
-                    <strong>Erros encontrados:</strong>
-                    <ul class="list-disc list-inside mt-2">
+                <div class="mb-5 p-3 bg-[#FEF1F2] border border-error/20 rounded-[11px] text-error text-sm">
+                    <p class="font-bold mb-1">Erros encontrados:</p>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
                         @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                         @endforeach
@@ -27,88 +27,72 @@
                 </div>
                 @endif
 
-                <form action="{{ route('admin.agents.store') }}" method="POST" class="space-y-6">
+                <form action="{{ route('admin.agents.store') }}" method="POST" class="space-y-5">
                     @csrf
 
-                    <!-- Name -->
                     <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Nome Completo</label>
-                        <input type="text" name="name" value="{{ old('name') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('name') ? 'border-error' : '' }}" placeholder="Digite o nome completo" required>
-                        @error('name')<span class="text-error text-xs">{{ $message }}</span>@enderror
+                        <label class="block text-xs font-bold text-gray-500 mb-1.5">Nome Completo</label>
+                        <input type="text" name="name" value="{{ old('name') }}" class="input-primary" placeholder="Digite o nome completo" required>
+                        @error('name')<span class="text-error text-xs mt-1 block">{{ $message }}</span>@enderror
                     </div>
 
-                    <!-- Email -->
                     <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('email') ? 'border-error' : '' }}" placeholder="Digite o email" required>
-                        @error('email')<span class="text-error text-xs">{{ $message }}</span>@enderror
+                        <label class="block text-xs font-bold text-gray-500 mb-1.5">Email</label>
+                        <input type="email" name="email" value="{{ old('email') }}" class="input-primary" placeholder="email@exemplo.com" required>
+                        @error('email')<span class="text-error text-xs mt-1 block">{{ $message }}</span>@enderror
                     </div>
 
-                    <!-- Password -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1.5">Senha</label>
+                            <input type="password" name="password" class="input-primary" placeholder="Mínimo 8 caracteres" required>
+                            @error('password')<span class="text-error text-xs mt-1 block">{{ $message }}</span>@enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1.5">Confirmar Senha</label>
+                            <input type="password" name="password_confirmation" class="input-primary" placeholder="Repita a senha" required>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1.5">Cargo</label>
+                            <select name="role" class="select-primary" required>
+                                <option value="">Selecione</option>
+                                @foreach($roles as $value => $label)
+                                <option value="{{ $value }}" {{ old('role') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('role')<span class="text-error text-xs mt-1 block">{{ $message }}</span>@enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1.5">Setor</label>
+                            <select name="sector_id" class="select-primary">
+                                <option value="">Selecione</option>
+                                @foreach($sectors as $sector)
+                                <option value="{{ $sector->id }}" {{ old('sector_id') == $sector->id ? 'selected' : '' }}>{{ $sector->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('sector_id')<span class="text-error text-xs mt-1 block">{{ $message }}</span>@enderror
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Senha</label>
-                        <input type="password" name="password" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('password') ? 'border-error' : '' }}" placeholder="Mínimo 8 caracteres" required>
-                        @error('password')<span class="text-error text-xs">{{ $message }}</span>@enderror
+                        <label class="block text-xs font-bold text-gray-500 mb-1.5">Observações</label>
+                        <textarea name="notes" rows="3" class="textarea-primary" placeholder="Anotações sobre este atendente">{{ old('notes') }}</textarea>
                     </div>
 
-                    <!-- Confirm Password -->
-                    <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Confirmar Senha</label>
-                        <input type="password" name="password_confirmation" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary" placeholder="Repita a senha" required>
-                        @error('password_confirmation')<span class="text-error text-xs">{{ $message }}</span>@enderror
+                    <div class="flex items-center gap-3">
+                        <div class="toggle-switch {{ old('is_active', true) ? 'active' : '' }}" onclick="this.classList.toggle('active'); this.nextElementSibling.value = this.classList.contains('active') ? '1' : '0'"></div>
+                        <input type="hidden" name="is_active" value="{{ old('is_active', true) ? '1' : '0' }}">
+                        <span class="text-sm text-gray-700 font-medium">Ativado</span>
                     </div>
 
-                    <!-- Role -->
-                    <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Cargo</label>
-                        <select name="role" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('role') ? 'border-error' : '' }}" required onchange="this.form.dataset.role = this.value">
-                            <option value="">Selecione um cargo</option>
-                            @foreach($roles as $value => $label)
-                            <option value="{{ $value }}" {{ old('role') === $value ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        @error('role')<span class="text-error text-xs">{{ $message }}</span>@enderror
-                    </div>
-
-                    <!-- Sector (required for agent/supervisor) -->
-                    <div id="sector-field">
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Setor</label>
-                        <select name="sector_id" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('sector_id') ? 'border-error' : '' }}">
-                            <option value="">Selecione um setor</option>
-                            @foreach($sectors as $sector)
-                            <option value="{{ $sector->id }}" {{ old('sector_id') == $sector->id ? 'selected' : '' }}>
-                                {{ $sector->keyboard_option }}. {{ $sector->name }}
-                            </option>
-                            @endforeach
-                        </select>
-                        @error('sector_id')<span class="text-error text-xs">{{ $message }}</span>@enderror
-                        <p class="text-xs text-gray-600 mt-1">Obrigatório para Atendentes e Supervisores</p>
-                    </div>
-
-                    <!-- Active Status -->
-                    <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Status</label>
-                        <label class="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }} class="w-4 h-4 rounded border-gray-200">
-                            <span class="text-sm text-on-surface">Ativado</span>
-                        </label>
-                        <p class="text-xs text-gray-600 mt-1">Atendentes inativos não recebem novas conversas</p>
-                    </div>
-
-                    <!-- Notes -->
-                    <div>
-                        <label class="text-sm font-semibold text-on-surface block mb-2">Observações</label>
-                        <textarea name="notes" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:border-secondary {{ $errors->has('notes') ? 'border-error' : '' }}" placeholder="Anotações sobre este atendente" rows="3">{{ old('notes') }}</textarea>
-                        @error('notes')<span class="text-error text-xs">{{ $message }}</span>@enderror
-                    </div>
-
-                    <!-- Form Actions -->
-                    <div class="flex justify-end gap-2 pt-4 border-t border-gray-200">
-                        <a href="{{ route('admin.agents.index') }}" class="px-4 py-2 border border-gray-200 rounded-lg text-on-surface hover:bg-gray-100 transition-colors">
-                            Cancelar
-                        </a>
-                        <button type="submit" class="px-4 py-2 bg-secondary text-on-secondary rounded-lg font-semibold hover:bg-secondary/90 active:scale-95 transition-all">
-                            <span class="material-symbols-outlined inline text-sm mr-1">save</span> Cadastrar Atendente
+                    <div class="flex justify-end gap-2 pt-4 border-t border-[#F2F4F8]">
+                        <a href="{{ route('admin.agents.index') }}" class="btn-secondary text-sm px-4 py-2">Cancelar</a>
+                        <button type="submit" class="btn-primary text-sm px-4 py-2">
+                            <span class="material-symbols-outlined text-[16px] mr-1">save</span>
+                            Cadastrar
                         </button>
                     </div>
                 </form>

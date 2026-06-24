@@ -123,7 +123,24 @@ class Conversation extends Model
             return false;
         }
 
-        return !$this->getActiveClaim();
+        if ($this->getActiveClaim()) {
+            return false;
+        }
+
+        return $this->hasMessages();
+    }
+
+    public function hasMessages(): bool
+    {
+        if ($this->relationLoaded('lastMessage')) {
+            return $this->lastMessage !== null;
+        }
+
+        if ($this->relationLoaded('messages')) {
+            return $this->messages->isNotEmpty();
+        }
+
+        return $this->messages()->exists();
     }
 
     public function claim(int $userId, ?string $reason = null): ConversationClaim

@@ -15,6 +15,7 @@ use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\SectorController;
 use App\Http\Controllers\Admin\FlowController;
 
 Route::middleware('guest')->group(function () {
@@ -123,6 +124,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/conversations/{conversation}/tags', [TagController::class, 'attachToConversation'])->name('conversations.tags.attach');
     Route::delete('/conversations/{conversation}/tags/{tag}', [TagController::class, 'detachFromConversation'])->name('conversations.tags.detach');
 
+    Route::get('/sectors-json', [SectorController::class, 'index'])->name('sectors.index');
+    Route::get('/conversations/{conversation}/sector-json', [SectorController::class, 'conversationSector'])->name('conversations.sector.json');
+    Route::patch('/conversations/{conversation}/sector', [SectorController::class, 'updateConversationSector'])->name('conversations.sector.update');
+
     Route::post('/conversations/reopen/request', [\App\Http\Controllers\ConversationReopenController::class, 'request'])->name('conversations.reopen.request');
     Route::get('/conversations/reopen/pending', [\App\Http\Controllers\ConversationReopenController::class, 'pending'])->name('conversations.reopen.pending');
     Route::post('/conversations/reopen/{reopenRequest}/approve', [\App\Http\Controllers\ConversationReopenController::class, 'approve'])->name('conversations.reopen.approve');
@@ -134,6 +139,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/conversations/{conversation}/improve-text', [ConversationController::class, 'improveText'])
         ->name('conversations.improve-text');
 
+    Route::post('/macros/improve-text', [MacroController::class, 'improveText'])->name('macros.improve-text');
     Route::resource('macros', MacroController::class);
     Route::post('/macros/{macro}/files', [MacroFileController::class, 'store'])->name('macros.files.store');
     Route::delete('/macros/{macro}/files/{file}', [MacroFileController::class, 'destroy'])->name('macros.files.destroy');

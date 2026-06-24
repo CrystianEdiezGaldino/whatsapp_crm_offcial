@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Conversation;
 use App\Models\ConversationClaim;
+use App\Models\Message;
 use Tests\TestCase;
 
 class ConversationPendingQueueTest extends TestCase
@@ -12,6 +13,7 @@ class ConversationPendingQueueTest extends TestCase
     {
         $conv = new Conversation(['status' => 'new', 'claimed_by' => null]);
         $conv->setRelation('activeClaim', null);
+        $conv->setRelation('lastMessage', new Message(['content' => 'oi']));
 
         $this->assertTrue($conv->isPendingInQueue());
     }
@@ -37,5 +39,23 @@ class ConversationPendingQueueTest extends TestCase
         $conv->setRelation('activeClaim', $claim);
 
         $this->assertFalse($conv->isPendingInQueue());
+    }
+
+    public function test_empty_conversation_is_not_pending(): void
+    {
+        $conv = new Conversation(['status' => 'new', 'claimed_by' => null]);
+        $conv->setRelation('activeClaim', null);
+        $conv->setRelation('lastMessage', null);
+
+        $this->assertFalse($conv->isPendingInQueue());
+    }
+
+    public function test_new_with_message_is_pending(): void
+    {
+        $conv = new Conversation(['status' => 'new', 'claimed_by' => null]);
+        $conv->setRelation('activeClaim', null);
+        $conv->setRelation('lastMessage', new \App\Models\Message(['content' => 'oi']));
+
+        $this->assertTrue($conv->isPendingInQueue());
     }
 }

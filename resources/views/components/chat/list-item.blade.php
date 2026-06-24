@@ -8,11 +8,7 @@
 ])
 
 @php
-    $sectorName = $conversation->sector?->name;
-    if ($sectorName && preg_match('/^Sector [a-f0-9]{6,}$/i', $sectorName)) {
-        $sectorName = 'Geral';
-    }
-    $sectorName = $sectorName ?: 'Geral';
+    $tags = $conversation->tags;
 @endphp
 
 <a
@@ -40,7 +36,12 @@
                 @endif
             </div>
             <div class="chat-list-item__tags">
-                <span class="chat-list-chip chat-list-chip--neutral">{{ $sectorName }}</span>
+                @foreach($tags as $tag)
+                    <span
+                        class="chat-list-chip chat-list-chip--tag"
+                        style="--tag-color: {{ $tag->color }}"
+                    >{{ $tag->name }}</span>
+                @endforeach
                 @if($pending)
                     <span class="chat-list-chip chat-list-chip--warning">Aguardando</span>
                 @elseif($resolved)

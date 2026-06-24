@@ -105,11 +105,18 @@
             </div>
 
             <!-- Active Conversations -->
+            @php
+                $activeConversations = \App\Models\Conversation::where('claimed_by', $user->id)
+                    ->whereIn('status', ['new', 'in_attendance'])
+                    ->with('contact')
+                    ->latest()
+                    ->get();
+            @endphp
             <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
                 <h2 class="text-lg font-bold text-on-surface mb-4">Conversas Ativas</h2>
-                @if($user->conversations()->whereIn('status', ['new', 'in_attendance'])->count() > 0)
+                @if($activeConversations->isNotEmpty())
                 <div class="space-y-3">
-                    @foreach($user->conversations()->whereIn('status', ['new', 'in_attendance'])->latest()->get() as $conversation)
+                    @foreach($activeConversations as $conversation)
                     <div class="flex items-start justify-between p-3 rounded-lg bg-gray-100-low hover:bg-gray-100 transition-colors">
                         <div class="flex-1">
                             <p class="font-medium text-on-surface">{{ $conversation->contact->name ?? 'Contato Desconhecido' }}</p>

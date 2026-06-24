@@ -72,9 +72,40 @@ class MacroController extends Controller
         return redirect()->route('macros.index')->with('success', 'Macro removida!');
     }
 
+    public function improveText(Request $request)
+    {
+        $validated = $request->validate([
+            'content' => 'required|string|min:1|max:5000',
+            'type' => 'required|in:grammar,professional,both',
+        ]);
+
+        try {
+            $original = $validated['content'];
+            $type = $validated['type'];
+
+            $improved = match ($type) {
+                'grammar' => \App\Services\OllamaService::improveGrammar($original),
+                'professional' => \App\Services\OllamaService::improveProfessionalTone($original),
+                'both' => \App\Services\OllamaService::improveBoth($original),
+            };
+
+            return response()->json([
+                'success' => true,
+                'original' => $original,
+                'improved' => $improved,
+                'type' => $type,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     private function authorizeMacro(Macro $macro): void
     {
-        if ($macro->user_id !== Auth::id()) {
+        if ($macro->user_id !== Auth::id() && !Auth::user()->isAdmin()) {
             abort(403);
         }
     }

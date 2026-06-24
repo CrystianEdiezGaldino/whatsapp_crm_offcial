@@ -17,14 +17,19 @@ class FlowController extends Controller
     public function __construct(private FlowManagementService $service)
     {}
 
-    public function index()
+    public function index(Request $request)
     {
         $flows = ConversationFlow::with('nodes', 'createdBy')
             ->orderBy('type', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return view('admin.flows.index', compact('flows'));
+        $selectedFlow = null;
+        if ($flowId = $request->input('flow')) {
+            $selectedFlow = ConversationFlow::with('nodes', 'createdBy')->find($flowId);
+        }
+
+        return view('admin.flows.index', compact('flows', 'selectedFlow'));
     }
 
     public function create()
@@ -42,7 +47,7 @@ class FlowController extends Controller
                 'trigger_type' => 'required|in:on_new_conversation,on_command,manual',
                 'config' => 'required|array',
                 'config.initial_message' => 'required|string',
-                'config.final_message' => 'required|string',
+                'config.final_message' => 'nullable|string',
                 'nodes' => 'array'
             ]);
 
@@ -76,7 +81,7 @@ class FlowController extends Controller
                 'trigger_type' => 'required|in:on_new_conversation,on_command,manual',
                 'config' => 'required|array',
                 'config.initial_message' => 'required|string',
-                'config.final_message' => 'required|string',
+                'config.final_message' => 'nullable|string',
                 'nodes' => 'array'
             ]);
 

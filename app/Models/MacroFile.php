@@ -23,8 +23,10 @@ class MacroFile extends Model
     public function getFileSizeFormatted(): string
     {
         $bytes = $this->file_size;
+        if (!$bytes || $bytes <= 0) {
+            return '0 B';
+        }
         $units = ['B', 'KB', 'MB', 'GB'];
-        $bytes = max($bytes, 0);
         $pow = floor(log($bytes, 1024));
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));

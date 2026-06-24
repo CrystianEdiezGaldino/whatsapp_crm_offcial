@@ -130,6 +130,7 @@ class ConversationController extends Controller
 
         $conversations = $query->orderBy('last_message_at', 'desc')->get();
         $conversations = $this->dedupeConversationsByContact($conversations, (int) Auth::id());
+        $conversations = $this->filterOrphanEmptyStubs($conversations);
 
         $pendingCount = $this->countPendingInQueue();
 
@@ -146,12 +147,14 @@ class ConversationController extends Controller
 
     private function countPendingInQueue(): int
     {
-        $conversations = Conversation::with(['activeClaim.user'])
+        $conversations = Conversation::with(['activeClaim.user', 'lastMessage'])
             ->whereIn('status', ['new', 'in_attendance'])
             ->orderBy('last_message_at', 'desc')
             ->get();
 
-        return $this->dedupeConversationsByContact($conversations, (int) Auth::id())
+        return $this->filterOrphanEmptyStubs(
+            $this->dedupeConversationsByContact($conversations, (int) Auth::id())
+        )
             ->filter(fn($c) => $c->isPendingInQueue())
             ->count();
     }
@@ -160,11 +163,7 @@ class ConversationController extends Controller
     {
         $pending = $conv->isPendingInQueue();
         $resolved = in_array($conv->status, ['resolved', 'closed'], true);
-        $sectorName = $conv->sector?->name;
-        if ($sectorName && preg_match('/^Sector [a-f0-9]{6,}$/i', $sectorName)) {
-            $sectorName = 'Geral';
-        }
-        $sectorName = $sectorName ?: 'Geral';
+        $sectorUi = $conv->sector?->toUiArray() ?? \App\Models\Sector::defaultUi();
 
         $query = $request->query();
         $query['conversation'] = $conv->id;
@@ -178,7 +177,14 @@ class ConversationController extends Controller
             'last_time' => $conv->last_message_at?->locale('pt_BR')->diffForHumans(short: true) ?? '???',
             'pending' => $pending,
             'resolved' => $resolved,
-            'sector' => $sectorName,
+            'sector' => $sectorUi['name'],
+            'sector_id' => $sectorUi['id'],
+            'sector_color' => $sectorUi['color'],
+            'tags' => $conv->tags->map(fn ($tag) => [
+                'id' => $tag->id,
+                'name' => $tag->name,
+                'color' => $tag->color,
+            ])->values(),
             'active' => $activeId === (int) $conv->id,
             'url' => route('conversations.index', $query),
         ];
@@ -191,6 +197,7 @@ class ConversationController extends Controller
             'assignedUser',
             'activeClaim.user',
             'tags',
+            'sector',
             'messages' => fn ($q) => $q->orderBy('created_at', 'asc')->limit(100),
         ])->find($conversationId);
     }
@@ -230,7 +237,7 @@ class ConversationController extends Controller
         return $conversations
             ->groupBy('contact_id')
             ->map(function ($group) use ($userId) {
-                $sorted = $group->sortByDesc(fn ($c) => $c->last_message_at ?? $c->created_at);
+                $sorted = $group->sortByDesc(fn ($c) => $c->last_message_at ?? $c->created_at)->values();
 
                 $mine = $sorted->first(fn ($c) => $c->hasActiveClaim($userId));
                 if ($mine) {
@@ -242,7 +249,14 @@ class ConversationController extends Controller
                     return $claimed;
                 }
 
-                $open = $sorted->first(fn ($c) => ! in_array($c->status, ['resolved', 'closed'], true));
+                $isOpen = fn ($c) => ! in_array($c->status, ['resolved', 'closed'], true);
+
+                $openWithMessages = $sorted->first(fn ($c) => $isOpen($c) && $c->hasMessages());
+                if ($openWithMessages) {
+                    return $openWithMessages;
+                }
+
+                $open = $sorted->first($isOpen);
                 if ($open) {
                     return $open;
                 }
@@ -251,6 +265,52 @@ class ConversationController extends Controller
             })
             ->sortByDesc(fn ($c) => $c->last_message_at ?? $c->created_at)
             ->values();
+    }
+
+    /** Remove stubs vazios (status new sem mensagens) quando o contato já tem atendimento encerrado. */
+    private function filterOrphanEmptyStubs($conversations): \Illuminate\Support\Collection
+    {
+        $emptyNew = $conversations->filter(
+            fn ($c) => $c->status === 'new' && ! $c->hasMessages()
+        );
+
+        if ($emptyNew->isEmpty()) {
+            return $conversations;
+        }
+
+        $contactIdsWithResolved = Conversation::query()
+            ->whereIn('contact_id', $emptyNew->pluck('contact_id')->unique())
+            ->whereIn('status', ['resolved', 'closed'])
+            ->pluck('contact_id')
+            ->unique();
+
+        if ($contactIdsWithResolved->isEmpty()) {
+            return $conversations;
+        }
+
+        return $conversations->reject(
+            fn ($c) => $c->status === 'new'
+                && ! $c->hasMessages()
+                && $contactIdsWithResolved->contains($c->contact_id)
+        )->values();
+    }
+
+    private function closeSiblingOpenConversations(Conversation $conversation): void
+    {
+        $siblings = Conversation::query()
+            ->where('contact_id', $conversation->contact_id)
+            ->where('id', '!=', $conversation->id)
+            ->whereNotIn('status', ['resolved', 'closed'])
+            ->get();
+
+        foreach ($siblings as $sibling) {
+            $sibling->releaseClaim('Encerrado junto com atendimento #' . $conversation->id);
+            $sibling->update([
+                'status' => 'resolved',
+                'claimed_by' => null,
+                'claimed_at' => null,
+            ]);
+        }
     }
 
     public function sendMessage(Request $request)
@@ -460,7 +520,13 @@ class ConversationController extends Controller
     public function resolve(Conversation $conversation)
     {
         $oldStatus = $conversation->status;
-        $conversation->update(['status' => 'resolved']);
+        $conversation->releaseClaim('Atendimento encerrado');
+        $conversation->update([
+            'status' => 'resolved',
+            'claimed_by' => null,
+            'claimed_at' => null,
+        ]);
+        $this->closeSiblingOpenConversations($conversation);
 
         // Dispatch event for real-time update
         event(new \App\Events\ConversationStatusChanged($conversation, $oldStatus));
@@ -498,6 +564,8 @@ class ConversationController extends Controller
                 'claimed_by' => null,
                 'claimed_at' => null,
             ]);
+
+            $this->closeSiblingOpenConversations($conversation);
 
             // Dispatch event for real-time update
             event(new \App\Events\ConversationStatusChanged($conversation, $oldStatus));

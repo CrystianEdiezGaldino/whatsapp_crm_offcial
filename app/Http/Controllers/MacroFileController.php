@@ -124,21 +124,33 @@ class MacroFileController extends Controller
             return response()->json(['success' => false, 'message' => 'Permissão negada'], 403);
         }
 
-        $files = $macro->files()
-            ->orderBy('order_index')
-            ->get()
-            ->map(fn($f) => [
-                'id' => $f->id,
-                'name' => basename($f->file_path),
-                'type' => $f->file_type,
-                'size' => $f->getFileSizeFormatted(),
-                'mime_type' => $f->mime_type,
-                'icon' => $this->getFileIcon($f->file_type),
-            ]);
+        $files = collect();
+        try {
+            $files = $macro->files()
+                ->orderBy('order_index')
+                ->get()
+                ->map(fn($f) => [
+                    'id' => $f->id,
+                    'name' => basename($f->file_path),
+                    'type' => $f->file_type,
+                    'size' => $f->getFileSizeFormatted(),
+                    'mime_type' => $f->mime_type,
+                    'icon' => $this->getFileIcon($f->file_type),
+                ]);
+        } catch (\Exception $e) {
+            // macro_files table may not exist yet
+        }
 
         return response()->json([
             'success' => true,
-            'content_type' => $macro->getContentType(),
+            'macro' => [
+                'id' => $macro->id,
+                'name' => $macro->name,
+                'shortcut' => $macro->shortcut,
+                'category' => $macro->category,
+                'content' => $macro->content,
+            ],
+            'content_type' => $files->isNotEmpty() ? 'files' : 'text',
             'text' => $macro->content,
             'files' => $files,
         ]);

@@ -185,17 +185,30 @@
                 unread.remove();
             }
 
-            const tags = el.querySelector('.chat-list-item__tags');
-            if (tags && conv.sector != null) {
-                const pendingChip = conv.pending
-                    ? '<span class="chat-list-chip chat-list-chip--warning">Aguardando</span>'
-                    : conv.resolved
-                      ? '<span class="chat-list-chip chat-list-chip--muted">Encerrado</span>'
-                      : '';
-                tags.innerHTML =
-                    `<span class="chat-list-chip chat-list-chip--neutral">${this.escape(conv.sector)}</span>` +
-                    pendingChip;
+            const tagsEl = el.querySelector('.chat-list-item__tags');
+            if (tagsEl && Array.isArray(conv.tags)) {
+                tagsEl.innerHTML = this.buildTagChipsHtml(conv.tags) + this.buildStatusChipHtml(conv);
             }
+        }
+
+        buildTagChipsHtml(tags) {
+            return (tags || [])
+                .map(
+                    (tag) =>
+                        `<span class="chat-list-chip chat-list-chip--tag" style="--tag-color: ${this.escape(tag.color || '#4353E8')}">${this.escape(tag.name)}</span>`
+                )
+                .join('');
+        }
+
+        buildStatusChipHtml(conv) {
+            if (conv.pending) {
+                return '<span class="chat-list-chip chat-list-chip--warning">Aguardando</span>';
+            }
+            if (conv.resolved) {
+                return '<span class="chat-list-chip chat-list-chip--muted">Encerrado</span>';
+            }
+
+            return '';
         }
 
         moveToTop(el) {
@@ -209,11 +222,7 @@
             const pending = conv.pending
                 ? '<span class="chat-list-item__unread" title="Aguardando">!</span>'
                 : '';
-            const pendingChip = conv.pending
-                ? '<span class="chat-list-chip chat-list-chip--warning">Aguardando</span>'
-                : conv.resolved
-                  ? '<span class="chat-list-chip chat-list-chip--muted">Encerrado</span>'
-                  : '';
+            const pendingChip = this.buildStatusChipHtml(conv);
             const avatarClass =
                 'contact-avatar' + (conv.pending ? ' contact-avatar--pending' : '');
 
@@ -229,8 +238,7 @@
                         ${pending}
                     </div>
                     <div class="chat-list-item__tags">
-                        <span class="chat-list-chip chat-list-chip--neutral">${this.escape(conv.sector)}</span>
-                        ${pendingChip}
+                        ${this.buildTagChipsHtml(conv.tags || [])}${pendingChip}
                     </div>
                 </div>
             </div>`;

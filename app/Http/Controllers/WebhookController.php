@@ -44,22 +44,19 @@ class WebhookController extends Controller
             return response('Ignored', 200);
         }
 
-        // Validar que a mensagem é do número ativo
-        $activeNumber = \App\Models\WhatsAppNumber::active();
-        if ($activeNumber) {
-            // Validar phone_number_id se disponível
-            $changes = $payload['entry'][0]['changes'][0] ?? [];
-            $value = $changes['value'] ?? [];
-            $incomingPhoneNumberId = $value['metadata']['phone_number_id'] ?? null;
+        // Validar phone_number_id contra .env (fonte principal)
+        $expectedPhoneId = config('services.whatsapp.phone_number_id');
+        $changes = $payload['entry'][0]['changes'][0] ?? [];
+        $value = $changes['value'] ?? [];
+        $incomingPhoneNumberId = $value['metadata']['phone_number_id'] ?? null;
 
-            if ($incomingPhoneNumberId && $activeNumber->phone_number_id &&
-                $incomingPhoneNumberId !== $activeNumber->phone_number_id) {
-                Log::warning('Webhook from different WhatsApp number', [
-                    'expected' => $activeNumber->phone_number_id,
-                    'received' => $incomingPhoneNumberId,
-                ]);
-                return response('Ignored', 200);
-            }
+        if ($incomingPhoneNumberId && $expectedPhoneId &&
+            $incomingPhoneNumberId !== $expectedPhoneId) {
+            Log::warning('Webhook from different WhatsApp number', [
+                'expected' => $expectedPhoneId,
+                'received' => $incomingPhoneNumberId,
+            ]);
+            return response('Ignored', 200);
         }
 
         // Registrar webhook

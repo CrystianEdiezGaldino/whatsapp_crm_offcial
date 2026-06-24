@@ -94,6 +94,8 @@ class FlowManagementService
 
     public function deleteFlow(ConversationFlow $flow): void
     {
+        $flow->executions()->delete();
+        $flow->nodes()->delete();
         $flow->delete();
     }
 }

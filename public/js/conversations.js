@@ -205,6 +205,7 @@ function applyImprovedContactNotes() {
     const textarea = document.getElementById('contactNotes');
     textarea.value = currentImprovedContactNotes.improved;
     textarea.focus();
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
 
     closeImproveContactNotesModal();
 }

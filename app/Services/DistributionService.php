@@ -34,8 +34,9 @@ class DistributionService
             'overflow_action' => $settings->overflow_action,
         ]);
 
-        // Get active agents with capacity available
+        // Get active AND online agents with capacity available
         $availableAgents = AgentCapacity::where('is_active', true)
+            ->whereHas('user', fn($q) => $q->where('status', 'online'))
             ->with('user')
             ->get()
             ->filter(fn($capacity) => $capacity->hasCapacity())
@@ -50,8 +51,9 @@ class DistributionService
 
         // All agents are at capacity
         if ($settings->isNextAgentOverflow()) {
-            // Find agent with least load
+            // Find online agent with least load
             $agentCapacities = AgentCapacity::where('is_active', true)
+                ->whereHas('user', fn($q) => $q->where('status', 'online'))
                 ->with('user')
                 ->get()
                 ->sortBy(fn($capacity) => $capacity->activeConversationsCount());
@@ -68,8 +70,8 @@ class DistributionService
             }
         }
 
-        // Queue mode or no agents available - leave in queue
-        Log::info('[Distribution] All agents full - keeping in queue', [
+        // Queue mode or no online agents available - leave in queue
+        Log::info('[Distribution] No online agents available or all full - keeping in queue', [
             'conversation_id' => $conversation->id,
         ]);
     }
@@ -147,6 +149,7 @@ class DistributionService
             ->get()
             ->map(function ($capacity) {
                 $activeCount = $capacity->activeConversationsCount();
+                $isOnline = $capacity->user->isOnline();
                 return [
                     'user_id' => $capacity->user_id,
                     'name' => $capacity->user->name,
@@ -155,6 +158,8 @@ class DistributionService
                     'available_slots' => $capacity->getAvailableSlots(),
                     'load_percent' => (int) (($activeCount / $capacity->max_conversations) * 100),
                     'is_full' => $capacity->isFull(),
+                    'is_online' => $isOnline,
+                    'can_receive' => $isOnline && !$capacity->isFull(),
                 ];
             })
             ->sortBy('load_percent');

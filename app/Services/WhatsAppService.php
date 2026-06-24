@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\MessageReceived;
 use App\Models\Contact;
 use App\Models\Conversation;
+use App\Models\DistributionSetting;
 use App\Models\Message;
 use App\Support\PhoneNormalizer;
 use App\Support\WhatsAppApiError;
@@ -26,16 +27,28 @@ class WhatsAppService
 
     public function __construct()
     {
-        // Buscar número ativo do WhatsApp
+        $configPhoneId = (string) config('services.whatsapp.phone_number_id');
+        $configToken = $this->getValidAccessToken();
         $activeNumber = \App\Models\WhatsAppNumber::active();
 
-        if ($activeNumber) {
-            $this->phoneNumberId = $activeNumber->phone_number_id ?? config('services.whatsapp.phone_number_id');
+        // .env é a fonte principal; DB só se bater phone_number_id e tiver token
+        if (
+            $activeNumber
+            && !empty($activeNumber->access_token)
+            && $activeNumber->phone_number_id === $configPhoneId
+        ) {
+            $this->phoneNumberId = $activeNumber->phone_number_id;
             $this->accessToken = $activeNumber->access_token;
         } else {
-            // Fallback para configuração do banco de dados ou .env
-            $this->phoneNumberId = config('services.whatsapp.phone_number_id');
-            $this->accessToken = $this->getValidAccessToken();
+            $this->phoneNumberId = $configPhoneId;
+            $this->accessToken = $configToken;
+
+            if ($activeNumber && $activeNumber->phone_number_id !== $configPhoneId) {
+                Log::warning('WhatsApp DB ativo difere do .env, usando .env', [
+                    'db_phone_number_id' => $activeNumber->phone_number_id,
+                    'env_phone_number_id' => $configPhoneId,
+                ]);
+            }
         }
 
         $this->apiVersion = config('services.whatsapp.api_version', 'v23.0');
@@ -63,6 +76,19 @@ class WhatsAppService
             Log::warning('Erro ao buscar token do BD, usando .env', ['error' => $e->getMessage()]);
         }
         return config('services.whatsapp.access_token');
+    }
+
+    private function resolveSenderName(): string
+    {
+        if (auth()->check()) {
+            return auth()->user()->name;
+        }
+
+        try {
+            return DistributionSetting::current()->bot_name ?: 'Assistente Virtual';
+        } catch (\Exception $e) {
+            return 'Assistente Virtual';
+        }
     }
 
     public function getLastError(): ?array
@@ -132,8 +158,8 @@ class WhatsAppService
             return null;
         }
 
-        // Adicionar nome do agente em frente à mensagem
-        $agentName = auth()->user()->name ?? 'Agente';
+        // Agente logado ou nome do bot (fluxos/automação)
+        $agentName = $this->resolveSenderName();
         $messageBody = "[{$agentName}] {$text}";
 
         return $this->postToRecipients($normalizedPhone, [
@@ -513,7 +539,7 @@ class WhatsAppService
 
         // Find existing conversation or create new one
         $conversation = Conversation::where('contact_id', $contact->id)
-            ->where('status', '!=', 'resolved')
+            ->whereNotIn('status', ['resolved', 'closed'])
             ->latest()
             ->first();
 
@@ -527,33 +553,7 @@ class WhatsAppService
             $conversation->update(['last_message_at' => now()]);
         }
 
-        // Check if there's an active flow for new conversations
-        // Execute flow if: status is 'new' OR conversation has never had a flow executed
-        $hasFlowExecution = \App\Models\FlowExecution::where('conversation_id', $conversation->id)->exists();
-
-        if ($conversation->status === 'new' || !$hasFlowExecution) {
-            $flow = \App\Models\ConversationFlow::where('trigger_type', 'on_new_conversation')
-                ->where('is_active', true)
-                ->first();
-
-            if ($flow) {
-                \Log::info('[Flow] Executing flow for conversation', [
-                    'conversation_id' => $conversation->id,
-                    'flow_id' => $flow->id,
-                    'flow_name' => $flow->name,
-                    'status' => $conversation->status,
-                    'has_previous_execution' => $hasFlowExecution
-                ]);
-
-                $flowService = app(\App\Services\FlowService::class);
-                $flowService->executeFlow($conversation, $flow);
-                return;
-            }
-        }
-
-        // Apply automatic distribution if enabled
-        \App\Services\DistributionService::assign($conversation);
-
+        // First, save the inbound message regardless of flow
         $content = match ($type) {
             'text' => $waMessage['text']['body'] ?? null,
             'image' => $waMessage['image']['caption'] ?? null,
@@ -617,8 +617,43 @@ class WhatsAppService
             'conversation_id' => $conversation->id,
         ]);
 
+        // Check if there's an active flow for new conversations
+        $hasFlowExecution = \App\Models\FlowExecution::where('conversation_id', $conversation->id)->exists();
+
+        if ($conversation->status === 'new' && !$hasFlowExecution) {
+            $flow = \App\Models\ConversationFlow::where('trigger_type', 'on_new_conversation')
+                ->where('is_active', true)
+                ->first();
+
+            if ($flow) {
+                Log::info('[Flow] Executing flow for new conversation', [
+                    'conversation_id' => $conversation->id,
+                    'flow_id' => $flow->id,
+                    'flow_name' => $flow->name,
+                ]);
+
+                try {
+                    $flowService = app(\App\Services\FlowService::class);
+                    $flowService->executeFlow($conversation, $flow);
+                } catch (\Exception $e) {
+                    Log::error('[Flow] Error executing flow', [
+                        'conversation_id' => $conversation->id,
+                        'flow_id' => $flow->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                // Invalida cache de relatórios
+                Cache::flush();
+                return;
+            }
+        }
+
+        // Apply automatic distribution if no flow
+        \App\Services\DistributionService::assign($conversation);
+
         // Invalida cache de relatórios
-        Cache::flush(); // Simplificado: limpa todo o cache de relatórios
+        Cache::flush();
     }
 
     public function getPhoneNumbersFromMeta(string $businessAccountId): array

@@ -101,14 +101,14 @@
 
         @if($activeConversation?->contact)
         <!-- Chat Header -->
-        <div class="h-[66px] shrink-0 flex items-center gap-3 px-[18px] bg-white border-b border-gray-200">
+        <div class="h-[66px] shrink-0 flex items-center gap-3 px-[18px] bg-white border-b border-[#E8EAF0]">
             <div class="flex items-center gap-3 flex-1 min-w-0">
-                <div class="w-[42px] h-[42px] rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold text-base shrink-0">
+                <div class="w-[42px] h-[42px] rounded-full bg-[#EEF0FE] text-secondary flex items-center justify-center font-bold text-base shrink-0">
                     {{ $activeConversation->contact->initials }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-1">
-                        <h2 class="text-sm font-bold text-on-surface">{{ $activeConversation->contact->name }}</h2>
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <h2 class="text-[14px] font-bold text-gray-900">{{ $activeConversation->contact->name }}</h2>
                         @php
                             $activeClaim = $activeConversation->getActiveClaim();
                             $isAdmin = Auth::user()->isAdmin();
@@ -140,23 +140,27 @@
             <div class="flex gap-2 ml-4 shrink-0 flex-wrap justify-end">
                 @if(!$activeClaim)
                     @if($isAdmin)
-                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-tertiary/90 text-on-tertiary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-tertiary shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-primary text-white px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-primary-dark flex items-center gap-1.5 transition-all active:scale-95">
                             <span class="material-symbols-outlined text-sm">assignment</span>
                             <span class="hidden sm:inline">Para Mim</span>
                         </button>
-                        <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary/90 text-on-tertiary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-tertiary shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                        <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-white border border-[#E2E5EE] text-gray-700 px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-gray-50 flex items-center gap-1.5 transition-all active:scale-95">
                             <span class="material-symbols-outlined text-sm">person_add</span>
                             <span class="hidden sm:inline">Transferir</span>
                         </button>
                     @else
-                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-secondary/90 text-on-secondary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-secondary shadow-md flex items-center gap-1.5 transition-all active:scale-95">
+                        <button onclick="claimConversation({{ $activeConversation->id }})" class="bg-primary text-white px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-primary-dark flex items-center gap-1.5 transition-all active:scale-95">
                             <span class="material-symbols-outlined text-sm">done</span>
-                            <span class="hidden sm:inline">Clamar</span>
+                            <span class="hidden sm:inline">Aceitar</span>
                         </button>
                     @endif
                 @elseif($hasMyClaim)
                     @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
-                    <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-warning/90 text-on-warning px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-warning shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                    <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-white border border-[#E2E5EE] text-gray-700 px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-gray-50 flex items-center gap-1.5 transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-sm">swap_horiz</span>
+                        <span class="hidden sm:inline">Transferir</span>
+                    </button>
+                    <button onclick="releaseConversation({{ $activeConversation->id }})" class="bg-white border border-[#E2E5EE] text-gray-700 px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-gray-50 flex items-center gap-1.5 transition-all active:scale-95">
                         <span class="material-symbols-outlined text-sm">lock_open</span>
                         <span class="hidden sm:inline">Liberar</span>
                     </button>
@@ -164,19 +168,19 @@
                 @endif
                 @if($isAdmin && $activeClaim && !$hasMyClaim)
                     @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
-                    <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-tertiary/90 text-on-tertiary px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-tertiary shadow-sm flex items-center gap-1.5 transition-all active:scale-95">
+                    <button onclick="openReassignModal({{ $activeConversation->id }})" class="bg-white border border-[#E2E5EE] text-gray-700 px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-gray-50 flex items-center gap-1.5 transition-all active:scale-95">
                         <span class="material-symbols-outlined text-sm">person_add</span>
                         <span class="hidden sm:inline">Reatribuir</span>
                     </button>
                     @endif
                 @endif
                 @if($activeConversation->status !== 'resolved' && $activeConversation->status !== 'closed')
-                <button type="button" onclick="openResolutionModal({{ $activeConversation->id }})" class="bg-error/90 text-on-error px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-error shadow-md flex items-center gap-1.5 transition-all active:scale-95">
+                <button type="button" onclick="openResolutionModal({{ $activeConversation->id }})" class="bg-[#FEF1F2] text-error border border-error/20 px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-error/10 flex items-center gap-1.5 transition-all active:scale-95">
                     <span class="material-symbols-outlined text-sm">done_all</span>
                     <span class="hidden sm:inline">Encerrar</span>
                 </button>
                 @else
-                <button type="button" onclick="openReopenRequestModal({{ $activeConversation->id }})" class="bg-info/90 text-on-info px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-info shadow-md flex items-center gap-1.5 transition-all active:scale-95">
+                <button type="button" onclick="openReopenRequestModal({{ $activeConversation->id }})" class="bg-[#EEF0FE] text-secondary border border-secondary/20 px-3.5 py-1.5 rounded-[11px] text-xs font-semibold hover:bg-secondary/10 flex items-center gap-1.5 transition-all active:scale-95">
                     <span class="material-symbols-outlined text-sm">lock_clock</span>
                     <span class="hidden sm:inline">Reabrir</span>
                 </button>
@@ -239,16 +243,16 @@
 
         <!-- Messages -->
         <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-            <div class="flex justify-center sticky top-0">
-                <span class="text-[10px] uppercase text-gray-600 bg-white/60 backdrop-blur-sm py-1.5 px-4 rounded-full tracking-wider border border-gray-200/30 shadow-sm">
-                    📩 {{ $activeConversation->created_at->format('d \d\e M \d\e Y') }}
+            <div class="flex justify-center sticky top-0 z-10">
+                <span class="msg-bubble-system">
+                    {{ $activeConversation->created_at->format('d \d\e M \d\e Y') }}
                 </span>
             </div>
             @foreach($activeConversation->messages as $msg)
                 @if($msg->direction === 'inbound')
                 <!-- Customer Message -->
                 <div class="flex items-end gap-3 max-w-[80%]">
-                    <div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-[10px] text-on-primary-fixed shrink-0">
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-[10px] text-gray-500 shrink-0">
                         {{ $activeConversation->contact->initials }}
                     </div>
                     <div>
@@ -288,11 +292,11 @@
                         </div>
                         @endif
                         @if($msg->content)
-                        <div class="bg-white p-4 rounded-xl rounded-bl-none border border-gray-200 shadow-sm">
-                            <p class="text-sm text-on-surface leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
+                        <div class="msg-bubble-inbound p-3.5">
+                            <p class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
                         </div>
                         @endif
-                        <span class="text-[10px] text-gray-600 mt-1 block">{{ $msg->created_at->format('H:i') }}</span>
+                        <span class="text-[10px] text-gray-400 mt-1 block">{{ $msg->created_at->format('H:i') }}</span>
                     </div>
                 </div>
                 @else
@@ -333,12 +337,12 @@
                         </div>
                         @endif
                         @if($msg->content)
-                        <div class="bg-primary text-on-primary p-4 rounded-xl rounded-br-none shadow-md">
-                            <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
+                        <div class="msg-bubble-outbound p-3.5">
+                            <p class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
                         </div>
                         @endif
                         <div class="flex justify-end items-center gap-1 mt-1">
-                            <span class="text-[10px] text-gray-600">{{ $msg->created_at->format('H:i') }}</span>
+                            <span class="text-[10px] text-[#6FA382]">{{ $msg->created_at->format('H:i') }}</span>
                             @if($msg->status === 'read')
                             <span class="material-symbols-outlined text-[14px] text-blue-500">done_all</span>
                             @elseif($msg->status === 'delivered')
@@ -357,11 +361,14 @@
 
         <!-- Macros Quick Bar -->
         @if($macros->count() > 0)
-        <div class="px-4 py-3 bg-white/60 backdrop-blur-sm border-t border-gray-200/50">
-            <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
-                <span class="text-[10px] font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap mr-2 flex items-center">✓ Rápido:</span>
+        <div class="px-4 py-2.5 bg-white border-t border-[#F2F4F8]">
+            <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1 items-center">
+                <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap mr-1 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px]">bolt</span>
+                    Rápido:
+                </span>
                 @foreach($macros as $macro)
-                <button onclick="applyMacro('{{ addslashes($macro->content) }}')" class="whitespace-nowrap bg-white/80 border border-gray-200/50 px-3 py-1.5 rounded-full text-xs text-on-surface hover:bg-white hover:border-gray-200/80 transition-all shadow-sm hover:shadow-md shrink-0">
+                <button onclick="applyMacro('{{ addslashes($macro->content) }}')" class="whitespace-nowrap bg-[#F7F8FB] border border-[#E2E5EE] px-3 py-1.5 rounded-[8px] text-xs text-gray-700 font-medium hover:bg-[#EEF0FE] hover:text-secondary hover:border-secondary/20 transition-all shrink-0">
                     {{ $macro->name }}
                 </button>
                 @endforeach
@@ -370,7 +377,7 @@
         @endif
 
         <!-- Chat Input -->
-        <div class="p-4 bg-white/70 backdrop-blur-sm border-t border-gray-200/50 space-y-3 @if(!$hasMyClaim && !$isAdmin) hidden @endif">
+        <div class="p-4 bg-white border-t border-[#E8EAF0] space-y-3 @if(!$hasMyClaim && !$isAdmin) hidden @endif">
             <!-- File Preview -->
             <div id="filePreview" class="hidden bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-lg p-3 flex items-center gap-3 shadow-sm">
                 <div id="filePreviewThumb" class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
@@ -388,11 +395,14 @@
                 @csrf
                 <input type="hidden" name="conversation_id" value="{{ $activeConversation->id }}">
                 <div class="relative">
-                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl p-4 pr-48 focus:ring-2 focus:ring-secondary-container/50 focus:border-secondary transition-all resize-none text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm" placeholder="Escreva uma mensagem... (/ para macros)" @if(!$hasMyClaim || $activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') title="Esta conversa foi encerrada" @elseif($isAdmin) title="Clique em 'Para Mim' para reivindicar" @else title="Clamado por {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'outro agente' }}" @endif @endif></textarea>
+                    <textarea id="messageInput" name="content" rows="2" class="w-full bg-[#F7F8FB] border border-[#E2E5EE] rounded-[12px] p-3.5 pr-48 focus:ring-2 focus:ring-secondary/10 focus:border-secondary transition-all resize-none text-sm" placeholder="Escreva uma mensagem... (/ para macros)" @if(!$hasMyClaim || $activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') title="Esta conversa foi encerrada" @elseif($isAdmin) title="Clique em 'Para Mim' para reivindicar" @else title="Clamado por {{ $activeClaim && $activeClaim->user ? $activeClaim->user->name : 'outro agente' }}" @endif @endif></textarea>
 
                     <!-- Macros Menu -->
-                    <div id="macrosMenu" class="hidden absolute bottom-full left-4 right-4 mb-2 bg-white/95 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-lg z-50 max-h-64 overflow-y-auto custom-scrollbar">
-                        <div id="macrosMenuItems" class="space-y-1 p-2"></div>
+                    <div id="macrosMenu" class="hidden absolute bottom-full left-0 right-0 mb-2 bg-white border border-[#E8EAF0] rounded-[14px] shadow-lg z-50 max-h-64 overflow-y-auto design-scrollbar">
+                        <div class="p-3 border-b border-[#F2F4F8]">
+                            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Macros</span>
+                        </div>
+                        <div id="macrosMenuItems" class="space-y-0.5 p-2"></div>
                     </div>
 
                     <div class="absolute right-4 bottom-4 flex items-center gap-2 text-gray-600" id="chatActions">
@@ -409,14 +419,14 @@
                         <button type="button" id="audioRecordBtn" class="hover:text-secondary transition-colors {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" title="Audio" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="material-symbols-outlined">mic</span>
                         </button>
-                        <button type="submit" class="bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center shadow-md hover:shadow-lg active:scale-95 transition-all {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
+                        <button type="submit" class="bg-primary text-white w-[46px] h-[42px] rounded-[12px] flex items-center justify-center hover:bg-primary-dark active:scale-95 transition-all {{ ($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') ? 'opacity-50 cursor-not-allowed' : '' }}" @if($activeConversation->status === 'resolved' || $activeConversation->status === 'closed') disabled @endif>
                             <span class="material-symbols-outlined">send</span>
                         </button>
                     </div>
 
                     <!-- Emoji Picker -->
-                    <div id="emojiPicker" class="hidden absolute bottom-full right-4 mb-2 bg-white/95 backdrop-blur-md border border-gray-200/50 rounded-xl shadow-lg z-50 w-80 sm:w-96 max-h-80 flex flex-col">
-                        <div class="flex gap-1 p-2 border-b border-gray-200/50 overflow-x-auto custom-scrollbar flex-shrink-0" id="emojiCategories"></div>
+                    <div id="emojiPicker" class="hidden absolute bottom-full right-0 mb-2 bg-white border border-[#E8EAF0] rounded-[14px] shadow-lg z-50 w-80 sm:w-96 max-h-80 flex flex-col">
+                        <div class="flex gap-1 p-2 border-b border-[#F2F4F8] overflow-x-auto custom-scrollbar flex-shrink-0" id="emojiCategories"></div>
                         <div class="flex-1 overflow-y-auto custom-scrollbar p-3">
                             <div class="grid grid-cols-7 gap-1" id="emojiGrid"></div>
                         </div>
@@ -600,11 +610,6 @@
 <script src="{{ asset('js/helpers/emoji-picker.js') }}"></script>
 <script src="{{ asset('js/conversations.js') }}"></script>
 <script>
-    // Debug logging
-    console.log('[App] Initializing conversation page');
-    console.log('[Auth] Has claim:', {{ $hasMyClaim ?? 'false' }});
-    console.log('[Auth] Is Admin:', {{ $isAdmin ?? 'false' }});
-
     document.getElementById('chatSearchInput')?.addEventListener('input', function () {
         const q = this.value.toLowerCase().trim();
         document.querySelectorAll('[data-chat-name]').forEach((row) => {

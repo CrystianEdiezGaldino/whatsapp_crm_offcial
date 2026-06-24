@@ -1,306 +1,245 @@
-@extends('layouts.app')
+@extends('layouts.app', ['fullHeight' => true])
 
 @section('title', 'Macros')
 
-@push('head')
-<style>
-    .macro-card { transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
-    .macro-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -8px rgba(0,0,0,0.12); }
-    .macro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-    @media (min-width: 1280px) {
-        .macro-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-    }
-    .category-pill[data-active="true"] { background: var(--tw-ring-color, #006d2f); color: #fff; border-color: transparent; }
-</style>
-@endpush
-
 @section('content')
-<header class="page-header sticky top-0 z-40 flex-wrap gap-4 h-auto min-h-[64px] py-3">
-    <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-secondary/15 flex items-center justify-center">
-            <span class="material-symbols-outlined text-secondary">bolt</span>
-        </div>
-        <div>
-            <h2 class="text-xl font-bold text-primary leading-tight">Macros</h2>
-            <p class="text-xs text-gray-600">Respostas rápidas para agilizar o atendimento</p>
-        </div>
-    </div>
-    <button type="button" onclick="document.getElementById('newMacroModal').classList.remove('hidden')"
-        class="bg-primary text-on-primary text-xs font-semibold px-4 py-2.5 flex items-center gap-1.5 rounded-xl shadow-sm hover:opacity-90 active:scale-95 transition-all">
-        <span class="material-symbols-outlined text-base">add</span>
-        Nova Macro
-    </button>
-</header>
-
-<div class="page-body design-scrollbar !p-4 md:!p-6">
-    @if(session('success'))
-    <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-green-800 text-sm flex items-center gap-2">
-        <span class="material-symbols-outlined text-lg">check_circle</span>
-        {{ session('success') }}
-    </div>
-    @endif
-
-    {{-- KPIs --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <span class="material-symbols-outlined text-primary text-xl">library_books</span>
-            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Total</p>
-            <p class="text-2xl font-bold text-on-surface">{{ $stats['total'] }}</p>
-        </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <span class="material-symbols-outlined text-blue-600 text-xl">attach_file</span>
-            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Com mídia</p>
-            <p class="text-2xl font-bold text-on-surface">{{ $stats['with_files'] }}</p>
-        </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <span class="material-symbols-outlined text-secondary text-xl">category</span>
-            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Categorias</p>
-            <p class="text-2xl font-bold text-on-surface">{{ $stats['categories'] }}</p>
-        </div>
-        <div class="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <span class="material-symbols-outlined text-amber-600 text-xl">keyboard</span>
-            <p class="text-[10px] font-semibold text-gray-600 uppercase mt-2 tracking-wide">Com atalho</p>
-            <p class="text-2xl font-bold text-on-surface">{{ $stats['with_shortcut'] }}</p>
-        </div>
-    </div>
-
-    {{-- Busca + filtros --}}
-    @php
-        $categoryMeta = [
-            'saudacao' => ['label' => 'Saudação', 'icon' => 'waving_hand', 'accent' => 'border-l-emerald-500'],
-            'util' => ['label' => 'Útil', 'icon' => 'build', 'accent' => 'border-l-blue-500'],
-            'encerramento' => ['label' => 'Encerramento', 'icon' => 'logout', 'accent' => 'border-l-violet-500'],
-            'financeiro' => ['label' => 'Financeiro', 'icon' => 'payments', 'accent' => 'border-l-amber-500'],
-            'logistica' => ['label' => 'Logística', 'icon' => 'local_shipping', 'accent' => 'border-l-orange-500'],
-            'general' => ['label' => 'Geral', 'icon' => 'folder', 'accent' => 'border-l-slate-400'],
-        ];
-    @endphp
-
-    @if($stats['total'] > 0)
-    <div class="mb-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-        <div class="relative flex-1 max-w-md">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-lg">search</span>
-            <input type="search" id="macroSearch" placeholder="Buscar por nome, atalho ou conteúdo..."
-                class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary">
-        </div>
-        <div class="flex flex-wrap gap-2" id="categoryFilters">
-            <button type="button" data-category="all" class="category-pill px-3 py-1.5 text-xs font-semibold rounded-full border border-secondary bg-secondary text-on-secondary transition-colors" data-active="true">Todas</button>
-            @foreach($macros->keys() as $cat)
-            @php $meta = $categoryMeta[$cat] ?? ['label' => ucfirst($cat), 'icon' => 'label']; @endphp
-            <button type="button" data-category="{{ $cat }}" class="category-pill px-3 py-1.5 text-xs font-semibold rounded-full border border-gray-200 bg-white text-gray-600 hover:border-secondary transition-colors">
-                {{ $meta['label'] }}
-            </button>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    <div id="macrosContainer">
-    @forelse($macros as $category => $items)
-    @php
-        $meta = $categoryMeta[$category] ?? ['label' => ucfirst($category), 'icon' => 'label', 'accent' => 'border-l-slate-400'];
-    @endphp
-    <section class="macro-category-section mb-8" data-category="{{ $category }}">
-        <div class="flex items-center gap-3 mb-4 px-1">
-            <div class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-secondary text-xl">{{ $meta['icon'] }}</span>
+<div class="master-detail">
+    <!-- Left Panel: Macro List -->
+    <div class="master-panel" style="width: 380px;">
+        <div class="master-panel-header">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-extrabold text-gray-900">Macros</h2>
+                <button type="button" onclick="document.getElementById('newMacroModal').classList.remove('hidden')" class="w-[38px] h-[38px] rounded-[11px] bg-secondary text-white flex items-center justify-center hover:opacity-90 transition-opacity" title="Nova Macro">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                </button>
             </div>
-            <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-bold text-on-surface">{{ $meta['label'] }}</h3>
-                <p class="text-xs text-gray-600">{{ $items->count() }} {{ $items->count() === 1 ? 'macro' : 'macros' }}</p>
+            <div class="relative">
+                <span class="material-symbols-outlined text-gray-400 text-[16px] absolute left-3 top-1/2 -translate-y-1/2">search</span>
+                <input type="search" id="macroSearch" placeholder="Buscar macro..." class="input-primary !pl-9 !h-[38px] !text-[13px]">
             </div>
-            <span class="text-xs font-mono text-gray-600/60 hidden sm:inline">{{ $category }}</span>
         </div>
 
-        <div class="macro-grid">
-            @foreach($items as $macro)
-            <article class="macro-card macro-item bg-white border border-gray-200 rounded-2xl overflow-hidden flex flex-col border-l-4 {{ $meta['accent'] }}"
-                data-name="{{ strtolower($macro->name) }}"
-                data-shortcut="{{ strtolower($macro->shortcut ?? '') }}"
-                data-content="{{ strtolower(Str::limit($macro->content, 200)) }}"
-                data-category="{{ $category }}">
-                <div class="p-4 flex-1 flex flex-col">
-                    <div class="flex justify-between items-start gap-2 mb-3">
-                        <div class="min-w-0 flex-1">
-                            <h4 class="text-sm font-bold text-on-surface truncate" title="{{ $macro->name }}">{{ $macro->name }}</h4>
-                            @if($macro->shortcut)
-                            <code class="inline-block mt-1.5 text-[11px] bg-gray-100 px-2 py-0.5 rounded-md text-secondary font-mono">{{ $macro->shortcut }}</code>
-                            @endif
-                        </div>
-                        <div class="flex gap-0.5 shrink-0">
-                            <button type="button"
-                                data-macro="{{ base64_encode(json_encode([
-                                    'id' => $macro->id,
-                                    'name' => $macro->name,
-                                    'content' => $macro->content,
-                                    'shortcut' => $macro->shortcut,
-                                    'category' => $macro->category,
-                                ], JSON_UNESCAPED_UNICODE)) }}"
-                                onclick="editMacroFromButton(this)"
-                                class="p-1.5 hover:bg-gray-100-high text-gray-600 rounded-lg transition-colors" title="Editar">
-                                <span class="material-symbols-outlined text-lg">edit</span>
-                            </button>
-                            <form method="POST" action="{{ route('macros.destroy', $macro) }}" class="inline" onsubmit="return confirm('Remover macro?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="p-1.5 hover:bg-red-50 text-error rounded-lg transition-colors" title="Excluir">
-                                    <span class="material-symbols-outlined text-lg">delete</span>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <p class="text-sm text-gray-600 leading-relaxed line-clamp-4 flex-1">{{ $macro->content }}</p>
-
-                    <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-gray-200/60">
-                        @if($macro->files_count > 0)
-                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-blue-50 text-blue-700 px-2 py-1 rounded-md">
-                            <span class="material-symbols-outlined text-[14px]">attach_file</span>
-                            {{ $macro->files_count }} {{ $macro->files_count === 1 ? 'arquivo' : 'arquivos' }}
-                        </span>
-                        @else
-                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md">
-                            <span class="material-symbols-outlined text-[14px]">chat</span>
-                            Texto
-                        </span>
-                        @endif
-                        <button type="button"
-                            data-content="{{ base64_encode(json_encode($macro->content, JSON_UNESCAPED_UNICODE)) }}"
-                            onclick="copyMacroContent(JSON.parse(atob(this.dataset.content)))"
-                            class="ml-auto text-[11px] font-semibold text-secondary hover:underline flex items-center gap-0.5">
-                            <span class="material-symbols-outlined text-[14px]">content_copy</span>
-                            Copiar
-                        </button>
+        <div class="master-panel-list design-scrollbar" id="macroListPanel">
+            @php $allMacros = $macros->flatten(); @endphp
+            @forelse($allMacros as $macro)
+            <div class="master-panel-item macro-list-entry" data-macro-id="{{ $macro->id }}" data-name="{{ strtolower($macro->name) }}" data-shortcut="{{ strtolower($macro->shortcut ?? '') }}" data-content="{{ strtolower(Str::limit($macro->content, 200)) }}" onclick="selectMacro(this)">
+                <div class="flex items-start gap-3">
+                    @if($macro->shortcut)
+                    <span class="shortcut-badge mt-0.5">/{{ $macro->shortcut }}</span>
+                    @else
+                    <span class="w-6 h-6 rounded-[6px] bg-gray-100 flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-gray-400 text-[14px]">bolt</span>
+                    </span>
+                    @endif
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-[13.5px] font-bold text-gray-900 truncate">{{ $macro->name }}</h3>
+                        <p class="text-[12px] text-gray-400 font-medium line-clamp-1 mt-0.5">{{ Str::limit($macro->content, 60) }}</p>
                     </div>
                 </div>
-            </article>
-            @endforeach
+            </div>
+            @empty
+            <div class="p-8 text-center">
+                <span class="material-symbols-outlined text-4xl text-gray-300 block mb-2">bolt</span>
+                <p class="text-sm text-gray-400 font-semibold">Nenhuma macro criada</p>
+                <button type="button" onclick="document.getElementById('newMacroModal').classList.remove('hidden')" class="mt-3 text-sm text-secondary font-semibold hover:underline">Criar primeira macro</button>
+            </div>
+            @endforelse
         </div>
-    </section>
-    @empty
-    <div class="col-span-full flex flex-col items-center justify-center py-20 px-6 bg-white rounded-2xl border border-dashed border-gray-200">
-        <div class="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-4xl text-secondary">bolt</span>
-        </div>
-        <h3 class="text-lg font-bold text-on-surface">Nenhuma macro ainda</h3>
-        <p class="text-sm text-gray-600 mt-1 text-center max-w-sm">Crie respostas prontas com atalhos para usar nos chats.</p>
-        <button type="button" onclick="document.getElementById('newMacroModal').classList.remove('hidden')"
-            class="mt-6 bg-secondary text-on-secondary px-5 py-2.5 rounded-xl text-sm font-semibold active:scale-95 transition-transform shadow-sm">
-            Criar primeira macro
-        </button>
-    </div>
-    @endforelse
     </div>
 
-    <p id="noResults" class="hidden text-center py-12 text-gray-600 text-sm">
-        <span class="material-symbols-outlined text-3xl block mb-2 opacity-50">search_off</span>
-        Nenhuma macro encontrada para esta busca.
-    </p>
+    <!-- Right Panel: Macro Detail/Edit -->
+    <div class="detail-panel design-scrollbar" id="macroDetailPanel">
+        <div class="flex flex-col items-center justify-center h-full text-center" id="macroEmptyState">
+            <span class="material-symbols-outlined text-6xl text-gray-200 mb-4">bolt</span>
+            <h3 class="text-lg font-bold text-gray-400 mb-1">Selecione uma macro</h3>
+            <p class="text-sm text-gray-400">Escolha uma macro na lista para editar</p>
+        </div>
+
+        <div class="max-w-xl mx-auto hidden" id="macroEditForm">
+            <form id="editMacroFormInline" method="POST" action="" class="space-y-5">
+                @csrf @method('PUT')
+                <input type="hidden" id="inline_macro_id" name="macro_id">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">Título</label>
+                    <input type="text" id="inline_macro_name" name="name" class="input-primary" required>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">Atalho</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-mono">/</span>
+                        <input type="text" id="inline_macro_shortcut" name="shortcut" class="input-primary !pl-7 font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">Categoria</label>
+                    <select id="inline_macro_category" name="category" class="select-primary">
+                        <option value="saudacao">Saudação</option>
+                        <option value="util">Útil</option>
+                        <option value="encerramento">Encerramento</option>
+                        <option value="financeiro">Financeiro</option>
+                        <option value="logistica">Logística</option>
+                        <option value="general">Geral</option>
+                    </select>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-xs font-bold text-gray-500">Conteúdo</label>
+                        <button type="button" onclick="openMacroImproveModal()" class="flex items-center gap-1 px-2.5 py-1 rounded-[8px] bg-gradient-to-r from-purple-500/10 to-secondary/10 hover:from-purple-500/20 hover:to-secondary/20 border border-purple-300/30 text-[11px] font-bold text-purple-600 transition-all" title="Melhorar texto com IA">
+                            <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+                            Melhorar com IA
+                        </button>
+                    </div>
+                    <textarea id="inline_macro_content" name="content" rows="8" class="textarea-primary" required></textarea>
+                    <p class="text-[11px] text-gray-400 mt-1.5" id="charCount">0 caracteres</p>
+                </div>
+
+                <!-- Info box -->
+                <div class="bg-[#EEF0FE] border border-secondary/20 rounded-[11px] p-3.5 flex items-start gap-2.5">
+                    <span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">info</span>
+                    <p class="text-[12.5px] text-secondary font-medium leading-relaxed">
+                        Use <span class="shortcut-badge text-[10px]">/atalho</span> no campo de mensagem para inserir esta macro rapidamente. Variáveis: <code class="text-[11px] font-mono">{nome}</code>, <code class="text-[11px] font-mono">{telefone}</code>.
+                    </p>
+                </div>
+
+                <!-- Files -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Arquivos</label>
+                    <div id="macro_files_list" class="space-y-2 mb-3"></div>
+                    <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-[#E2E5EE] rounded-[11px] cursor-pointer hover:border-secondary/40 hover:bg-[#EEF0FE]/30 transition-colors">
+                        <span class="material-symbols-outlined text-gray-400 text-[18px]">cloud_upload</span>
+                        <span class="text-sm text-gray-500 font-medium">Adicionar arquivo</span>
+                        <input type="file" id="macro_file_input" class="hidden" accept="audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,image/*">
+                    </label>
+                </div>
+
+                <div class="flex justify-between items-center pt-4 border-t border-[#F2F4F8]">
+                    <button type="button" id="deleteMacroBtn" onclick="document.getElementById('deleteMacroForm').submit()" class="bg-white border border-error/30 text-error px-4 py-2 rounded-[11px] text-xs font-bold hover:bg-error/5 flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-[16px]">delete</span>
+                        Excluir
+                    </button>
+                    <button type="submit" class="bg-secondary text-white px-6 py-2 rounded-[11px] text-xs font-bold hover:opacity-90 flex items-center gap-1.5 transition-all">
+                        <span class="material-symbols-outlined text-[16px]">save</span>
+                        Salvar
+                    </button>
+                </div>
+            </form>
+            <form id="deleteMacroForm" method="POST" action="" class="hidden" onsubmit="return confirm('Excluir esta macro?')">
+                @csrf @method('DELETE')
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- New Macro Modal -->
-<div id="newMacroModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+<div id="newMacroModal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+    <div class="modal-card w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-5">
-            <h3 class="text-lg font-bold text-on-surface">Nova Macro</h3>
-            <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="p-1 text-gray-600 hover:text-on-surface rounded-lg">
-                <span class="material-symbols-outlined">close</span>
+            <h3 class="text-lg font-extrabold text-gray-900">Nova Macro</h3>
+            <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="modal-close-btn">
+                <span class="material-symbols-outlined text-[16px]">close</span>
             </button>
         </div>
         <form method="POST" action="{{ route('macros.store') }}">
             @csrf
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Nome</label>
-                    <input name="name" required class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30 focus:border-secondary" placeholder="Ex: Saudação inicial">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">Nome</label>
+                    <input name="name" required class="input-primary" placeholder="Ex: Saudação inicial">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1.5">Atalho</label>
+                        <input name="shortcut" class="input-primary font-mono" placeholder="/oi">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1.5">Categoria</label>
+                        <select name="category" class="select-primary">
+                            <option value="saudacao">Saudação</option>
+                            <option value="util">Útil</option>
+                            <option value="encerramento">Encerramento</option>
+                            <option value="financeiro">Financeiro</option>
+                            <option value="logistica">Logística</option>
+                            <option value="general">Geral</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Atalho</label>
-                    <input name="shortcut" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-secondary/30" placeholder="/oi">
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">Conteúdo</label>
+                    <textarea name="content" required rows="5" class="textarea-primary" placeholder="Mensagem da macro... Use {nome} para variáveis."></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Categoria</label>
-                    <select name="category" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
-                        <option value="saudacao">Saudação</option>
-                        <option value="util">Útil</option>
-                        <option value="encerramento">Encerramento</option>
-                        <option value="financeiro">Financeiro</option>
-                        <option value="logistica">Logística</option>
-                        <option value="general">Geral</option>
-                    </select>
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Conteúdo</label>
-                    <textarea name="content" required rows="5" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30" placeholder="Mensagem da macro... Use {nome} para variáveis."></textarea>
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase">Arquivos (Imagem, Vídeo, PDF)</label>
-                    <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-secondary/40 rounded-xl cursor-pointer hover:bg-secondary/5 transition-colors">
-                        <span class="material-symbols-outlined text-secondary">cloud_upload</span>
-                        <span class="text-sm text-on-surface">Selecionar arquivo</span>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Arquivos</label>
+                    <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-[#E2E5EE] rounded-[11px] cursor-pointer hover:border-secondary/40 transition-colors">
+                        <span class="material-symbols-outlined text-gray-400">cloud_upload</span>
+                        <span class="text-sm text-gray-500">Selecionar arquivo</span>
                         <input type="file" id="new_macro_file_input" class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx">
                     </label>
-                    <div id="new_macro_files_list" class="mt-3 text-xs text-gray-600">Nenhum arquivo selecionado</div>
+                    <div id="new_macro_files_list" class="mt-2 text-xs text-gray-400">Nenhum arquivo selecionado</div>
                 </div>
             </div>
             <div class="flex gap-2 mt-6">
-                <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm hover:bg-gray-100">Cancelar</button>
-                <button type="submit" class="flex-1 bg-secondary text-on-secondary py-2.5 rounded-xl text-sm font-semibold active:scale-95">Criar Macro</button>
+                <button type="button" onclick="document.getElementById('newMacroModal').classList.add('hidden')" class="btn-secondary flex-1 text-sm">Cancelar</button>
+                <button type="submit" class="bg-secondary text-white flex-1 py-2.5 rounded-[12px] text-sm font-bold hover:opacity-90 transition-opacity">Criar Macro</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Edit Macro Modal -->
-<div id="editMacroModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+<!-- Improve Text Modal -->
+<div id="macroImproveModal" class="hidden fixed inset-0 modal-backdrop z-50 flex items-center justify-center p-4">
+    <div class="modal-card w-full max-w-lg">
         <div class="flex justify-between items-center mb-5">
-            <h3 class="text-lg font-bold text-on-surface">Editar Macro</h3>
-            <button type="button" onclick="document.getElementById('editMacroModal').classList.add('hidden')" class="p-1 text-gray-600 hover:text-on-surface rounded-lg">
-                <span class="material-symbols-outlined">close</span>
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-[10px] bg-gradient-to-br from-purple-500/15 to-secondary/15 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-purple-600 text-[18px]">auto_awesome</span>
+                </div>
+                <h3 class="text-lg font-extrabold text-gray-900">Melhorar com IA</h3>
+            </div>
+            <button type="button" onclick="closeMacroImproveModal()" class="modal-close-btn">
+                <span class="material-symbols-outlined text-[16px]">close</span>
             </button>
         </div>
-        <form id="editMacroForm" method="POST" action="">
-            @csrf @method('PUT')
-            <input type="hidden" id="edit_macro_id">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Nome</label>
-                    <input id="edit_macro_name" name="name" required class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Atalho</label>
-                    <input id="edit_macro_shortcut" name="shortcut" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-secondary/30">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Categoria</label>
-                    <select id="edit_macro_category" name="category" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30">
-                        <option value="saudacao">Saudação</option>
-                        <option value="util">Útil</option>
-                        <option value="encerramento">Encerramento</option>
-                        <option value="financeiro">Financeiro</option>
-                        <option value="logistica">Logística</option>
-                        <option value="general">Geral</option>
-                    </select>
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1 uppercase">Conteúdo</label>
-                    <textarea id="edit_macro_content" name="content" required rows="5" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-secondary/30"></textarea>
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase">Arquivos</label>
-                    <div id="macro_files_list" class="grid grid-cols-1 gap-2 mb-3 max-h-40 overflow-y-auto"></div>
-                    <label class="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-secondary/40 rounded-xl cursor-pointer hover:bg-secondary/5 transition-colors">
-                        <span class="material-symbols-outlined text-secondary">cloud_upload</span>
-                        <span class="text-sm text-on-surface">Adicionar arquivo</span>
-                        <input type="file" id="macro_file_input" class="hidden" accept="audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,image/*">
-                    </label>
-                </div>
+
+        <div class="space-y-4">
+            <!-- Type selector -->
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5">Tipo de melhoria</label>
+                <select id="macroImproveType" class="select-primary" onchange="refreshMacroImprovement()">
+                    <option value="grammar">Corrigir gramática e ortografia</option>
+                    <option value="professional">Tom profissional</option>
+                    <option value="both">Gramática + Tom profissional</option>
+                </select>
             </div>
-            <div class="flex gap-2 mt-6">
-                <button type="button" onclick="document.getElementById('editMacroModal').classList.add('hidden')" class="flex-1 py-2.5 border border-gray-200 rounded-xl text-sm hover:bg-gray-100">Cancelar</button>
-                <button type="submit" class="flex-1 bg-secondary text-on-secondary py-2.5 rounded-xl text-sm font-semibold active:scale-95">Salvar</button>
+
+            <!-- Original text -->
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5">Texto original</label>
+                <div id="macroImproveOriginal" class="p-3 bg-[#F7F8FB] rounded-[11px] text-sm text-gray-700 max-h-[100px] overflow-y-auto"></div>
             </div>
-        </form>
+
+            <!-- Result -->
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-1.5">Texto melhorado</label>
+                <div id="macroImproveLoading" class="p-6 bg-[#F7F8FB] rounded-[11px] flex items-center justify-center gap-2">
+                    <svg class="animate-spin h-5 w-5 text-secondary" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <span class="text-sm text-gray-500 font-medium">Processando...</span>
+                </div>
+                <div id="macroImproveResult" class="hidden p-3 bg-green-50 border border-green-200/60 rounded-[11px] text-sm text-gray-800 max-h-[150px] overflow-y-auto"></div>
+                <div id="macroImproveError" class="hidden p-3 bg-red-50 border border-red-200/60 rounded-[11px] text-sm text-error"></div>
+            </div>
+        </div>
+
+        <div class="flex gap-2 mt-6">
+            <button type="button" onclick="closeMacroImproveModal()" class="btn-secondary flex-1 text-sm">Cancelar</button>
+            <button type="button" id="macroImproveUseBtn" onclick="applyMacroImprovement()" disabled class="bg-secondary text-white flex-1 py-2.5 rounded-[12px] text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">check</span>
+                Usar texto melhorado
+            </button>
+        </div>
     </div>
 </div>
 @endsection
@@ -309,105 +248,66 @@
 <script>
 let currentMacroId = null;
 let macroFiles = {};
-let activeCategory = 'all';
 
-function copyMacroContent(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        window.Feedback?.success('Conteúdo copiado!') || alert('Copiado!');
-    }).catch(() => alert('Não foi possível copiar.'));
-}
+function selectMacro(el) {
+    document.querySelectorAll('.macro-list-entry').forEach(e => e.classList.remove('active'));
+    el.classList.add('active');
 
-function filterMacros() {
-    const q = (document.getElementById('macroSearch')?.value || '').trim().toLowerCase();
-    const items = document.querySelectorAll('.macro-item');
-    const sections = document.querySelectorAll('.macro-category-section');
-    let visibleCount = 0;
+    const macroId = el.dataset.macroId;
+    currentMacroId = macroId;
 
-    items.forEach(el => {
-        const matchCat = activeCategory === 'all' || el.dataset.category === activeCategory;
-        const matchQ = !q || el.dataset.name.includes(q) || el.dataset.shortcut.includes(q) || el.dataset.content.includes(q);
-        const show = matchCat && matchQ;
-        el.classList.toggle('hidden', !show);
-        if (show) visibleCount++;
-    });
-
-    sections.forEach(sec => {
-        const visibleInSection = sec.querySelectorAll('.macro-item:not(.hidden)').length;
-        sec.classList.toggle('hidden', visibleInSection === 0);
-    });
-
-    const noResults = document.getElementById('noResults');
-    if (noResults) noResults.classList.toggle('hidden', visibleCount > 0 || items.length === 0);
-}
-
-document.getElementById('macroSearch')?.addEventListener('input', filterMacros);
-
-document.querySelectorAll('.category-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.category-pill').forEach(b => {
-            b.dataset.active = 'false';
-            b.classList.remove('bg-secondary', 'text-on-secondary', 'border-secondary');
-        });
-        btn.dataset.active = 'true';
-        btn.classList.add('bg-secondary', 'text-on-secondary', 'border-secondary');
-        activeCategory = btn.dataset.category;
-        filterMacros();
-    });
-});
-
-function parseMacroData(encoded) {
-    return JSON.parse(atob(encoded));
-}
-
-function editMacroFromButton(btn) {
-    const data = parseMacroData(btn.dataset.macro);
-    editMacro(data.id, data.name, data.content, data.shortcut, data.category);
-}
-
-function editMacro(id, name, content, shortcut, category) {
-    currentMacroId = id;
-    document.getElementById('edit_macro_id').value = id;
-    document.getElementById('edit_macro_name').value = name;
-    document.getElementById('edit_macro_content').value = content;
-    document.getElementById('edit_macro_shortcut').value = shortcut || '';
-    document.getElementById('edit_macro_category').value = category;
-    document.getElementById('editMacroForm').action = '{{ url("/macros") }}/' + id;
-    document.getElementById('editMacroModal').classList.remove('hidden');
-    loadMacroFiles(id);
-}
-
-function loadMacroFiles(macroId) {
     fetch(`{{ url('/macros') }}/${macroId}/preview`, {
         headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
     })
-        .then(r => r.json())
-        .then(data => {
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            const m = data.macro || {};
+            document.getElementById('inline_macro_id').value = m.id;
+            document.getElementById('inline_macro_name').value = m.name || '';
+            document.getElementById('inline_macro_shortcut').value = (m.shortcut || '').replace(/^\//, '');
+            document.getElementById('inline_macro_category').value = m.category || 'general';
+            document.getElementById('inline_macro_content').value = m.content || '';
+            document.getElementById('editMacroFormInline').action = `{{ url('/macros') }}/${m.id}`;
+            document.getElementById('deleteMacroForm').action = `{{ url('/macros') }}/${m.id}`;
+            updateCharCount();
+
             macroFiles = {};
-            if (data.success && data.files?.length) {
+            if (data.files?.length) {
                 data.files.forEach(file => { macroFiles[file.id] = file; });
             }
             renderMacroFiles();
-        })
-        .catch(e => console.error('Erro ao carregar arquivos:', e));
+
+            document.getElementById('macroEmptyState').classList.add('hidden');
+            document.getElementById('macroEditForm').classList.remove('hidden');
+        }
+    })
+    .catch(e => console.error('Erro:', e));
 }
+
+function updateCharCount() {
+    const content = document.getElementById('inline_macro_content')?.value || '';
+    document.getElementById('charCount').textContent = content.length + ' caracteres';
+}
+document.getElementById('inline_macro_content')?.addEventListener('input', updateCharCount);
 
 function renderMacroFiles() {
     const filesList = document.getElementById('macro_files_list');
     const files = Object.values(macroFiles);
 
     if (files.length === 0) {
-        filesList.innerHTML = '<p class="text-xs text-gray-600 text-center py-3 col-span-full">Nenhum arquivo</p>';
+        filesList.innerHTML = '<p class="text-xs text-gray-400 py-2">Nenhum arquivo</p>';
         return;
     }
 
     filesList.innerHTML = files.map(f => `
-        <div class="flex items-center gap-2 p-2.5 bg-gray-100-low rounded-xl group">
-            <span class="material-symbols-outlined text-secondary text-lg">${f.icon}</span>
+        <div class="flex items-center gap-2 p-2.5 bg-[#F7F8FB] rounded-[10px]">
+            <span class="material-symbols-outlined text-secondary text-lg">${f.icon || 'description'}</span>
             <div class="flex-1 min-w-0">
-                <p class="text-xs font-semibold text-on-surface truncate">${f.name}</p>
-                <p class="text-[10px] text-gray-600">${f.size}</p>
+                <p class="text-xs font-semibold text-gray-900 truncate">${f.name}</p>
+                <p class="text-[10px] text-gray-400">${f.size}</p>
             </div>
-            <button type="button" onclick="deleteFile(${f.id})" class="p-1 text-gray-600 hover:text-error rounded-lg">
+            <button type="button" onclick="deleteFile(${f.id})" class="p-1 text-gray-400 hover:text-error rounded-lg transition-colors">
                 <span class="material-symbols-outlined text-base">delete</span>
             </button>
         </div>
@@ -462,26 +362,21 @@ if (macroFileInput) {
     });
 }
 
-let newMacroSelectedFile = null;
-const newMacroFileInput = document.getElementById('new_macro_file_input');
-if (newMacroFileInput) {
-    newMacroFileInput.addEventListener('change', function() {
-        if (this.files[0]) {
-            newMacroSelectedFile = this.files[0];
-            const filesList = document.getElementById('new_macro_files_list');
-            filesList.innerHTML = `<p class="text-xs">📎 ${this.files[0].name} (${(this.files[0].size / 1024).toFixed(2)} KB)</p>`;
-        }
+// Search filter
+document.getElementById('macroSearch')?.addEventListener('input', function() {
+    const q = this.value.trim().toLowerCase();
+    document.querySelectorAll('.macro-list-entry').forEach(el => {
+        const match = !q || el.dataset.name.includes(q) || el.dataset.shortcut.includes(q) || el.dataset.content.includes(q);
+        el.classList.toggle('hidden', !match);
     });
-}
+});
 
-// Interceptar submit do formulário de nova macro para fazer upload após criar
+// New macro form
 const newMacroForm = document.querySelector('#newMacroModal form');
 if (newMacroForm) {
     newMacroForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-
         const formData = new FormData(this);
-
         try {
             const response = await fetch(this.action, {
                 method: 'POST',
@@ -492,9 +387,7 @@ if (newMacroForm) {
                 },
                 body: formData,
             });
-
             const data = await response.json();
-
             if (data.success) {
                 window.location.reload();
             } else if (response.status === 422) {
@@ -509,6 +402,96 @@ if (newMacroForm) {
             alert('Erro ao criar macro: ' + e.message);
         }
     });
+}
+
+let newMacroSelectedFile = null;
+const newMacroFileInput = document.getElementById('new_macro_file_input');
+if (newMacroFileInput) {
+    newMacroFileInput.addEventListener('change', function() {
+        if (this.files[0]) {
+            newMacroSelectedFile = this.files[0];
+            const filesList = document.getElementById('new_macro_files_list');
+            filesList.innerHTML = `<p class="text-xs text-gray-700 font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">attach_file</span> ${this.files[0].name} (${(this.files[0].size / 1024).toFixed(1)} KB)</p>`;
+        }
+    });
+}
+
+// ── Improve Text with AI ──
+let macroImprovedText = '';
+
+function openMacroImproveModal() {
+    const textarea = document.getElementById('inline_macro_content');
+    const text = textarea?.value?.trim();
+    if (!text) {
+        alert('Digite algum conteúdo antes de melhorar com IA.');
+        return;
+    }
+
+    macroImprovedText = '';
+    document.getElementById('macroImproveModal').classList.remove('hidden');
+    document.getElementById('macroImproveOriginal').textContent = text;
+    document.getElementById('macroImproveType').value = 'grammar';
+    document.getElementById('macroImproveLoading').classList.remove('hidden');
+    document.getElementById('macroImproveResult').classList.add('hidden');
+    document.getElementById('macroImproveError').classList.add('hidden');
+    document.getElementById('macroImproveUseBtn').disabled = true;
+
+    refreshMacroImprovement();
+}
+
+function closeMacroImproveModal() {
+    document.getElementById('macroImproveModal').classList.add('hidden');
+    macroImprovedText = '';
+}
+
+function refreshMacroImprovement() {
+    const type = document.getElementById('macroImproveType').value;
+    const text = document.getElementById('macroImproveOriginal').textContent;
+    if (!text) return;
+
+    document.getElementById('macroImproveLoading').classList.remove('hidden');
+    document.getElementById('macroImproveResult').classList.add('hidden');
+    document.getElementById('macroImproveError').classList.add('hidden');
+    document.getElementById('macroImproveUseBtn').disabled = true;
+
+    fetch('{{ route("macros.improve-text") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({ content: text, type: type }),
+    })
+    .then(r => {
+        if (!r.ok) throw new Error('Erro ao processar texto');
+        return r.json();
+    })
+    .then(data => {
+        if (data.success) {
+            macroImprovedText = data.improved;
+            document.getElementById('macroImproveLoading').classList.add('hidden');
+            document.getElementById('macroImproveResult').textContent = data.improved;
+            document.getElementById('macroImproveResult').classList.remove('hidden');
+            document.getElementById('macroImproveUseBtn').disabled = false;
+        } else {
+            throw new Error(data.message || 'Erro desconhecido');
+        }
+    })
+    .catch(error => {
+        document.getElementById('macroImproveLoading').classList.add('hidden');
+        document.getElementById('macroImproveError').textContent = error.message;
+        document.getElementById('macroImproveError').classList.remove('hidden');
+    });
+}
+
+function applyMacroImprovement() {
+    if (!macroImprovedText) return;
+    const textarea = document.getElementById('inline_macro_content');
+    textarea.value = macroImprovedText;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    updateCharCount();
+    closeMacroImproveModal();
 }
 </script>
 @endpush

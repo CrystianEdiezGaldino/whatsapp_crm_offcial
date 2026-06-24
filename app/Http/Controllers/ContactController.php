@@ -33,7 +33,12 @@ class ContactController extends Controller
         $contacts = $query->orderBy('last_message_at', 'desc')->paginate(25);
         $agents = User::all();
 
-        return view('contacts.index', compact('contacts', 'agents'));
+        $selectedContact = null;
+        if ($contactId = $request->input('contact')) {
+            $selectedContact = Contact::withCount('messages')->find($contactId);
+        }
+
+        return view('contacts.index', compact('contacts', 'agents', 'selectedContact'));
     }
 
     public function store(Request $request)

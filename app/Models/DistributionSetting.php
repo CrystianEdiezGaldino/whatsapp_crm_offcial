@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DistributionSetting extends Model
 {
-    protected $fillable = ['mode', 'overflow_action'];
+    protected $fillable = ['mode', 'overflow_action', 'bot_name'];
 
     protected $casts = [
         'mode' => 'string',

@@ -25,7 +25,11 @@ class Macro extends Model
 
     public function hasFiles(): bool
     {
-        return $this->files()->exists();
+        try {
+            return $this->files()->exists();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     public function getContentType(): string

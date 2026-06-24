@@ -4,18 +4,13 @@
 
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Topbar -->
-    <div class="page-header sticky top-0 z-40">
-        <div>
-            <h1 class="text-2xl font-bold text-on-surface">Distribuição de Leads</h1>
-            <p class="text-xs text-gray-600 mt-1">Gerencie o modo de distribuição e capacidade dos atendentes</p>
-        </div>
-        <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 rounded-full text-xs font-semibold {{ $settings->isAutomatic() ? 'bg-secondary text-on-secondary' : 'bg-gray-100 text-on-surface' }}">
-                <span class="material-symbols-outlined inline text-sm mr-1">{{ $settings->isAutomatic() ? 'smart_toy' : 'person' }}</span>
-                {{ $settings->isAutomatic() ? 'Automático' : 'Manual' }}
-            </span>
-        </div>
+    <!-- Header -->
+    <div class="h-[66px] shrink-0 flex items-center justify-between px-6 bg-white border-b border-[#E8EAF0]">
+        <h1 class="text-lg font-extrabold text-gray-900">Fila & Distribuição</h1>
+        <span class="px-3 py-1.5 rounded-full text-xs font-bold {{ $settings->isAutomatic() ? 'bg-[#E8F8EF] text-primary' : 'bg-gray-100 text-gray-500' }}">
+            <span class="material-symbols-outlined inline text-sm mr-1">{{ $settings->isAutomatic() ? 'smart_toy' : 'person' }}</span>
+            {{ $settings->isAutomatic() ? 'Automático' : 'Manual' }}
+        </span>
     </div>
 
     <!-- Alerts -->
@@ -45,11 +40,11 @@
     @endif
 
     <!-- Content -->
-    <div class="flex-1 overflow-y-auto custom-scrollbar p-6">
-        <div class="grid grid-cols-1 gap-6 max-w-7xl">
+    <div class="flex-1 overflow-y-auto design-scrollbar p-6 bg-app-bg">
+        <div class="grid grid-cols-1 gap-5 max-w-7xl">
             <!-- Modo de Distribuição Card -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                <h2 class="text-lg font-bold text-on-surface mb-4">⚙️ Modo de Distribuição</h2>
+            <div class="card-primary">
+                <h2 class="text-sm font-bold text-gray-900 mb-4">Modo de Distribuição</h2>
 
                 <form action="{{ route('admin.distribution.settings') }}" method="POST" class="space-y-4">
                     @csrf
@@ -82,7 +77,8 @@
                             <p class="text-sm font-medium text-on-surface mb-2">📋 Como funciona o modo automático:</p>
                             <ul class="text-xs text-gray-600 space-y-1 ml-4 list-disc">
                                 <li>Novos leads são distribuídos em <strong>round-robin</strong> (alternando entre agentes)</li>
-                                <li>Apenas agentes <strong>"Ativo"</strong> recebem novas atribuições</li>
+                                <li>Apenas agentes <strong>"Online" e "Ativo"</strong> recebem novas atribuições</li>
+                                <li>Agentes <strong>offline</strong> não recebem conversas mesmo se ativos</li>
                                 <li>Respeita a <strong>capacidade máxima</strong> de cada agente</li>
                                 <li>Usa a <strong>ordem round-robin position</strong> para justiça na distribuição</li>
                                 <li>Quando agente atinge limite → ativa <strong>ação de overflow</strong> abaixo</li>
@@ -105,6 +101,13 @@
                         </p>
                     </div>
 
+                    <!-- Bot Name -->
+                    <div class="space-y-2 pt-4 border-t border-gray-200">
+                        <label class="text-sm font-semibold text-on-surface">Nome do Bot / Assistente</label>
+                        <input type="text" name="bot_name" value="{{ $settings->bot_name ?? 'Assistente Virtual' }}" class="input-primary" placeholder="Ex: SisZap, Assistente Virtual, etc.">
+                        <p class="text-xs text-gray-500">Este nome será usado na variável <code class="shortcut-badge text-[10px]">{agente}</code> nas mensagens dos fluxos.</p>
+                    </div>
+
                     <div class="flex justify-between items-center">
                         @if($settings->isAutomatic() && $queuedLeads->count() > 0)
                         <button type="button" onclick="processDistributionQueue()" class="px-4 py-2 bg-tertiary text-on-tertiary rounded-lg font-semibold hover:bg-tertiary/90 active:scale-95 transition-all flex items-center gap-2">
@@ -119,8 +122,10 @@
             </div>
 
             <!-- Capacidade dos Agentes -->
-            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                <h2 class="text-lg font-bold text-on-surface mb-4">👥 Capacidade dos Atendentes</h2>
+            <div class="card-primary !p-0 overflow-hidden">
+                <div class="px-5 py-4 border-b border-[#F2F4F8]">
+                    <h2 class="text-sm font-bold text-gray-900">Capacidade dos Atendentes</h2>
+                </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">

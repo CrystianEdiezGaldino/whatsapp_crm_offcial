@@ -11,6 +11,9 @@
     data-tags-url="{{ route('tags.index') }}"
     data-conversation-tags-url="{{ route('conversations.tags.json', $conversation) }}"
     data-attach-tags-url="{{ route('conversations.tags.attach', $conversation) }}"
+    data-sectors-url="{{ route('sectors.index') }}"
+    data-conversation-sector-url="{{ route('conversations.sector.json', $conversation) }}"
+    data-update-sector-url="{{ route('conversations.sector.update', $conversation) }}"
 >
     <div class="contact-panel__head">
         <span class="contact-panel__title">Dados do contato</span>
@@ -38,9 +41,29 @@
             <span class="contact-panel__label">Última mensagem</span>
             <span class="contact-panel__value">{{ $conversation->last_message_at?->diffForHumans(short: true) ?? '—' }}</span>
         </div>
-        <div class="contact-panel__field">
-            <span class="contact-panel__label">Setor</span>
-            <span class="contact-panel__value">{{ $conversation->sector?->name ?? 'Geral' }}</span>
+    </div>
+
+    @php
+        $sectorUi = $conversation->sector?->toUiArray() ?? \App\Models\Sector::defaultUi();
+    @endphp
+
+    <div class="contact-panel__section">
+        <div class="contact-panel__section-head">
+            <span class="contact-panel__label">Setor do atendimento</span>
+            <button type="button" id="openSectorModalBtn" class="contact-panel__link">
+                <span class="material-symbols-outlined text-[16px]">edit</span>
+                Alterar
+            </button>
+        </div>
+        <div id="conversationSector" class="contact-panel__tag-list">
+            <span
+                class="contact-panel__tag-pill contact-panel__sector-pill"
+                style="--tag-color: {{ $sectorUi['color'] }}"
+                data-sector-id="{{ $sectorUi['id'] ?? '' }}"
+            >
+                <span class="contact-panel__tag-dot"></span>
+                <span class="contact-panel__tag-name">{{ $sectorUi['name'] }}</span>
+            </span>
         </div>
     </div>
 
@@ -49,21 +72,52 @@
             <span class="contact-panel__label">Notas</span>
             <span id="contactNotesStatus" class="contact-panel__save-status" aria-live="polite"></span>
         </div>
-        <div class="flex gap-2 mb-2">
+
+        @php
+            $hasNotes = filled(trim((string) $contact->notes));
+        @endphp
+
+        <div
+            id="contactNotesBox"
+            class="contact-panel__notes-box{{ $hasNotes ? ' contact-panel__notes-box--filled' : '' }}"
+        >
+            <div class="contact-panel__notes-toolbar">
+                <div class="contact-panel__notes-toolbar-left">
+                    <span class="material-symbols-outlined contact-panel__notes-icon">edit_note</span>
+                    <span class="contact-panel__notes-hint">Nota interna</span>
+                </div>
+                <button
+                    type="button"
+                    id="improveContactNotesBtn"
+                    class="contact-panel__notes-ai-btn"
+                    title="Melhorar com IA"
+                    onclick="openImproveContactNotesModal()"
+                >
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    <span class="contact-panel__notes-ai-label">IA</span>
+                </button>
+            </div>
+
             <textarea
                 id="contactNotes"
-                class="contact-panel__notes-input flex-1"
+                class="contact-panel__notes-input"
                 rows="4"
                 maxlength="5000"
                 placeholder="Anote informações importantes sobre este contato..."
             >{{ $contact->notes }}</textarea>
-            <button type="button" id="improveContactNotesBtn" class="hover:text-secondary transition-colors" title="Melhorar com IA" onclick="openImproveContactNotesModal()">
-                <span class="material-symbols-outlined text-xl">auto_awesome</span>
-            </button>
+
+            <div class="contact-panel__notes-footer">
+                <span id="contactNotesPreview" class="contact-panel__notes-preview{{ $hasNotes ? '' : ' hidden' }}">
+                    <span class="material-symbols-outlined">sticky_note_2</span>
+                    Nota salva neste contato
+                </span>
+                <span id="contactNotesCounter" class="contact-panel__notes-counter">0/5000</span>
+            </div>
         </div>
-        <button type="button" id="saveContactNotes" class="contact-panel__save-btn">
-            <span class="material-symbols-outlined text-[16px]">save</span>
-            Salvar nota
+
+        <button type="button" id="saveContactNotes" class="contact-panel__save-btn" disabled>
+            <span class="material-symbols-outlined contact-panel__save-icon">save</span>
+            <span id="saveContactNotesLabel">Salvar nota</span>
         </button>
     </div>
 
@@ -95,6 +149,25 @@
             @empty
                 <span class="contact-panel__tag-empty">Nenhuma etiqueta</span>
             @endforelse
+        </div>
+    </div>
+
+    <div id="sectorModal" class="tags-modal hidden" role="dialog" aria-modal="true" aria-labelledby="sectorModalTitle">
+        <div class="tags-modal__backdrop" data-close-sector-modal></div>
+        <div class="tags-modal__card">
+            <div class="tags-modal__header">
+                <div>
+                    <h3 id="sectorModalTitle" class="tags-modal__title">Setor do atendimento</h3>
+                    <p class="tags-modal__subtitle">Toque para selecionar o setor</p>
+                </div>
+                <button type="button" class="tags-modal__close" data-close-sector-modal aria-label="Fechar">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div id="sectorsContainer" class="tags-modal__body custom-scrollbar"></div>
+            <div class="tags-modal__footer">
+                <button type="button" class="tags-modal__done" data-close-sector-modal>Concluir</button>
+            </div>
         </div>
     </div>
 

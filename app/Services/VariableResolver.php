@@ -3,18 +3,23 @@
 namespace App\Services;
 
 use App\Models\Conversation;
+use App\Models\DistributionSetting;
 
 class VariableResolver
 {
-    /**
-     * Resolve todas as variáveis disponíveis para uma conversa
-     */
     public function resolve(Conversation $conversation): array
     {
+        try {
+            $botName = DistributionSetting::current()->bot_name ?? 'Assistente Virtual';
+        } catch (\Exception $e) {
+            $botName = 'Assistente Virtual';
+        }
+
         return [
             'nome' => $conversation->contact->name ?? '',
             'telefone' => $conversation->contact->phone ?? '',
-            'setor' => $conversation->sector->name ?? ''
+            'setor' => $conversation->sector->name ?? '',
+            'agente' => $botName,
         ];
     }
 
@@ -40,7 +45,8 @@ class VariableResolver
         return [
             'nome' => 'Nome do contato',
             'telefone' => 'Telefone do contato',
-            'setor' => 'Setor de atendimento'
+            'setor' => 'Setor de atendimento',
+            'agente' => 'Nome do bot/assistente',
         ];
     }
 }

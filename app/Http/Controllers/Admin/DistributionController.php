@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\AuditLog;
 use App\Services\DistributionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class DistributionController extends Controller
 {
@@ -52,6 +53,7 @@ class DistributionController extends Controller
             $validated = $request->validate([
                 'mode' => 'required|in:manual,automatic',
                 'overflow_action' => 'sometimes|in:next_agent,queue',
+                'bot_name' => 'nullable|string|max:100',
             ]);
 
             // If mode is automatic, ensure overflow_action is set
@@ -65,6 +67,11 @@ class DistributionController extends Controller
             }
 
             $settings = DistributionSetting::current();
+
+            if (!Schema::hasColumn('distribution_settings', 'bot_name')) {
+                unset($validated['bot_name']);
+            }
+
             $settings->update($validated);
 
             \Log::info('[Distribution] Settings updated', $validated);
