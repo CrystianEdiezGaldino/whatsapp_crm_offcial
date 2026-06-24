@@ -164,7 +164,13 @@
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900');
             $mainNav = [
                 ['route' => 'dashboard', 'match' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Dashboard'],
-                ['route' => 'conversations.index', 'match' => 'conversations', 'icon' => 'chat_bubble', 'label' => 'Atendimentos'],
+                [
+                    'route' => 'conversations.index',
+                    'match' => 'conversations',
+                    'icon' => 'chat_bubble',
+                    'label' => 'Atendimentos',
+                    'params' => (auth()->check() && auth()->user()->isAgent()) ? ['assigned' => 'mine'] : [],
+                ],
                 ['route' => 'contacts.index', 'match' => 'contacts', 'icon' => 'person_book', 'label' => 'Contatos'],
                 ['route' => 'macros.index', 'match' => 'macros', 'icon' => 'bolt', 'label' => 'Macros'],
             ];
@@ -198,7 +204,7 @@
                 <p class="px-3 pt-2.5 pb-1.5 text-[10.5px] font-bold uppercase tracking-[0.09em] text-gray-400">Operação</p>
                 @foreach($mainNav as $item)
                     @php $active = $navActive($item['match']); @endphp
-                    <a href="{{ route($item['route']) }}" class="{{ $navItemClass($active) }}">
+                    <a href="{{ route($item['route'], $item['params'] ?? []) }}" class="{{ $navItemClass($active) }}">
                         <span class="nav-icon-wrap shrink-0">
                             <span class="material-symbols-outlined text-[17px]">{{ $item['icon'] }}</span>
                         </span>

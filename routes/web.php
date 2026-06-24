@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\StorageMediaController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactController;
@@ -17,6 +18,10 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\Admin\FlowController;
+
+Route::get('/storage/{path}', [StorageMediaController::class, 'show'])
+    ->where('path', '.*')
+    ->name('storage.fallback');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

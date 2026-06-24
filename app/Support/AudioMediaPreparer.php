@@ -2,11 +2,16 @@
 
 namespace App\Support;
 
-use Illuminate\Support\Facades\Log;
+use App\Services\AudioConverter;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class AudioMediaPreparer
 {
+    private const AUDIO_EXTENSIONS = ['m4a', 'mp3', 'aac', 'amr', 'ogg', 'opus', 'webm', 'wav'];
+
     /** MIME aceitos direto pela Cloud API (sem conversão). */
     private const NATIVE_MIMES = [
         'audio/aac' => 'audio/aac',
@@ -17,10 +22,48 @@ class AudioMediaPreparer
         'audio/ogg' => 'audio/ogg',
     ];
 
+    public static function isAudioFile(string $mime, string $filename): bool
+    {
+        $mime = strtolower(trim($mime));
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        if (str_starts_with($mime, 'audio/')) {
+            return true;
+        }
+
+        if (in_array($ext, self::AUDIO_EXTENSIONS, true)) {
+            return true;
+        }
+
+        return $mime === 'video/mp4' && $ext === 'm4a';
+    }
+
+    public static function normalizeMime(string $mime, string $filename): string
+    {
+        $mime = strtolower(trim($mime));
+
+        if (str_starts_with($mime, 'audio/')) {
+            return self::NATIVE_MIMES[$mime] ?? $mime;
+        }
+
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+        return match ($ext) {
+            'm4a' => 'audio/mp4',
+            'mp3' => 'audio/mpeg',
+            'aac' => 'audio/aac',
+            'amr' => 'audio/amr',
+            'ogg', 'opus' => 'audio/ogg',
+            'webm' => 'audio/webm',
+            'wav' => 'audio/wav',
+            default => $mime,
+        };
+    }
+
     /**
-     * Prepara arquivo para upload na Meta (método upload + media_id).
+     * Prepara áudio para envio. Com $asAttachment=true (padrão outbound API-only),
+     * normaliza para MP3 e envia como documento — evita "mídia não existe" no celular.
      *
-     * @param  bool  $asAttachment  Envia como documento (anexo) — evita erro "mídia não existe" no áudio nativo.
      * @return array{path: string, mime: string, filename: string, voice: bool, cleanup: string[]}
      */
     public static function prepare(
@@ -28,49 +71,94 @@ class AudioMediaPreparer
         string $originalMime,
         string $originalName,
         bool $recorded = false,
-        bool $asAttachment = false
+        bool $asAttachment = true
     ): array {
         $mime = strtolower(trim($originalMime));
-        $cleanup = [];
+        $converter = app(AudioConverter::class);
 
         if ($asAttachment) {
-            $recorded = false;
+            if (in_array($mime, ['audio/mpeg', 'audio/mp3'], true)) {
+                return [
+                    'path' => $sourcePath,
+                    'mime' => 'audio/mpeg',
+                    'filename' => self::attachmentFilename($originalName, 'audio/mpeg'),
+                    'voice' => false,
+                    'cleanup' => [],
+                ];
+            }
+
+            $converted = $converter->toMp3($sourcePath, $originalName);
+            if (!$converted) {
+                throw new RuntimeException(
+                    'Áudio não suportado pelo WhatsApp (use MP3, M4A, OGG ou AAC). '
+                    . ($converter->isAvailable()
+                        ? 'Falha ao converter no servidor.'
+                        : 'Instale ffmpeg no servidor Linux: apt install ffmpeg')
+                );
+            }
+
+            return [
+                'path' => $converted['path'],
+                'mime' => 'audio/mpeg',
+                'filename' => self::attachmentFilename($originalName, 'audio/mpeg'),
+                'voice' => false,
+                'cleanup' => $converted['cleanup'],
+            ];
         }
 
-        $needsConvert = !isset(self::NATIVE_MIMES[$mime])
-            || ($asAttachment && in_array($mime, ['audio/ogg', 'audio/webm'], true));
+        if ($recorded) {
+            $converted = ($mime === 'audio/ogg')
+                ? ['path' => $sourcePath, 'mime' => 'audio/ogg', 'cleanup' => []]
+                : $converter->toOggVoice($sourcePath, $originalName);
 
-        if (!$needsConvert && isset(self::NATIVE_MIMES[$mime])) {
+            if (!$converted) {
+                throw new RuntimeException(
+                    'Falha ao preparar mensagem de voz. '
+                    . ($converter->isAvailable()
+                        ? 'Conversão OGG falhou.'
+                        : 'Instale ffmpeg no servidor Linux: apt install ffmpeg')
+                );
+            }
+
+            return [
+                'path' => $converted['path'],
+                'mime' => $converted['mime'],
+                'filename' => pathinfo($originalName, PATHINFO_FILENAME) . '.ogg',
+                'voice' => true,
+                'cleanup' => $converted['cleanup'],
+            ];
+        }
+
+        if (isset(self::NATIVE_MIMES[$mime])) {
             $normalizedMime = self::NATIVE_MIMES[$mime];
 
             return [
                 'path' => $sourcePath,
                 'mime' => $normalizedMime,
-                'filename' => $asAttachment
-                    ? self::attachmentFilename($originalName, $normalizedMime)
-                    : ($originalName ?: basename($sourcePath)),
+                'filename' => $originalName ?: basename($sourcePath),
                 'voice' => false,
-                'cleanup' => $cleanup,
+                'cleanup' => [],
             ];
         }
 
-        $converted = self::convertWithFfmpeg($sourcePath, false);
-        if ($converted) {
-            $cleanup[] = $converted['path'];
-            if ($asAttachment) {
-                $converted['filename'] = self::attachmentFilename($originalName, 'audio/mpeg');
-                $converted['voice'] = false;
-            }
+        $converted = $converter->toMp3($sourcePath, $originalName);
 
-            return array_merge($converted, ['cleanup' => $cleanup]);
+        if (!$converted) {
+            throw new RuntimeException(
+                'Áudio não suportado pelo WhatsApp (use MP3, M4A, OGG ou AAC). '
+                . ($converter->isAvailable()
+                    ? 'Falha ao converter no servidor.'
+                    : 'Instale ffmpeg no servidor Linux: apt install ffmpeg')
+            );
         }
 
-        throw new \RuntimeException(
-            'Áudio não suportado pelo WhatsApp (use MP3, M4A, OGG ou AAC). '
-            . (self::ffmpegAvailable()
-                ? 'Falha ao converter a gravação.'
-                : 'Instale ffmpeg no servidor para converter gravações WebM.')
-        );
+        return [
+            'path' => $converted['path'],
+            'mime' => $converted['mime'],
+            'filename' => pathinfo($originalName, PATHINFO_FILENAME) . '.mp3',
+            'voice' => false,
+            'cleanup' => $converted['cleanup'],
+        ];
     }
 
     public static function attachmentFilename(string $originalName, string $mime): string
@@ -94,71 +182,32 @@ class AudioMediaPreparer
 
     public static function ffmpegAvailable(): bool
     {
-        $bin = self::ffmpegBinary();
-        $out = @shell_exec('"' . $bin . '" -version 2>&1');
-
-        return is_string($out) && str_contains($out, 'ffmpeg');
+        return app(AudioConverter::class)->isAvailable();
     }
 
     public static function ffmpegBinary(): string
     {
-        return config('services.whatsapp.ffmpeg_path', 'ffmpeg');
+        return app(AudioConverter::class)->binary();
     }
 
-    /** @return array{path: string, mime: string, filename: string, voice: bool}|null */
-    private static function convertWithFfmpeg(string $source, bool $asVoice): ?array
+    public static function persistToPublicDisk(string $sourcePath, string $extension = 'mp3'): string
     {
-        if (!self::ffmpegAvailable()) {
-            return null;
+        $extension = strtolower(ltrim($extension, '.')) ?: 'mp3';
+        $stored = Storage::disk('public')->putFileAs(
+            'media',
+            new File($sourcePath),
+            Str::uuid() . '.' . $extension
+        );
+
+        if (!$stored || !Storage::disk('public')->exists($stored)) {
+            throw new RuntimeException('Falha ao salvar áudio em storage/app/public/media.');
         }
 
-        $bin = self::ffmpegBinary();
-        $ext = $asVoice ? 'ogg' : 'mp3';
-        $outPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'wa_audio_' . Str::uuid() . '.' . $ext;
-
-        if ($asVoice) {
-            $cmd = sprintf(
-                '"%s" -y -i %s -c:a libopus -ar 48000 -ac 1 %s 2>&1',
-                $bin,
-                escapeshellarg($source),
-                escapeshellarg($outPath)
-            );
-            $mime = 'audio/ogg';
-        } else {
-            $cmd = sprintf(
-                '"%s" -y -i %s -c:a libmp3lame -b:a 128k %s 2>&1',
-                $bin,
-                escapeshellarg($source),
-                escapeshellarg($outPath)
-            );
-            $mime = 'audio/mpeg';
-        }
-
-        exec($cmd, $output, $code);
-
-        if ($code !== 0 || !is_file($outPath)) {
-            Log::warning('ffmpeg audio conversion failed', ['cmd' => $cmd, 'output' => $output, 'code' => $code]);
-
-            return null;
-        }
-
-        return [
-            'path' => $outPath,
-            'mime' => $mime,
-            'filename' => basename($outPath),
-            'voice' => $asVoice,
-        ];
+        return $stored;
     }
 
     public static function deleteCleanup(array $paths): void
     {
-        $tmp = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-
-        foreach ($paths as $path) {
-            if (!$path || !is_file($path) || !str_starts_with($path, $tmp)) {
-                continue;
-            }
-            @unlink($path);
-        }
+        app(AudioConverter::class)->deleteFiles($paths);
     }
 }

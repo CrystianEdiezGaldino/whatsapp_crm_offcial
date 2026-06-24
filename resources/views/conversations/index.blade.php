@@ -262,7 +262,7 @@
                             <a href="{{ Storage::url($msg->media_url) }}" target="_blank">
                                 <img src="{{ Storage::url($msg->media_url) }}" alt="{{ $msg->media_filename ?? 'Imagem' }}" class="max-w-[280px] max-h-[240px] rounded-lg object-cover border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity">
                             </a>
-                            @elseif(str_starts_with($msg->mime_type ?? '', 'audio/'))
+                            @elseif(\App\Support\AudioMediaPreparer::isAudioFile($msg->mime_type ?? '', $msg->media_filename ?? ''))
                             <div class="bg-white border border-gray-200 rounded-lg p-3 min-w-[260px]">
                                 <div class="flex items-center gap-2 mb-2">
                                     <span class="material-symbols-outlined text-primary text-lg">mic</span>
@@ -270,7 +270,7 @@
                                     <a href="{{ Storage::url($msg->media_url) }}" download class="material-symbols-outlined text-gray-600 text-base hover:text-primary">download</a>
                                 </div>
                                 <audio controls class="w-full h-8" preload="metadata">
-                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ $msg->mime_type ?? 'audio/mpeg' }}">
+                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ \App\Support\AudioMediaPreparer::normalizeMime($msg->mime_type ?? 'audio/mpeg', $msg->media_filename ?? '') }}">
                                 </audio>
                             </div>
                             @elseif(str_starts_with($msg->mime_type ?? '', 'video/'))
@@ -291,7 +291,7 @@
                             @endif
                         </div>
                         @endif
-                        @if($msg->content)
+                        @if($msg->content && !($msg->media_url && \App\Support\AudioMediaPreparer::isAudioFile($msg->mime_type ?? '', $msg->media_filename ?? '') && $msg->content === ($msg->media_filename ?? '')))
                         <div class="msg-bubble-inbound p-3.5">
                             <p class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
                         </div>
@@ -309,14 +309,14 @@
                             <a href="{{ Storage::url($msg->media_url) }}" target="_blank">
                                 <img src="{{ Storage::url($msg->media_url) }}" alt="{{ $msg->media_filename ?? 'Imagem' }}" class="max-w-[280px] max-h-[240px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity">
                             </a>
-                            @elseif(str_starts_with($msg->mime_type ?? '', 'audio/'))
+                            @elseif(\App\Support\AudioMediaPreparer::isAudioFile($msg->mime_type ?? '', $msg->media_filename ?? ''))
                             <div class="bg-white border border-gray-200 rounded-lg p-3 min-w-[260px]">
                                 <div class="flex items-center gap-2 mb-2">
                                     <span class="material-symbols-outlined text-primary text-lg">mic</span>
                                     <p class="text-xs font-bold text-on-surface truncate flex-1">{{ $msg->media_filename ?? 'Audio' }}</p>
                                 </div>
                                 <audio controls class="w-full h-8" preload="metadata">
-                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ $msg->mime_type ?? 'audio/mpeg' }}">
+                                    <source src="{{ Storage::url($msg->media_url) }}" type="{{ \App\Support\AudioMediaPreparer::normalizeMime($msg->mime_type ?? 'audio/mpeg', $msg->media_filename ?? '') }}">
                                 </audio>
                             </div>
                             @elseif(str_starts_with($msg->mime_type ?? '', 'video/'))
@@ -336,7 +336,7 @@
                             @endif
                         </div>
                         @endif
-                        @if($msg->content)
+                        @if($msg->content && !($msg->media_url && \App\Support\AudioMediaPreparer::isAudioFile($msg->mime_type ?? '', $msg->media_filename ?? '') && $msg->content === ($msg->media_filename ?? '')))
                         <div class="msg-bubble-outbound p-3.5">
                             <p class="text-sm text-gray-900 leading-relaxed whitespace-pre-wrap">{{ $msg->content }}</p>
                         </div>
@@ -786,18 +786,47 @@
     let audioChunks = [];
     let isRecording = false;
 
+    function pickAudioMime() {
+        const preferred = [
+            'audio/ogg;codecs=opus',
+            'audio/ogg',
+            'audio/webm;codecs=opus',
+            'audio/webm',
+            'audio/mpeg',
+            'audio/mp4',
+            'audio/aac',
+        ];
+        for (const mime of preferred) {
+            if (MediaRecorder.isTypeSupported(mime)) return mime;
+        }
+        return '';
+    }
+
+    function mimeToExt(mime) {
+        if (mime.startsWith('audio/mp4')) return 'm4a';
+        if (mime.startsWith('audio/aac')) return 'aac';
+        if (mime.startsWith('audio/mpeg')) return 'mp3';
+        if (mime.startsWith('audio/ogg')) return 'ogg';
+        return 'webm';
+    }
+
     if (audioRecordBtn) {
         audioRecordBtn.addEventListener('click', async function() {
             if (!isRecording) {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
+                    const mimeType = pickAudioMime();
+                    const options = mimeType ? { mimeType } : {};
+                    mediaRecorder = new MediaRecorder(stream, options);
+                    const actualMime = mediaRecorder.mimeType || mimeType || 'audio/webm';
                     audioChunks = [];
 
                     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                     mediaRecorder.onstop = () => {
-                        const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                        const file = new File([blob], `audio_${Date.now()}.webm`, { type: 'audio/webm' });
+                        const ext = mimeToExt(actualMime);
+                        const baseMime = actualMime.split(';')[0];
+                        const blob = new Blob(audioChunks, { type: baseMime });
+                        const file = new File([blob], `audio_${Date.now()}.${ext}`, { type: baseMime });
                         const dt = new DataTransfer();
                         dt.items.add(file);
                         fileInput.files = dt.files;

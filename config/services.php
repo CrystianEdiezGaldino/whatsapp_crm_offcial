@@ -38,7 +38,7 @@ return [
         'verify_token' => env('WA_VERIFY_TOKEN', ''),
         'api_version' => env('WA_API_VERSION', 'v23.0'),
         'base_url' => env('WA_BASE_URL', 'https://graph.facebook.com'),
-        'ffmpeg_path' => env('WA_FFMPEG_PATH', 'ffmpeg'),
+        'ffmpeg_path' => env('WA_FFMPEG_PATH', PHP_OS_FAMILY === 'Windows' ? 'ffmpeg' : '/usr/bin/ffmpeg'),
         'app_id' => env('META_APP_ID', ''),
         'app_secret' => env('META_APP_SECRET', ''),
     ],

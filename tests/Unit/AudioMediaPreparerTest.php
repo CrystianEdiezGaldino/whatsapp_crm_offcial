@@ -7,6 +7,17 @@ use Tests\TestCase;
 
 class AudioMediaPreparerTest extends TestCase
 {
+    public function test_is_audio_file_detects_m4a_as_video_mp4(): void
+    {
+        $this->assertTrue(AudioMediaPreparer::isAudioFile('video/mp4', 'audio_1782331559288.m4a'));
+        $this->assertSame('audio/mp4', AudioMediaPreparer::normalizeMime('video/mp4', 'audio_1782331559288.m4a'));
+    }
+
+    public function test_is_audio_file_detects_webm(): void
+    {
+        $this->assertTrue(AudioMediaPreparer::isAudioFile('audio/webm', 'gravacao.webm'));
+    }
+
     public function test_prepare_mp3_without_conversion(): void
     {
         $tmp = tempnam(sys_get_temp_dir(), 'mp3');
@@ -21,7 +32,7 @@ class AudioMediaPreparerTest extends TestCase
         @unlink($tmp);
     }
 
-    public function test_prepare_as_attachment_forces_mp3_filename(): void
+    public function test_prepare_attachment_forces_mp3_filename(): void
     {
         $tmp = tempnam(sys_get_temp_dir(), 'mp3');
         rename($tmp, $tmp . '.mp3');

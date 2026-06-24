@@ -10,6 +10,7 @@ use App\Models\Macro;
 use App\Models\User;
 use App\Services\WhatsAppService;
 use App\Support\AudioMediaPreparer;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -367,9 +368,16 @@ class ConversationController extends Controller
 
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $mimeType = $file->getMimeType() ?: 'application/octet-stream';
             $mediaFilename = $file->getClientOriginalName();
-            $path = $file->store('media', 'public');
+            $mimeType = AudioMediaPreparer::normalizeMime(
+                $file->getMimeType() ?: 'application/octet-stream',
+                $mediaFilename
+            );
+            $path = $file->storeAs(
+                'media',
+                Str::uuid() . '.' . strtolower(pathinfo($mediaFilename, PATHINFO_EXTENSION) ?: 'bin'),
+                'public'
+            );
             $fullPath = Storage::disk('public')->path($path);
             $mediaUrl = $path;
             $uploadPath = $fullPath;
@@ -379,9 +387,12 @@ class ConversationController extends Controller
 
             if (str_starts_with($mimeType, 'image/')) {
                 $type = 'image';
-            } elseif (str_starts_with($mimeType, 'audio/') || str_ends_with(strtolower($mediaFilename), '.webm')) {
+            } elseif (AudioMediaPreparer::isAudioFile($mimeType, $mediaFilename)) {
+                // API-only: documento MP3 no WhatsApp; player nativo só no ERP
                 $type = 'document';
-                $isRecorded = str_contains($mimeType, 'webm') || str_ends_with(strtolower($mediaFilename), '.webm');
+                $isRecorded = str_contains($mimeType, 'webm')
+                    || str_ends_with(strtolower($mediaFilename), '.webm')
+                    || str_starts_with(strtolower($mediaFilename), 'audio_');
 
                 try {
                     $prepared = AudioMediaPreparer::prepare(
@@ -397,6 +408,14 @@ class ConversationController extends Controller
                     $tempCleanup = $prepared['cleanup'];
                     $mimeType = $uploadMime;
                     $mediaFilename = $uploadFilename;
+
+                    if (str_starts_with($uploadPath, rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR))) {
+                        $mediaUrl = AudioMediaPreparer::persistToPublicDisk(
+                            $uploadPath,
+                            'mp3'
+                        );
+                        Storage::disk('public')->delete($path);
+                    }
                 } catch (\RuntimeException $e) {
                     return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
                 }
@@ -419,7 +438,7 @@ class ConversationController extends Controller
 
             $mediaId = $uploadedMediaId;
 
-            $documentFilename = $type === 'document' && str_starts_with($mimeType, 'audio/')
+            $documentFilename = $type === 'document' && AudioMediaPreparer::isAudioFile($mimeType, $mediaFilename)
                 ? $mediaFilename
                 : null;
 
@@ -430,7 +449,9 @@ class ConversationController extends Controller
                 $documentFilename ?? $content
             );
 
-            $content = str_starts_with($mimeType, 'audio/') ? ($content ?: null) : ($content ?: $mediaFilename);
+            $content = AudioMediaPreparer::isAudioFile($mimeType, $mediaFilename)
+                ? ($content ?: null)
+                : ($content ?: $mediaFilename);
         } else {
             $result = $whatsapp->sendText($phone, $content);
         }
@@ -476,7 +497,7 @@ class ConversationController extends Controller
         $messages = $conversation->messages()
             ->where('id', '>', $lastId)
             ->orderBy('id', 'asc')
-            ->select(['id', 'conversation_id', 'direction', 'content', 'status', 'type', 'wa_message_id', 'media_url', 'created_at'])
+            ->select(['id', 'conversation_id', 'direction', 'content', 'status', 'type', 'wa_message_id', 'media_url', 'media_filename', 'mime_type', 'created_at'])
             ->limit(50)
             ->get();
 

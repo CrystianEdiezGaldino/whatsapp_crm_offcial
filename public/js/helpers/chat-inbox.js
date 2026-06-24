@@ -163,23 +163,32 @@
             });
         }
 
+        _isAudioMessage(msg) {
+            const mime = (msg.mime_type || '').toLowerCase();
+            if (mime.startsWith('audio/')) return true;
+            const name = (msg.media_filename || '').toLowerCase();
+            return /\.(m4a|mp3|aac|amr|ogg|opus|webm|wav)$/.test(name);
+        }
+
         _mediaHtml(msg) {
             if (!msg.media_url) return '';
             const url = msg.media_url.startsWith('http')
                 ? msg.media_url
                 : '/storage/' + msg.media_url;
             const mime = msg.mime_type || '';
+            const isAudio = this._isAudioMessage(msg);
 
             if (mime.startsWith('image/')) {
                 return `<a href="${url}" target="_blank"><img src="${url}" class="max-w-[280px] max-h-[240px] rounded-lg object-cover cursor-pointer hover:opacity-90 transition-opacity"></a>`;
             }
-            if (mime.startsWith('audio/')) {
+            if (isAudio) {
+                const audioMime = mime.startsWith('audio/') ? mime : 'audio/mpeg';
                 return `<div class="bg-white border border-outline-variant rounded-lg p-3 min-w-[260px]">
                     <div class="flex items-center gap-2 mb-2">
                         <span class="material-symbols-outlined text-primary text-lg">mic</span>
                         <p class="text-xs font-bold truncate flex-1">${msg.media_filename || 'Audio'}</p>
                     </div>
-                    <audio controls class="w-full h-8" preload="metadata"><source src="${url}" type="${mime}"></audio>
+                    <audio controls class="w-full h-8" preload="metadata"><source src="${url}" type="${audioMime}"></audio>
                 </div>`;
             }
             if (mime.startsWith('video/')) {
@@ -205,7 +214,7 @@
             div.className = 'flex flex-col items-end';
             const time = this._formatTime(msg.created_at);
             const mediaHtml = this._mediaHtml(msg);
-            const contentHtml = msg.content
+            const contentHtml = msg.content && !(msg.media_url && this._isAudioMessage(msg) && msg.content === msg.media_filename)
                 ? `<div class="bg-primary-container text-on-primary p-4 rounded-xl rounded-br-none shadow-md"><p class="text-sm leading-relaxed whitespace-pre-wrap">${msg.content}</p></div>`
                 : '';
 

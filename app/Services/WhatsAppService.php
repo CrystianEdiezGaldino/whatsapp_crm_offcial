@@ -268,7 +268,7 @@ class WhatsAppService
         return null;
     }
 
-    public function downloadMedia(string $mediaId): ?string
+    public function downloadMedia(string $mediaId, ?string $mimeType = null, ?string $originalFilename = null): ?string
     {
         try {
             $response = $this->client->get("{$mediaId}");
@@ -278,7 +278,13 @@ class WhatsAppService
             if (!$url) return null;
 
             $mediaResponse = $this->client->get($url);
-            $filename = 'media/' . $mediaId . '_' . time();
+
+            $responseMime = $mediaResponse->getHeaderLine('Content-Type');
+            $mime = $mimeType ?: $responseMime ?: 'application/octet-stream';
+            $mime = strtok($mime, ';');
+
+            $ext = self::mimeToExtension($mime, $originalFilename);
+            $filename = 'media/' . $mediaId . '_' . time() . ($ext ? '.' . $ext : '');
             Storage::put("public/{$filename}", $mediaResponse->getBody()->getContents());
 
             return $filename;
@@ -286,6 +292,35 @@ class WhatsAppService
             Log::error('WhatsApp media download failed', ['media_id' => $mediaId, 'error' => $e->getMessage()]);
             return null;
         }
+    }
+
+    private static function mimeToExtension(string $mime, ?string $originalFilename = null): string
+    {
+        if ($originalFilename) {
+            $ext = strtolower(pathinfo($originalFilename, PATHINFO_EXTENSION));
+            if ($ext) return $ext;
+        }
+
+        return match ($mime) {
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+            'audio/ogg' => 'ogg',
+            'audio/mpeg', 'audio/mp3' => 'mp3',
+            'audio/mp4' => 'm4a',
+            'audio/aac' => 'aac',
+            'audio/amr' => 'amr',
+            'video/mp4' => 'mp4',
+            'video/3gpp' => '3gp',
+            'application/pdf' => 'pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'xlsx',
+            'application/msword' => 'doc',
+            'application/vnd.ms-excel' => 'xls',
+            'text/plain' => 'txt',
+            default => '',
+        };
     }
 
     public function getContactProfilePhoto(string $phone): ?string
@@ -601,7 +636,7 @@ class WhatsAppService
 
         if ($mediaId && in_array($type, ['image', 'document', 'video', 'audio'])) {
             $whatsapp = new self();
-            $localPath = $whatsapp->downloadMedia($mediaId);
+            $localPath = $whatsapp->downloadMedia($mediaId, $mimeType, $mediaFilename);
             if ($localPath) {
                 $message->update(['media_url' => $localPath]);
             }
